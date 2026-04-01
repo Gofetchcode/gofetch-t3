@@ -1,0 +1,174 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ═══ CUSTOMERS ═══
+model Customer {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  phone         String?
+  password      String
+  vehicle       String?
+  color         String?
+  price         String?
+  savings       String?
+  agent         String?
+  delivery      String?
+  step          Int      @default(0)
+  source        String?
+  timeline      String?
+  tradein       String?
+  tradeinYear   String?  @map("tradein_year")
+  tradeinMake   String?  @map("tradein_make")
+  tradeinModel  String?  @map("tradein_model")
+  tradeinMiles  String?  @map("tradein_miles")
+  tradeinLien   String?  @map("tradein_lien")
+  tradeinBalance String? @map("tradein_balance")
+  tradeinLender String?  @map("tradein_lender")
+  notes         String?  @db.Text
+  paymentStatus String?  @default("unpaid") @map("payment_status")
+  stripeId      String?  @map("stripe_session_id")
+  paidAt        DateTime? @map("paid_at")
+  utmSource     String?  @map("utm_source")
+  utmMedium     String?  @map("utm_medium")
+  utmCampaign   String?  @map("utm_campaign")
+  utmTerm       String?  @map("utm_term")
+  utmContent    String?  @map("utm_content")
+  landingPage   String?  @map("landing_page")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  files      File[]
+  contracts  Contract[]
+  customerNotes Note[]
+  activity   Activity[]
+  payments   Payment[]
+  tags       CustomerTag[]
+
+  @@map("gf_customers")
+}
+
+// ═══ FILES ═══
+model File {
+  id         Int      @id @default(autoincrement())
+  customerId String   @map("customer_id")
+  fileName   String   @map("file_name")
+  fileType   String?  @map("file_type")
+  fileData   String   @db.LongText @map("file_data")
+  uploadedAt DateTime @default(now()) @map("uploaded_at")
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("gf_files")
+}
+
+// ═══ CONTRACTS ═══
+model Contract {
+  id            Int      @id @default(autoincrement())
+  customerId    String   @map("customer_id")
+  signatureName String?  @map("signature_name")
+  signatureData String?  @db.LongText @map("signature_data")
+  signedAt      DateTime @default(now()) @map("signed_at")
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("gf_contracts")
+}
+
+// ═══ NOTES ═══
+model Note {
+  id         Int      @id @default(autoincrement())
+  customerId String   @map("customer_id")
+  noteText   String   @db.Text @map("note_text")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("gf_notes")
+}
+
+// ═══ SURVEYS ═══
+model Survey {
+  id            Int      @id @default(autoincrement())
+  customerId    String   @map("customer_id")
+  customerName  String   @map("customer_name")
+  customerEmail String   @map("customer_email")
+  q1            Int      @default(0)
+  q2            Int      @default(0)
+  q3            Int      @default(0)
+  q4            Int      @default(0)
+  q5            Int      @default(0)
+  averageRating Float    @default(0) @map("average_rating")
+  comment       String?  @db.Text
+  submittedAt   DateTime @default(now()) @map("submitted_at")
+
+  @@map("gf_surveys")
+}
+
+// ═══ ACTIVITY LOG ═══
+model Activity {
+  id         Int      @id @default(autoincrement())
+  customerId String   @map("customer_id")
+  type       String
+  text       String   @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("gf_activity")
+}
+
+// ═══ PAYMENTS ═══
+model Payment {
+  id              Int      @id @default(autoincrement())
+  customerId      String   @map("customer_id")
+  stripeSessionId String?  @map("stripe_session_id")
+  amount          Int      @default(0)
+  status          String   @default("pending")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("gf_payments")
+}
+
+// ═══ DEALER USERS ═══
+model DealerUser {
+  id        Int      @id @default(autoincrement())
+  name      String
+  pin       String
+  role      String   @default("agent")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("gf_users")
+}
+
+// ═══ TAGS ═══
+model Tag {
+  id        Int      @id @default(autoincrement())
+  name      String
+  color     String   @default("#d4a23a")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  customers CustomerTag[]
+
+  @@map("gf_tags")
+}
+
+// ═══ CUSTOMER-TAG MAPPING ═══
+model CustomerTag {
+  customerId String @map("customer_id")
+  tagId      Int    @map("tag_id")
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([customerId, tagId])
+  @@map("gf_customer_tags")
+}
