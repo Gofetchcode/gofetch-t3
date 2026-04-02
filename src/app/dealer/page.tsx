@@ -350,11 +350,17 @@ export default function DealerPage() {
   }, []);
 
   /* ── Data ── */
-  const customers = trpc.customer.getAll.useQuery(undefined, { enabled: authed });
+  const customers = trpc.customer.getAll.useQuery(undefined, { enabled: authed, retry: false });
 
   const handleLogin = () => {
-    if (pin.length >= 4) setAuthed(true);
-    else setError("PIN must be at least 4 digits");
+    if (pin.length >= 4) {
+      localStorage.setItem("gf-dealer-pin", pin);
+      setAuthed(true);
+      // Force tRPC to refetch with new headers
+      setTimeout(() => customers.refetch(), 100);
+    } else {
+      setError("PIN must be at least 4 digits");
+    }
   };
 
   /* ── PIN Login Screen ── */
