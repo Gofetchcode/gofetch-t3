@@ -9,11 +9,17 @@ const sections = [
   { id: "leads", label: "Lead Settings", icon: "📋" },
   { id: "sources", label: "Lead Sources", icon: "🔗" },
   { id: "pipeline", label: "Pipeline Stages", icon: "📊" },
+  { id: "goals", label: "Sales Goals", icon: "🎯" },
+  { id: "desking", label: "Desking Defaults", icon: "💰" },
+  { id: "tasks", label: "Task Templates", icon: "✅" },
+  { id: "hours", label: "Business Hours", icon: "🕐" },
+  { id: "notifications", label: "Notifications", icon: "🔔" },
   { id: "comms", label: "Communications", icon: "💬" },
   { id: "ai", label: "AI Settings", icon: "🤖" },
   { id: "integrations", label: "Integrations", icon: "🔌" },
   { id: "webhooks", label: "Webhooks", icon: "🪝" },
   { id: "company", label: "Company Info", icon: "🏢" },
+  { id: "export", label: "Data Export", icon: "💾" },
   { id: "audit", label: "Audit Logs", icon: "📜" },
 ];
 
@@ -195,6 +201,120 @@ export default function SettingsPage() {
                   <div><label className="text-sm text-white/50 block mb-1">Phone</label><input defaultValue="(352) 410-5889" className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full" /></div>
                   <div><label className="text-sm text-white/50 block mb-1">Email</label><input defaultValue="inquiry@gofetchauto.com" className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full" /></div>
                   <button className="bg-amber text-navy font-semibold px-6 py-2 rounded-lg text-sm hover:bg-amber-light transition">Save</button>
+                </div>
+              </div>
+            )}
+
+            {active === "goals" && (
+              <div>
+                <h3 className="text-lg font-bold mb-4">Sales Goals</h3>
+                <p className="text-white/40 text-sm mb-4">Set monthly targets per advocate.</p>
+                <div className="space-y-3">
+                  {["Marcus J.", "Sarah K.", "David L."].map(name => (
+                    <div key={name} className="flex items-center gap-4 bg-white/[0.03] rounded-lg p-3 border border-white/5">
+                      <span className="text-sm font-medium text-white w-28">{name}</span>
+                      <div className="flex-1 grid grid-cols-3 gap-3">
+                        <div><label className="text-[10px] text-white/30">Deals/Month</label><input type="number" defaultValue={10} className="w-full bg-white/5 border border-white/10 rounded px-2 py-1 text-sm" /></div>
+                        <div><label className="text-[10px] text-white/30">Revenue Target</label><input defaultValue="$2,000" className="w-full bg-white/5 border border-white/10 rounded px-2 py-1 text-sm" /></div>
+                        <div><label className="text-[10px] text-white/30">Response Time</label><input defaultValue="15 min" className="w-full bg-white/5 border border-white/10 rounded px-2 py-1 text-sm" /></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button className="mt-4 bg-amber text-navy font-semibold px-4 py-2 rounded-lg text-sm">Save Goals</button>
+              </div>
+            )}
+
+            {active === "desking" && (
+              <div>
+                <h3 className="text-lg font-bold mb-4">Desking Defaults</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><label className="text-sm text-white/50 block mb-1">Default Tax Rate (%)</label><input type="number" defaultValue={7} step={0.1} className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full" /></div>
+                  <div><label className="text-sm text-white/50 block mb-1">Doc Fee ($)</label><input type="number" defaultValue={799} className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full" /></div>
+                  <div><label className="text-sm text-white/50 block mb-1">Title & Reg Fee ($)</label><input type="number" defaultValue={499} className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full" /></div>
+                  <div><label className="text-sm text-white/50 block mb-1">Default Finance Rate (%)</label><input type="number" defaultValue={5.9} step={0.1} className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full" /></div>
+                  <div><label className="text-sm text-white/50 block mb-1">Default Term (months)</label><input type="number" defaultValue={60} className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full" /></div>
+                </div>
+                <button className="mt-4 bg-amber text-navy font-semibold px-4 py-2 rounded-lg text-sm">Save Defaults</button>
+              </div>
+            )}
+
+            {active === "tasks" && (
+              <div>
+                <h3 className="text-lg font-bold mb-4">Task Templates</h3>
+                <p className="text-white/40 text-sm mb-4">Auto-create tasks when deals reach specific steps.</p>
+                <div className="space-y-2">
+                  {["Consultation", "Lead Received", "Researching", "Negotiating", "Client Approval", "Deal Agreed", "Paperwork", "Delivery", "Delivered"].map((step, i) => (
+                    <div key={step} className="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3 border border-white/5">
+                      <span className="text-xs text-white/30 w-6">{i}</span>
+                      <span className="text-sm text-white/60 w-32">{step}</span>
+                      <input placeholder={`Auto-task at step ${i}... (e.g., "Send welcome email")`} className="flex-1 bg-white/5 border border-white/10 rounded px-3 py-1.5 text-sm text-white placeholder-white/20 focus:border-amber outline-none" />
+                      <label className="flex items-center gap-1 text-xs text-white/30"><input type="checkbox" className="accent-amber" /> Active</label>
+                    </div>
+                  ))}
+                </div>
+                <button className="mt-4 bg-amber text-navy font-semibold px-4 py-2 rounded-lg text-sm">Save Templates</button>
+              </div>
+            )}
+
+            {active === "hours" && (
+              <div>
+                <h3 className="text-lg font-bold mb-4">Business Hours</h3>
+                <div className="space-y-2">
+                  {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map(day => (
+                    <div key={day} className="flex items-center gap-4 bg-white/[0.03] rounded-lg p-3 border border-white/5">
+                      <label className="flex items-center gap-2 w-28"><input type="checkbox" defaultChecked={day !== "Sunday"} className="accent-amber" /><span className="text-sm text-white">{day}</span></label>
+                      <input type="time" defaultValue="09:00" className="bg-white/5 border border-white/10 rounded px-3 py-1 text-sm" />
+                      <span className="text-white/20">to</span>
+                      <input type="time" defaultValue="18:00" className="bg-white/5 border border-white/10 rounded px-3 py-1 text-sm" />
+                    </div>
+                  ))}
+                </div>
+                <button className="mt-4 bg-amber text-navy font-semibold px-4 py-2 rounded-lg text-sm">Save Hours</button>
+              </div>
+            )}
+
+            {active === "notifications" && (
+              <div>
+                <h3 className="text-lg font-bold mb-4">Notification Preferences</h3>
+                <p className="text-white/40 text-sm mb-4">Choose which events trigger notifications per role.</p>
+                <table className="w-full text-sm">
+                  <thead><tr className="border-b border-white/5">
+                    <th className="p-2 text-left text-xs text-white/30">Event</th>
+                    <th className="p-2 text-center text-xs text-white/30">Admin</th>
+                    <th className="p-2 text-center text-xs text-white/30">Manager</th>
+                    <th className="p-2 text-center text-xs text-white/30">Advocate</th>
+                  </tr></thead>
+                  <tbody>
+                    {["New Lead", "Step Changed", "Payment Received", "Document Uploaded", "Offer Sent", "Offer Accepted", "AI Escalation", "Deal Closed"].map(event => (
+                      <tr key={event} className="border-b border-white/5">
+                        <td className="p-2 text-white/60">{event}</td>
+                        <td className="p-2 text-center"><input type="checkbox" defaultChecked className="accent-amber" /></td>
+                        <td className="p-2 text-center"><input type="checkbox" defaultChecked className="accent-amber" /></td>
+                        <td className="p-2 text-center"><input type="checkbox" defaultChecked={!event.includes("AI")} className="accent-amber" /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <button className="mt-4 bg-amber text-navy font-semibold px-4 py-2 rounded-lg text-sm">Save Preferences</button>
+              </div>
+            )}
+
+            {active === "export" && (
+              <div>
+                <h3 className="text-lg font-bold mb-4">Data Export & Backup</h3>
+                <div className="space-y-4">
+                  <div className="bg-white/[0.03] rounded-lg p-4 border border-white/5">
+                    <h4 className="text-sm font-medium text-white mb-2">Export Customers</h4>
+                    <p className="text-xs text-white/30 mb-3">Download all customer data as CSV.</p>
+                    <button onClick={() => { fetch("/api/trpc/dealer.exportCSV").then(r => r.json()).then(d => { const blob = new Blob([d.result?.data || ""], { type: "text/csv" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "gofetch-customers.csv"; a.click(); }); }} className="bg-amber text-navy font-semibold px-4 py-2 rounded-lg text-sm hover:bg-amber-light transition">📥 Export CSV</button>
+                  </div>
+                  <div className="bg-white/[0.03] rounded-lg p-4 border border-white/5">
+                    <h4 className="text-sm font-medium text-white mb-2">Full Database Backup</h4>
+                    <p className="text-xs text-white/30 mb-3">Generate a complete backup of all CRM data.</p>
+                    <button className="bg-white/10 text-white/60 font-semibold px-4 py-2 rounded-lg text-sm hover:bg-white/20 transition">📦 Generate Backup</button>
+                    <p className="text-[10px] text-white/20 mt-2">Last backup: Never</p>
+                  </div>
                 </div>
               </div>
             )}

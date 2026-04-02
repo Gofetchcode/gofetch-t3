@@ -135,7 +135,8 @@ export default function PortalPage() {
                 ) : "Log In"}
               </button>
             </div>
-            <p className="text-xs text-muted text-center mt-6">
+            <button onClick={() => { const em = prompt("Enter your email for password reset:"); if (em) fetch("/api/auth/reset", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: em }) }).then(() => alert("If that email exists, a reset has been sent.")); }} className="block text-xs text-muted hover:text-navy text-center mt-4 w-full">Forgot password?</button>
+            <p className="text-xs text-muted text-center mt-2">
               New client? <Link href="/car-finder" className="text-amber hover:underline">Start a free consultation →</Link>
             </p>
           </div>
@@ -612,18 +613,28 @@ export default function PortalPage() {
           </div>
         )}
 
-        {/* Estimated time remaining */}
+        {/* Estimated time remaining + velocity comparison */}
         {customer.step < 8 && (
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mt-6 text-center">
             <p className="text-xs text-amber font-semibold uppercase tracking-wider mb-1">Estimated Time Remaining</p>
             <p className="text-lg font-bold text-navy">{Math.max(1, (8 - customer.step) * 3)}-{Math.max(2, (8 - customer.step) * 5)} days</p>
-            <p className="text-xs text-muted mt-1">
-              {customer.step <= 3 ? "Your agent is actively working on your deal" :
-               customer.step <= 5 ? "Almost there — reviewing final offers" :
-               "Wrapping up paperwork and coordination"}
-            </p>
+            {(() => {
+              const daysActive = Math.floor((Date.now() - new Date(customer.createdAt).getTime()) / 86400000);
+              const avgDaysForStep = customer.step * 3;
+              const diff = avgDaysForStep - daysActive;
+              if (diff > 0) return <p className="text-xs text-green-600 mt-1">🚀 Your deal is moving {Math.round((diff / avgDaysForStep) * 100)}% faster than average!</p>;
+              if (diff < -2) return <p className="text-xs text-muted mt-1">Hang tight — your agent is working on the best deal possible</p>;
+              return <p className="text-xs text-muted mt-1">Your deal is right on track</p>;
+            })()}
           </div>
         )}
+
+        {/* WhatsApp chat button */}
+        <div className="mt-6 text-center">
+          <a href="https://wa.me/13524105889?text=Hi%20GoFetch%20Auto!%20I%20have%20a%20question%20about%20my%20deal." target="_blank" rel="noopener" className="inline-flex items-center gap-2 bg-green-500 text-white font-semibold px-6 py-3 rounded-xl hover:bg-green-600 transition shadow-lg">
+            <span className="text-xl">💬</span> Chat with us on WhatsApp
+          </a>
+        </div>
       </div>
 
       {/* Help Center */}
