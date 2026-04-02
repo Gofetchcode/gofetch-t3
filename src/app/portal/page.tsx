@@ -238,11 +238,79 @@ export default function PortalPage() {
                   { label: "Your Agent", value: "GoFetch Auto" },
                   { label: "Est. Delivery", value: customer.deliveryDate || "Pending" },
                 ].map((d) => (
-                  <div key={d.label} className="bg-offwhite rounded-lg p-4">
+                  <div key={d.label} className="bg-offwhite rounded-lg p-4 border-t-3 border-amber">
                     <p className="text-xs text-amber font-semibold uppercase tracking-wider mb-1">{d.label}</p>
                     <p className={`text-sm font-medium ${d.value === "Pending" ? "text-muted italic" : "text-navy"}`}>{d.value}</p>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Desking Offers */}
+            {customer.deskingOffers && customer.deskingOffers.length > 0 && (
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <h3 className="font-bold text-navy mb-4">Offers from Your Agent</h3>
+                <div className="space-y-4">
+                  {customer.deskingOffers.filter((o: any) => o.status === "sent_to_client" || o.isRevealed).map((offer: any) => (
+                    <div key={offer.id} className="border border-amber/20 rounded-xl p-5 bg-amber/5">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <p className="text-xs text-amber font-semibold uppercase tracking-wider">New Offer from Your GoFetch Agent</p>
+                          <p className="text-lg font-bold text-navy mt-1">{offer.vehicleDesc || "Vehicle"}</p>
+                        </div>
+                        <span className={`text-xs font-medium px-2 py-1 rounded-full ${offer.status === "accepted" ? "bg-green-100 text-green-700" : "bg-amber/20 text-amber-dark"}`}>{offer.status}</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-3 mb-4">
+                        <div className="bg-white rounded-lg p-3 text-center">
+                          <p className="text-[10px] text-muted uppercase">Negotiated</p>
+                          <p className="text-lg font-bold text-navy">{offer.negotiatedPrice || "—"}</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-3 text-center">
+                          <p className="text-[10px] text-muted uppercase">OTD Price</p>
+                          <p className="text-lg font-bold text-navy">{offer.otdPrice || "—"}</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-3 text-center">
+                          <p className="text-[10px] text-muted uppercase">Your Savings</p>
+                          <p className="text-lg font-bold text-green-600">{offer.savings || "—"}</p>
+                        </div>
+                      </div>
+                      {offer.notes && <p className="text-sm text-muted italic mb-4">&ldquo;{offer.notes}&rdquo; — GoFetch Auto</p>}
+                      {offer.status === "sent_to_client" && (
+                        <div className="flex gap-3">
+                          <button className="flex-1 bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition">✅ Accept This Offer</button>
+                          <button className="flex-1 border border-gray-200 text-muted font-medium py-3 rounded-lg hover:bg-gray-50 transition">↩ Request Changes</button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Activity Timeline */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-bold text-navy mb-4">Activity Timeline</h3>
+              <div className="space-y-4">
+                {customer.messages?.slice(0, 5).map((m: any, i: number) => (
+                  <div key={m.id || i} className="flex gap-3 items-start">
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber mt-1.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-bold text-navy">{new Date(m.createdAt).toLocaleDateString()}</p>
+                      <p className="text-sm text-muted">{m.content}</p>
+                    </div>
+                  </div>
+                ))}
+                {(!customer.messages || customer.messages.length === 0) && (
+                  <div className="space-y-4">
+                    <div className="flex gap-3 items-start">
+                      <div className="w-2.5 h-2.5 rounded-full bg-amber mt-1.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs font-bold text-navy">{new Date(customer.createdAt).toLocaleDateString()}</p>
+                        <p className="text-sm text-muted">Your consultation has been received. We&rsquo;ll be in touch shortly.</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -250,13 +318,24 @@ export default function PortalPage() {
 
         {/* DOCUMENTS TAB */}
         {tab === "documents" && (
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <h3 className="font-bold text-navy mb-4">Your Documents</h3>
-            <div className="border-2 border-dashed border-amber/30 rounded-xl p-8 text-center mb-6 hover:border-amber/60 transition">
-              <p className="text-3xl mb-2">📄</p>
-              <p className="text-sm text-navy font-medium">Drag & drop files or click to upload</p>
-              <p className="text-xs text-muted mt-1">PDF, JPEG, PNG up to 10MB</p>
-            </div>
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-bold text-navy mb-4">Upload Documents</h3>
+
+              {/* Doc type pill selector */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {["Driver's License", "Insurance", "Proof of Income", "Pre-Approval", "Trade-In Title", "Other"].map((t) => (
+                  <button key={t} className="px-3 py-1.5 text-xs font-medium rounded-full border border-gray-200 text-muted hover:bg-amber hover:text-navy hover:border-amber transition">
+                    {t}
+                  </button>
+                ))}
+              </div>
+
+              <div className="border-2 border-dashed border-amber/30 rounded-xl p-8 text-center mb-6 hover:border-amber/60 transition cursor-pointer">
+                <p className="text-3xl mb-2">📎</p>
+                <p className="text-sm text-navy font-medium">Drop files here or click to browse</p>
+                <p className="text-xs text-muted mt-1">PDF, JPEG, PNG &bull; Max 10MB</p>
+              </div>
             {customer.documents?.length > 0 ? (
               <div className="space-y-2">
                 {customer.documents.map((d: any) => (
@@ -281,6 +360,27 @@ export default function PortalPage() {
             ) : (
               <p className="text-sm text-muted">No documents uploaded yet.</p>
             )}
+            </div>
+
+            {/* Required Documents Checklist */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-bold text-navy mb-4">Required Documents</h3>
+              <div className="space-y-3">
+                {["Driver's License", "Insurance Card", "Proof of Income", "Pre-Approval Letter"].map((doc) => {
+                  const uploaded = customer.documents?.some((d: any) => d.docType === doc);
+                  return (
+                    <div key={doc} className="flex items-center gap-3">
+                      <span className={`w-5 h-5 rounded flex items-center justify-center text-xs ${uploaded ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-300"}`}>
+                        {uploaded ? "✓" : ""}
+                      </span>
+                      <span className={`text-sm ${uploaded ? "text-navy" : "text-muted"}`}>{doc}</span>
+                      {uploaded && <span className="text-xs text-green-500 ml-auto">Uploaded</span>}
+                      {!uploaded && <span className="text-xs text-amber ml-auto cursor-pointer hover:underline">Upload →</span>}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         )}
 

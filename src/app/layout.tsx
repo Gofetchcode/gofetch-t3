@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import { TRPCProvider } from "@/components/providers";
+import { ToastProvider } from "@/components/toast";
 import { Nav } from "@/components/layout/nav";
 import { Footer } from "@/components/layout/footer";
 import "./globals.css";
@@ -50,9 +51,11 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-white text-navy">
         <TRPCProvider>
-          <Nav />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <ToastProvider>
+            <Nav />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </ToastProvider>
         </TRPCProvider>
       </body>
     </html>
