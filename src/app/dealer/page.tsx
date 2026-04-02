@@ -1,18 +1,26 @@
 "use client";
 
-import { useState, useMemo, useCallback, useRef, type DragEvent } from "react";
+import { useState, useMemo, useCallback, useRef, type DragEvent, Component, type ReactNode } from "react";
 import { trpc } from "@/lib/trpc";
-import { FocusList } from "@/components/focus-list";
-import { FocusActions } from "@/components/next-best-action";
-import { WorkspaceSwitcher } from "@/components/workspace-switcher";
-import { OnboardingTour } from "@/components/onboarding-tour";
-import { DeskingTool } from "@/components/desking-tool";
-import { OutreachPanel } from "@/components/outreach-panel";
-import { DealerResponses } from "@/components/dealer-responses";
-import { MeetingPrep } from "@/components/meeting-prep";
-import { CompetitiveIntel } from "@/components/competitive-intel";
-import { ReferralTracker } from "@/components/referral-tracker";
-import { getScoreBadge, calculateDealHealth } from "@/lib/ai-engine";
+import dynamic from "next/dynamic";
+
+// Lazy load heavy components to prevent crashes
+const FocusList = dynamic(() => import("@/components/focus-list").then(m => ({ default: m.FocusList })), { ssr: false });
+const FocusActions = dynamic(() => import("@/components/next-best-action").then(m => ({ default: m.FocusActions })), { ssr: false });
+const WorkspaceSwitcher = dynamic(() => import("@/components/workspace-switcher").then(m => ({ default: m.WorkspaceSwitcher })), { ssr: false });
+const OnboardingTour = dynamic(() => import("@/components/onboarding-tour").then(m => ({ default: m.OnboardingTour })), { ssr: false });
+const OutreachPanel = dynamic(() => import("@/components/outreach-panel").then(m => ({ default: m.OutreachPanel })), { ssr: false });
+const DealerResponses = dynamic(() => import("@/components/dealer-responses").then(m => ({ default: m.DealerResponses })), { ssr: false });
+const MeetingPrep = dynamic(() => import("@/components/meeting-prep").then(m => ({ default: m.MeetingPrep })), { ssr: false });
+const CompetitiveIntel = dynamic(() => import("@/components/competitive-intel").then(m => ({ default: m.CompetitiveIntel })), { ssr: false });
+const ReferralTracker = dynamic(() => import("@/components/referral-tracker").then(m => ({ default: m.ReferralTracker })), { ssr: false });
+
+// Error boundary to catch crashes
+class ErrorBoundary extends Component<{children: ReactNode, fallback?: ReactNode}, {hasError: boolean}> {
+  constructor(props: any) { super(props); this.state = { hasError: false }; }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() { return this.state.hasError ? (this.props.fallback || <div className="p-4 text-red-400 text-sm">Component failed to load</div>) : this.props.children; }
+}
 
 const STEPS = [
   "Consultation", "Lead Received", "Researching", "Negotiating",
@@ -673,8 +681,8 @@ export default function DealerPage() {
             </div>
 
             {/* Focus List + AI Recommendations */}
-            <FocusList customers={data} onSelect={(id) => setSelectedCustomer(data.find((c: any) => c.id === id))} />
-            <FocusActions customers={data} />
+            <ErrorBoundary><FocusList customers={data} onSelect={(id: string) => setSelectedCustomer(data.find((c: any) => c.id === id))} /></ErrorBoundary>
+            <ErrorBoundary><FocusActions customers={data} /></ErrorBoundary>
 
             {/* View toggle */}
             <div className="flex bg-black/30 rounded-lg p-0.5 border border-white/5">
@@ -915,10 +923,10 @@ export default function DealerPage() {
       )}
 
       {/* ── Add Customer Drawer ── */}
-      <AddCustomerDrawer open={addCustomerDrawer} onClose={() => setAddCustomerDrawer(false)} />
+      <ErrorBoundary><AddCustomerDrawer open={addCustomerDrawer} onClose={() => setAddCustomerDrawer(false)} /></ErrorBoundary>
 
       {/* ── Onboarding Tour ── */}
-      <OnboardingTour />
+      <ErrorBoundary><OnboardingTour /></ErrorBoundary>
     </div>
   );
 }
