@@ -13,6 +13,176 @@ const STEP_COLORS = [
   "bg-amber/50", "bg-amber", "bg-green-200", "bg-green-300", "bg-green-500",
 ];
 
+function DetailPanel({ customer, onClose }: { customer: any; onClose: () => void }) {
+  const [detailTab, setDetailTab] = useState<"overview" | "notes" | "messages" | "documents" | "offers">("overview");
+  const [newNote, setNewNote] = useState("");
+
+  const detailTabs = [
+    { id: "overview" as const, label: "Overview" },
+    { id: "notes" as const, label: "Notes" },
+    { id: "messages" as const, label: "Messages" },
+    { id: "documents" as const, label: "Docs" },
+    { id: "offers" as const, label: "Offers" },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end" onClick={onClose}>
+      <div className="bg-black/50 absolute inset-0" />
+      <div className="relative w-full max-w-xl bg-navy-light border-l border-white/10 h-full overflow-y-auto animate-slide-in" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div className="sticky top-0 bg-navy-light border-b border-white/5 p-4 z-10">
+          <div className="flex justify-between items-center mb-3">
+            <div>
+              <h3 className="text-lg font-bold text-white">{customer.firstName} {customer.lastName}</h3>
+              <p className="text-xs text-amber">{customer.gofetchClientId || "No ID"}</p>
+            </div>
+            <button onClick={onClose} className="text-white/30 hover:text-white text-xl p-1">&times;</button>
+          </div>
+          <div className="flex gap-1 bg-black/30 rounded-lg p-0.5">
+            {detailTabs.map((t) => (
+              <button key={t.id} onClick={() => setDetailTab(t.id)} className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition ${detailTab === t.id ? "bg-amber text-navy" : "text-white/40 hover:text-white/60"}`}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-4">
+          {/* OVERVIEW TAB */}
+          {detailTab === "overview" && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "Email", value: customer.email },
+                  { label: "Phone", value: customer.phone },
+                  { label: "Vehicle", value: customer.vehicleSpecific || customer.vehicleType || "—" },
+                  { label: "Budget", value: customer.budget || "—" },
+                  { label: "Source", value: customer.source || "—" },
+                  { label: "Timeline", value: customer.timeline || "—" },
+                  { label: "Negotiated", value: customer.negotiatedPrice || "Pending" },
+                  { label: "Delivery", value: customer.deliveryDate || "Pending" },
+                ].map((f) => (
+                  <div key={f.label} className="bg-white/[0.03] rounded-lg p-3 border border-white/5">
+                    <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">{f.label}</p>
+                    <p className="text-sm text-white">{f.value}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="bg-white/[0.03] rounded-lg p-3 border border-white/5">
+                <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Status</p>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${STEP_COLORS[customer.step]} text-navy`}>{STEPS[customer.step]}</span>
+                  <span className="text-xs text-white/20">Step {customer.step + 1}/9</span>
+                </div>
+              </div>
+              {customer.notes && (
+                <div className="bg-white/[0.03] rounded-lg p-3 border border-white/5">
+                  <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Client Notes</p>
+                  <p className="text-sm text-white/60">{customer.notes}</p>
+                </div>
+              )}
+              <div className="flex items-center gap-2 text-xs text-white/20">
+                <span>Created: {new Date(customer.createdAt).toLocaleDateString()}</span>
+                <span>|</span>
+                <span>Fleet: {customer.isFleet ? "Yes" : "No"}</span>
+                <span>|</span>
+                <span>Paid: {customer.paid ? "Yes" : "No"}</span>
+              </div>
+            </div>
+          )}
+
+          {/* NOTES TAB */}
+          {detailTab === "notes" && (
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <input value={newNote} onChange={(e) => setNewNote(e.target.value)} placeholder="Add a note..." className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-amber outline-none" />
+                <button onClick={() => setNewNote("")} className="bg-amber text-navy px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-light transition">Add</button>
+              </div>
+              {customer.notesLog && customer.notesLog.length > 0 ? (
+                customer.notesLog.map((n: any) => (
+                  <div key={n.id} className="bg-white/[0.03] rounded-lg p-3 border border-white/5">
+                    <p className="text-sm text-white/70">{n.content}</p>
+                    <p className="text-xs text-white/20 mt-1">{n.author} — {new Date(n.createdAt).toLocaleString()}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-white/30 text-center py-6">No notes yet.</p>
+              )}
+            </div>
+          )}
+
+          {/* MESSAGES TAB */}
+          {detailTab === "messages" && (
+            <div className="space-y-2">
+              {customer.messages && customer.messages.length > 0 ? (
+                customer.messages.map((m: any) => (
+                  <div key={m.id} className={`flex ${m.sender === "customer" ? "justify-end" : "justify-start"}`}>
+                    <div className={`max-w-xs rounded-xl px-3 py-2 text-sm ${m.sender === "customer" ? "bg-amber text-navy" : m.sender === "system" ? "bg-blue-500/20 text-blue-300" : "bg-white/10 text-white/70"}`}>
+                      <p>{m.content}</p>
+                      <p className="text-[10px] mt-1 opacity-50">{m.sender} — {new Date(m.createdAt).toLocaleString()}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-white/30 text-center py-6">No messages.</p>
+              )}
+            </div>
+          )}
+
+          {/* DOCUMENTS TAB */}
+          {detailTab === "documents" && (
+            <div className="space-y-2">
+              {customer.documents && customer.documents.length > 0 ? (
+                customer.documents.map((d: any) => (
+                  <div key={d.id} className="flex items-center justify-between bg-white/[0.03] rounded-lg p-3 border border-white/5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">📄</span>
+                      <div>
+                        <p className="text-sm text-white">{d.originalName || d.fileName}</p>
+                        <p className="text-xs text-white/30">{d.docType}</p>
+                      </div>
+                    </div>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${d.status === "approved" ? "bg-green-500/20 text-green-400" : d.status === "under_review" ? "bg-amber/20 text-amber" : "bg-white/10 text-white/40"}`}>{d.status}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-white/30 text-center py-6">No documents uploaded.</p>
+              )}
+            </div>
+          )}
+
+          {/* OFFERS TAB */}
+          {detailTab === "offers" && (
+            <div className="space-y-2">
+              {customer.deskingOffers && customer.deskingOffers.length > 0 ? (
+                customer.deskingOffers.map((o: any) => (
+                  <div key={o.id} className="bg-white/[0.03] rounded-lg p-4 border border-white/5">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="text-sm font-medium text-white">{o.vehicleDesc || "Vehicle TBD"}</p>
+                        <p className="text-xs text-white/30">{o.dealerName || "Dealer TBD"}</p>
+                      </div>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${o.status === "accepted" ? "bg-green-500/20 text-green-400" : o.status === "rejected" ? "bg-red-500/20 text-red-400" : "bg-amber/20 text-amber"}`}>{o.status}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <div><span className="text-white/30">MSRP:</span> <span className="text-white">{o.msrp || "—"}</span></div>
+                      <div><span className="text-white/30">Negotiated:</span> <span className="text-amber">{o.negotiatedPrice || "—"}</span></div>
+                      <div><span className="text-white/30">OTD:</span> <span className="text-white">{o.otdPrice || "—"}</span></div>
+                    </div>
+                    {o.savings && <p className="text-xs text-green-400 mt-2">Savings: {o.savings}</p>}
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-white/30 text-center py-6">No offers yet.</p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DealerPage() {
   const [pin, setPin] = useState("");
   const [authed, setAuthed] = useState(false);
@@ -232,36 +402,9 @@ export default function DealerPage() {
           </div>
         )}
 
-        {/* DETAIL SLIDE-IN PANEL */}
+        {/* DETAIL SLIDE-IN PANEL WITH TABS */}
         {selectedCustomer && (
-          <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setSelectedCustomer(null)}>
-            <div className="bg-black/50 absolute inset-0" />
-            <div
-              className="relative w-full max-w-lg bg-navy-light border-l border-white/10 h-full overflow-y-auto animate-slide-in"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-bold">{selectedCustomer.firstName} {selectedCustomer.lastName}</h3>
-                  <button onClick={() => setSelectedCustomer(null)} className="text-white/30 hover:text-white text-xl">&times;</button>
-                </div>
-                <div className="space-y-4 text-sm">
-                  <div><span className="text-white/30">Email:</span> <span className="ml-2">{selectedCustomer.email}</span></div>
-                  <div><span className="text-white/30">Phone:</span> <span className="ml-2">{selectedCustomer.phone}</span></div>
-                  <div><span className="text-white/30">Vehicle:</span> <span className="ml-2">{selectedCustomer.vehicleSpecific || selectedCustomer.vehicleType || "—"}</span></div>
-                  <div><span className="text-white/30">Budget:</span> <span className="ml-2">{selectedCustomer.budget || "—"}</span></div>
-                  <div><span className="text-white/30">Status:</span> <span className={`ml-2 text-xs font-medium px-2 py-1 rounded-full ${STEP_COLORS[selectedCustomer.step]} text-navy`}>{STEPS[selectedCustomer.step]}</span></div>
-                  <div><span className="text-white/30">Client ID:</span> <span className="ml-2 text-amber">{selectedCustomer.gofetchClientId || "—"}</span></div>
-                  <div><span className="text-white/30">Source:</span> <span className="ml-2">{selectedCustomer.source || "—"}</span></div>
-                  <div><span className="text-white/30">Timeline:</span> <span className="ml-2">{selectedCustomer.timeline || "—"}</span></div>
-                  {selectedCustomer.notes && (
-                    <div><span className="text-white/30">Notes:</span><p className="mt-1 text-white/60 bg-white/5 p-3 rounded-lg">{selectedCustomer.notes}</p></div>
-                  )}
-                  <div><span className="text-white/30">Created:</span> <span className="ml-2">{new Date(selectedCustomer.createdAt).toLocaleString()}</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <DetailPanel customer={selectedCustomer} onClose={() => setSelectedCustomer(null)} />
         )}
       </div>
     </div>

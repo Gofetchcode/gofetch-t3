@@ -12,6 +12,8 @@ const links = [
   { href: "/car-finder", label: "Car Finder" },
   { href: "/contact", label: "Contact" },
   { href: "/fleet", label: "Fleet" },
+  { href: "/portal", label: "My Portal", cta: true },
+  { href: "/dealer", label: "Dealer", muted: true },
 ];
 
 export function Nav() {
@@ -43,39 +45,21 @@ export function Nav() {
 
         {/* Desktop links */}
         <div className="hidden lg:flex items-center gap-1">
-          {links.map((l) =>
-            (l as any).external ? (
-              <a
-                key={l.label}
-                href={l.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 py-2 text-sm text-white/60 hover:text-white transition"
-              >
-                {l.label}
-              </a>
-            ) : (
-              <Link
-                key={l.label}
-                href={l.href}
-                className="px-3 py-2 text-sm text-white/60 hover:text-white transition"
-              >
-                {l.label}
-              </Link>
-            )
-          )}
-          <Link
-            href="/portal"
-            className="ml-2 bg-amber text-navy px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-light transition"
-          >
-            My Portal
-          </Link>
-          <Link
-            href="/dealer"
-            className="ml-1 px-3 py-2 text-sm text-white/30 hover:text-white/60 transition"
-          >
-            Dealer
-          </Link>
+          {links.map((l) => (
+            <Link
+              key={l.label}
+              href={l.href}
+              className={
+                (l as any).cta
+                  ? "ml-2 bg-amber text-navy px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-light transition"
+                  : (l as any).muted
+                  ? "ml-1 px-3 py-2 text-sm text-white/30 hover:text-white/60 transition"
+                  : "px-3 py-2 text-sm text-white/60 hover:text-white transition"
+              }
+            >
+              {l.label}
+            </Link>
+          ))}
         </div>
 
         {/* Mobile hamburger */}
@@ -98,25 +82,17 @@ export function Nav() {
               key={l.label}
               href={l.href}
               onClick={() => setOpen(false)}
-              className="text-white/60 hover:text-white py-3 px-2 text-sm border-b border-white/5"
+              className={
+                (l as any).cta
+                  ? "bg-amber text-navy px-4 py-3 rounded-lg font-semibold text-center mt-2"
+                  : (l as any).muted
+                  ? "text-white/30 py-3 px-2 text-sm text-center"
+                  : "text-white/60 hover:text-white py-3 px-2 text-sm border-b border-white/5"
+              }
             >
               {l.label}
             </Link>
           ))}
-          <Link
-            href="/portal"
-            onClick={() => setOpen(false)}
-            className="bg-amber text-navy px-4 py-3 rounded-lg font-semibold text-center mt-2"
-          >
-            My Portal
-          </Link>
-          <Link
-            href="/dealer"
-            onClick={() => setOpen(false)}
-            className="text-white/30 py-3 px-2 text-sm text-center"
-          >
-            Dealer
-          </Link>
         </div>
       )}
     </nav>
