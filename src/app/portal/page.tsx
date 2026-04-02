@@ -4,6 +4,9 @@ import { useState, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import Link from "next/link";
 import { Confetti } from "@/components/confetti";
+import { HelpCenter } from "@/components/help-center";
+import { NPSSurvey } from "@/components/nps-survey";
+import { ShareableCard } from "@/components/shareable-card";
 
 const STEPS = [
   "Consultation Submitted",
@@ -227,6 +230,12 @@ export default function PortalPage() {
               {t === "deal" ? "📍 My Deal" : t === "documents" ? "📄 Documents" : t === "payment" ? "💳 Payment" : "💬 Messages"}
               {tab === t && (
                 <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber rounded-full transition-all duration-300" />
+              )}
+              {t === "messages" && (customer.messages?.length || 0) > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber text-navy text-[9px] font-bold rounded-full flex items-center justify-center">{customer.messages?.length}</span>
+              )}
+              {t === "documents" && customer.documents && customer.documents.length < 4 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">!</span>
               )}
             </button>
           ))}
@@ -557,8 +566,12 @@ export default function PortalPage() {
                   <div className={`max-w-xs rounded-xl px-4 py-2.5 text-sm ${
                     m.sender === "customer"
                       ? "bg-amber text-navy rounded-br-sm"
+                      : m.sender === "system"
+                      ? "bg-blue-50 text-navy rounded-bl-sm border border-blue-100"
                       : "bg-gray-100 text-navy rounded-bl-sm"
                   }`}>
+                    {m.sender === "system" && <p className="text-[10px] font-bold text-blue-500 mb-1">🤖 GoFetch AI</p>}
+                    {m.sender === "agent" && <p className="text-[10px] font-bold text-navy/50 mb-1">👤 Your Agent</p>}
                     {m.content}
                     <div className={`text-xs mt-1 ${m.sender === "customer" ? "text-navy/50" : "text-muted"}`}>
                       {new Date(m.createdAt).toLocaleString()}
@@ -584,7 +597,31 @@ export default function PortalPage() {
             </div>
           </div>
         )}
+
+        {/* NPS Survey + Shareable Card (shown at step 8 — Delivered) */}
+        {customer.step === 8 && (
+          <div className="space-y-6 mt-6">
+            <NPSSurvey customerName={customer.firstName} onSubmit={(score, comment) => console.log("NPS:", score, comment)} />
+            <ShareableCard vehicle={customer.vehicleSpecific || "vehicle"} savings={customer.negotiatedPrice ? "$4,400" : "~$3,400"} customerName={customer.firstName} />
+          </div>
+        )}
+
+        {/* Estimated time remaining */}
+        {customer.step < 8 && (
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mt-6 text-center">
+            <p className="text-xs text-amber font-semibold uppercase tracking-wider mb-1">Estimated Time Remaining</p>
+            <p className="text-lg font-bold text-navy">{Math.max(1, (8 - customer.step) * 3)}-{Math.max(2, (8 - customer.step) * 5)} days</p>
+            <p className="text-xs text-muted mt-1">
+              {customer.step <= 3 ? "Your agent is actively working on your deal" :
+               customer.step <= 5 ? "Almost there — reviewing final offers" :
+               "Wrapping up paperwork and coordination"}
+            </p>
+          </div>
+        )}
       </div>
+
+      {/* Help Center */}
+      <HelpCenter />
     </div>
   );
 }

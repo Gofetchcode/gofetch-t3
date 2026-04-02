@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { DarkModeToggle } from "@/components/dark-mode-toggle";
 
 const links = [
   { href: "/", label: "Home" },
@@ -57,6 +58,7 @@ export function Nav() {
               <Link key={l.label} href={l.href} className={cls}>{l.label}</Link>
             );
           })}
+          <DarkModeToggle />
         </div>
 
         {/* Mobile hamburger */}

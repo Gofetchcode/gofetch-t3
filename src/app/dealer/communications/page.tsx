@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SmartCompose } from "@/components/smart-compose";
 
 const mockConversations = [
   { id: "1", name: "John Smith", lastMsg: "Thanks, looking forward to the offer!", time: "2m ago", unread: 2, channel: "text" },
@@ -94,6 +95,10 @@ export default function CommunicationsPage() {
                   </div>
                 </div>
               ))}
+            </div>
+            {/* Smart Compose */}
+            <div className="p-3 border-t border-white/5">
+              <SmartCompose customerName={selectedConvo.name} vehicle="2026 Toyota RAV4" step={3} onSend={(msg) => setNewMsg(msg)} />
             </div>
             <div className="p-3 border-t border-white/5 flex gap-2">
               <select className="bg-white/5 border border-white/10 rounded-lg px-2 py-2 text-xs text-white/50">
