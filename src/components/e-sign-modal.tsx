@@ -3,13 +3,18 @@
 import { useRef, useState, useEffect } from "react";
 
 const CONTRACT_TERMS = [
-  "I authorize GoFetch Auto LLC to act as my exclusive buyer's representative for the vehicle(s) described in my consultation.",
-  "I understand the service fee is $99 (Standard), $199 (Premium), or $1,299 (Exotic), due only at the \"Deal Agreed\" milestone.",
-  "I agree not to contact any dealership introduced by GoFetch Auto independently for a period of 12 months.",
-  "I understand GoFetch Auto is not a dealership and does not sell vehicles directly.",
-  "I acknowledge that if GoFetch Auto cannot provide savings exceeding the service fee, no fee will be charged.",
-  "I consent to electronic signature and agree it carries the same legal weight as a handwritten signature under the E-SIGN Act.",
-  "I confirm all information provided is accurate and I am authorized to enter into this agreement.",
+  "EXCLUSIVE REPRESENTATION: I grant GoFetch Auto LLC the exclusive right to act as my authorized representative for locating, negotiating, and facilitating the purchase of a motor vehicle. This representation is effective for 180 days from signing.",
+  "SCOPE OF SERVICES: GoFetch will research vehicles, contact dealerships on my behalf using GoFetch's identity, negotiate pricing and fees, present offers, and coordinate paperwork and delivery upon acceptance and payment.",
+  "SERVICE FEES: Standard $99, Premium $199, Exotic $1,299. Fees are due BEFORE dealer identity is revealed. Fees are NON-REFUNDABLE once paid, as services will have been substantially performed.",
+  "NO CANCELLATION: I acknowledge GoFetch begins services immediately. There is NO cooling-off period, cancellation window, or right of rescission. I expressly waive any right to cancel after signing.",
+  "EXCLUSIVITY: During this Agreement, I will NOT contact, negotiate with, or purchase from any dealership GoFetch has contacted. I will not use GoFetch's pricing or deal information to negotiate independently. Violation results in full fee plus 2x penalty as liquidated damages.",
+  "NON-CIRCUMVENTION: All pricing and dealer information is proprietary and confidential. I will not contact any dealer identified by GoFetch for 12 months after termination. Circumvention penalty: full fee + $2,500.",
+  "INFORMATION PROTECTION: GoFetch will not share my personal information with any dealership without my consent. All outreach uses GoFetch's identity. My info is released to the selected dealer only AFTER I pay the service fee.",
+  "LIMITATION OF LIABILITY: GoFetch acts as a negotiation advocate, NOT a seller or dealer. GoFetch does not guarantee specific savings. Total liability shall not exceed the service fee paid.",
+  "DISPUTE RESOLUTION: Disputes shall be resolved through binding arbitration in Hillsborough County, Florida, per the American Arbitration Association rules. Prevailing party recovers attorneys' fees.",
+  "ELECTRONIC SIGNATURE: My electronic signature has the same legal force as a handwritten signature under the E-SIGN Act (15 U.S.C. § 7001) and Florida's UETA.",
+  "GOVERNING LAW: This Agreement is governed by the laws of the State of Florida.",
+  "ENTIRE AGREEMENT: This constitutes the entire agreement. No modification is effective unless in writing signed by both parties.",
 ];
 
 interface ESignModalProps {
