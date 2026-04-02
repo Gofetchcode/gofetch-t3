@@ -1,27 +1,28 @@
 import { PrismaClient } from "@prisma/client";
-
 const db = new PrismaClient();
 
 async function main() {
-  // Default admin user
-  const userCount = await db.dealerUser.count();
-  if (userCount === 0) {
-    await db.dealerUser.create({ data: { name: "Admin", pin: "7777", role: "admin" } });
-    console.log("Created default admin user (PIN: 7777)");
+  // Default dealer
+  const dealerCount = await db.dealer.count();
+  if (dealerCount === 0) {
+    await db.dealer.create({ data: { pin: "7777", name: "GoFetch Auto" } });
+    console.log("Created default dealer (PIN: 7777)");
   }
 
-  // Default tags
-  const tagCount = await db.tag.count();
-  if (tagCount === 0) {
-    await db.tag.createMany({
-      data: [
-        { name: "Hot Lead", color: "#d64545" },
-        { name: "Follow Up", color: "#3b82f6" },
-        { name: "Waiting Docs", color: "#f59e0b" },
-        { name: "VIP", color: "#8b5cf6" },
-      ],
+  // Default CRM admin
+  const userCount = await db.cRMUser.count();
+  if (userCount === 0) {
+    await db.cRMUser.create({
+      data: { email: "inquiry@gofetchauto.com", name: "Admin", pin: "7777", role: "admin" },
     });
-    console.log("Created default tags");
+    console.log("Created default CRM admin");
+  }
+
+  // Default tenant config
+  const tenantCount = await db.tenantConfig.count();
+  if (tenantCount === 0) {
+    await db.tenantConfig.create({ data: {} });
+    console.log("Created default tenant config");
   }
 
   console.log("Seed complete.");

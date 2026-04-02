@@ -9,166 +9,421 @@ datasource db {
 
 // ═══ CUSTOMERS ═══
 model Customer {
-  id            String   @id @default(cuid())
-  name          String
-  email         String   @unique
-  phone         String?
-  password      String
-  vehicle       String?
-  color         String?
-  price         String?
-  savings       String?
-  agent         String?
-  delivery      String?
-  step          Int      @default(0)
-  source        String?
-  timeline      String?
-  tradein       String?
-  tradeinYear   String?  @map("tradein_year")
-  tradeinMake   String?  @map("tradein_make")
-  tradeinModel  String?  @map("tradein_model")
-  tradeinMiles  String?  @map("tradein_miles")
-  tradeinLien   String?  @map("tradein_lien")
-  tradeinBalance String? @map("tradein_balance")
-  tradeinLender String?  @map("tradein_lender")
-  notes         String?  @db.Text
-  paymentStatus String?  @default("unpaid") @map("payment_status")
-  stripeId      String?  @map("stripe_session_id")
-  paidAt        DateTime? @map("paid_at")
-  utmSource     String?  @map("utm_source")
-  utmMedium     String?  @map("utm_medium")
-  utmCampaign   String?  @map("utm_campaign")
-  utmTerm       String?  @map("utm_term")
-  utmContent    String?  @map("utm_content")
-  landingPage   String?  @map("landing_page")
-  createdAt     DateTime @default(now()) @map("created_at")
+  id              String   @id @default(cuid())
+  firstName       String
+  lastName        String
+  email           String   @unique
+  phone           String
+  password        String
+  tempPassword    String?
+  passwordChanged Boolean  @default(false)
+  vehicleType     String?
+  vehicleSpecific String?
+  budget          String?
+  timeline        String?
+  source          String?
+  notes           String?  @db.Text
+  step            Int      @default(0)
+  negotiatedPrice String?
+  deliveryDate    String?
+  contractSigned  Boolean  @default(false)
+  contractDate    DateTime?
+  contractData    Json?
+  paid            Boolean  @default(false)
+  paidDate        DateTime?
+  paidAmount      String?
+  stripePaymentId String?
+  isFleet         Boolean  @default(false)
+  fleetCompany    String?
+  gofetchClientId String?  @unique
+  anonymousEmail  String?  @unique
+  assignedToId    String?
+  utmSource       String?
+  utmMedium       String?
+  utmCampaign     String?
+  utmTerm         String?
+  utmContent      String?
+  landingPage     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  files      File[]
-  contracts  Contract[]
-  customerNotes Note[]
-  activity   Activity[]
-  payments   Payment[]
-  tags       CustomerTag[]
+  assignedTo      CRMUser?           @relation("AssignedAdvocate", fields: [assignedToId], references: [id])
+  documents       Document[]
+  messages        Message[]
+  notesLog        Note[]
+  deskingOffers   DeskingOffer[]
+  outreachCampaigns OutreachCampaign[]
+  touchPoints     TouchPoint[]
+  aiAlerts        AIAlert[]
 
-  @@map("gf_customers")
+  @@map("customers")
 }
 
-// ═══ FILES ═══
-model File {
-  id         Int      @id @default(autoincrement())
-  customerId String   @map("customer_id")
-  fileName   String   @map("file_name")
-  fileType   String?  @map("file_type")
-  fileData   String   @db.LongText @map("file_data")
-  uploadedAt DateTime @default(now()) @map("uploaded_at")
+// ═══ DOCUMENTS ═══
+model Document {
+  id           String   @id @default(cuid())
+  customerId   String
+  docType      String
+  fileName     String
+  originalName String
+  mimeType     String
+  size         Int
+  storagePath  String
+  status       String   @default("received")
+  uploadedAt   DateTime @default(now())
 
   customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
-  @@map("gf_files")
+  @@map("documents")
 }
 
-// ═══ CONTRACTS ═══
-model Contract {
-  id            Int      @id @default(autoincrement())
-  customerId    String   @map("customer_id")
-  signatureName String?  @map("signature_name")
-  signatureData String?  @db.LongText @map("signature_data")
-  signedAt      DateTime @default(now()) @map("signed_at")
+// ═══ MESSAGES ═══
+model Message {
+  id         String   @id @default(cuid())
+  customerId String
+  sender     String
+  content    String   @db.Text
+  createdAt  DateTime @default(now())
 
   customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
-  @@map("gf_contracts")
+  @@map("messages")
 }
 
 // ═══ NOTES ═══
 model Note {
-  id         Int      @id @default(autoincrement())
-  customerId String   @map("customer_id")
-  noteText   String   @db.Text @map("note_text")
-  createdAt  DateTime @default(now()) @map("created_at")
+  id         String   @id @default(cuid())
+  customerId String
+  content    String   @db.Text
+  author     String   @default("agent")
+  createdAt  DateTime @default(now())
 
   customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
-  @@map("gf_notes")
+  @@map("notes")
 }
 
-// ═══ SURVEYS ═══
-model Survey {
-  id            Int      @id @default(autoincrement())
-  customerId    String   @map("customer_id")
-  customerName  String   @map("customer_name")
-  customerEmail String   @map("customer_email")
-  q1            Int      @default(0)
-  q2            Int      @default(0)
-  q3            Int      @default(0)
-  q4            Int      @default(0)
-  q5            Int      @default(0)
-  averageRating Float    @default(0) @map("average_rating")
-  comment       String?  @db.Text
-  submittedAt   DateTime @default(now()) @map("submitted_at")
+// ═══ DEALER AUTH ═══
+model Dealer {
+  id   String @id @default(cuid())
+  pin  String @unique
+  name String @default("GoFetch Auto")
 
-  @@map("gf_surveys")
+  @@map("dealers")
 }
 
-// ═══ ACTIVITY LOG ═══
-model Activity {
-  id         Int      @id @default(autoincrement())
-  customerId String   @map("customer_id")
-  type       String
-  text       String   @db.Text
-  createdAt  DateTime @default(now()) @map("created_at")
+// ═══ ANALYTICS ═══
+model Analytics {
+  id        String   @id @default(cuid())
+  page      String
+  action    String
+  data      Json?
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
 
-  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-
-  @@map("gf_activity")
+  @@map("analytics")
 }
 
-// ═══ PAYMENTS ═══
-model Payment {
-  id              Int      @id @default(autoincrement())
-  customerId      String   @map("customer_id")
-  stripeSessionId String?  @map("stripe_session_id")
-  amount          Int      @default(0)
+// ═══ FLEET COMPANY ═══
+model FleetCompany {
+  id           String   @id @default(cuid())
+  name         String
+  contactName  String
+  contactEmail String   @unique
+  contactPhone String
+  password     String
+  totalOrders  Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  @@map("fleet_companies")
+}
+
+// ═══ CRM USERS ═══
+model CRMUser {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String
+  pin         String
+  role        String   @default("advocate")
+  avatar      String?
+  isActive    Boolean  @default(true)
+  lastLoginAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  permissions       CRMPermission[]
+  activities        CRMActivity[]
+  tasks             CRMTask[]
+  assignedCustomers Customer[]      @relation("AssignedAdvocate")
+
+  @@map("crm_users")
+}
+
+// ═══ CRM PERMISSIONS ═══
+model CRMPermission {
+  id        String  @id @default(cuid())
+  userId    String
+  module    String
+  canView   Boolean @default(false)
+  canCreate Boolean @default(false)
+  canEdit   Boolean @default(false)
+  canDelete Boolean @default(false)
+  canExport Boolean @default(false)
+
+  user CRMUser @relation(fields: [userId], references: [id])
+
+  @@map("crm_permissions")
+}
+
+// ═══ CRM ACTIVITY LOG ═══
+model CRMActivity {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  entity    String
+  entityId  String?
+  details   String?  @db.Text
+  ip        String?
+  createdAt DateTime @default(now())
+
+  user CRMUser @relation(fields: [userId], references: [id])
+
+  @@map("crm_activities")
+}
+
+// ═══ CRM TASKS ═══
+model CRMTask {
+  id         String   @id @default(cuid())
+  userId     String
+  title      String
+  description String? @db.Text
+  dueDate    DateTime?
+  customerId String?
+  priority   String   @default("normal")
+  status     String   @default("open")
+  createdAt  DateTime @default(now())
+
+  user CRMUser @relation(fields: [userId], references: [id])
+
+  @@map("crm_tasks")
+}
+
+// ═══ DESKING OFFERS ═══
+model DeskingOffer {
+  id              String   @id @default(cuid())
+  customerId      String
+  dealershipId    String?
+  dealerName      String?
+  dealerAddress   String?
+  dealerContact   String?
+  dealerPhone     String?
+  stockNumber     String?
+  vin             String?
+  isRevealed      Boolean  @default(false)
+  vehicleDesc     String?
+  msrp            String?
+  negotiatedPrice String?
+  otdPrice        String?
+  savings         String?
+  notes           String?  @db.Text
   status          String   @default("pending")
-  createdAt       DateTime @default(now()) @map("created_at")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customer   Customer    @relation(fields: [customerId], references: [id])
+  dealership Dealership? @relation(fields: [dealershipId], references: [id])
 
-  @@map("gf_payments")
+  @@map("desking_offers")
 }
 
-// ═══ DEALER USERS ═══
-model DealerUser {
-  id        Int      @id @default(autoincrement())
+// ═══ DEALERSHIPS ═══
+model Dealership {
+  id              String   @id @default(cuid())
+  name            String
+  brand           String?
+  address         String?
+  city            String?
+  state           String?
+  zip             String?
+  latitude        Float?
+  longitude       Float?
+  phone           String?
+  email           String?
+  website         String?
+  contactName     String?
+  isActive        Boolean  @default(true)
+  lastContacted   DateTime?
+  responseRate    Float?
+  avgResponseTime Float?
+  isPreferred     Boolean  @default(false)
+  partnerSince    DateTime?
+  agreedTerms     Boolean  @default(false)
+  preferredTier   String?
+  createdAt       DateTime @default(now())
+
+  deskingOffers     DeskingOffer[]
+  outreachResponses OutreachResponse[]
+
+  @@map("dealerships")
+}
+
+// ═══ OUTREACH CAMPAIGNS ═══
+model OutreachCampaign {
+  id              String   @id @default(cuid())
+  customerId      String
+  vehicleDesc     String?
+  colorPref       String?
+  features        String?  @db.Text
+  maxPrice        String?
+  radiusMiles     Int?
+  brandFilter     String?
+  dealersSent     Int      @default(0)
+  dealersResponded Int     @default(0)
+  status          String   @default("active")
+  sentAt          DateTime @default(now())
+
+  customer  Customer           @relation(fields: [customerId], references: [id])
+  responses OutreachResponse[]
+
+  @@map("outreach_campaigns")
+}
+
+// ═══ OUTREACH RESPONSES ═══
+model OutreachResponse {
+  id           String   @id @default(cuid())
+  campaignId   String
+  dealershipId String
+  status       String   @default("pending")
+  otdPrice     String?
+  vin          String?
+  stockNumber  String?
+  notes        String?  @db.Text
+  responseTime Int?
+  respondedAt  DateTime?
+  createdAt    DateTime @default(now())
+
+  campaign   OutreachCampaign @relation(fields: [campaignId], references: [id])
+  dealership Dealership       @relation(fields: [dealershipId], references: [id])
+
+  @@map("outreach_responses")
+}
+
+// ═══ LEAD SOURCES ═══
+model LeadSource {
+  id          String  @id @default(cuid())
+  name        String
+  type        String
+  isActive    Boolean @default(true)
+  config      Json?
+
+  @@map("lead_sources")
+}
+
+// ═══ WEBHOOK ENDPOINTS ═══
+model WebhookEndpoint {
+  id        String  @id @default(cuid())
   name      String
-  pin       String
-  role      String   @default("agent")
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now()) @map("created_at")
+  url       String
+  secret    String?
+  events    Json?
+  isActive  Boolean @default(true)
+  createdAt DateTime @default(now())
 
-  @@map("gf_users")
+  @@map("webhook_endpoints")
 }
 
-// ═══ TAGS ═══
-model Tag {
-  id        Int      @id @default(autoincrement())
-  name      String
-  color     String   @default("#d4a23a")
-  createdAt DateTime @default(now()) @map("created_at")
+// ═══ AI ALERTS ═══
+model AIAlert {
+  id           String   @id @default(cuid())
+  customerId   String
+  type         String
+  message      String   @db.Text
+  triggered    Boolean  @default(false)
+  triggeredAt  DateTime?
+  autoTextSent Boolean  @default(false)
+  createdAt    DateTime @default(now())
 
-  customers CustomerTag[]
+  customer Customer @relation(fields: [customerId], references: [id])
 
-  @@map("gf_tags")
+  @@map("ai_alerts")
 }
 
-// ═══ CUSTOMER-TAG MAPPING ═══
-model CustomerTag {
-  customerId String @map("customer_id")
-  tagId      Int    @map("tag_id")
+// ═══ AUDIT LOG ═══
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  before    Json?
+  after     Json?
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
 
-  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  @@map("audit_logs")
+}
 
-  @@id([customerId, tagId])
-  @@map("gf_customer_tags")
+// ═══ TENANT CONFIG ═══
+model TenantConfig {
+  id             String @id @default(cuid())
+  companyName    String @default("GoFetch Auto")
+  logoUrl        String?
+  primaryColor   String @default("#D4A23A")
+  secondaryColor String @default("#0A1628")
+  accentColor    String?
+  fontDisplay    String @default("Instrument Serif")
+  fontBody       String @default("Outfit")
+  domain         String?
+  favicon        String?
+  emailFrom      String?
+  smsFrom        String?
+  tagline        String?
+
+  @@map("tenant_configs")
+}
+
+// ═══ AI LEARNING ═══
+model AILearning {
+  id          String   @id @default(cuid())
+  category    String
+  dataPoint   String   @db.Text
+  outcome     String?
+  feedback    String?
+  usedInModel Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@map("ai_learnings")
+}
+
+// ═══ AI MODEL VERSIONS ═══
+model AIModelVersion {
+  id          String   @id @default(cuid())
+  category    String
+  version     String
+  weights     Json?
+  accuracy    Float?
+  dataPoints  Int      @default(0)
+  trainedAt   DateTime @default(now())
+
+  @@map("ai_model_versions")
+}
+
+// ═══ TOUCHPOINTS (Attribution) ═══
+model TouchPoint {
+  id         String   @id @default(cuid())
+  customerId String
+  sessionId  String?
+  channel    String?
+  source     String?
+  medium     String?
+  campaign   String?
+  page       String?
+  action     String?
+  createdAt  DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id])
+
+  @@map("touch_points")
 }

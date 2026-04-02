@@ -1,26 +1,37 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-navy: #0a1628;
+  --color-navy: #0A1628;
   --color-navy-light: #132038;
-  --color-cream: #faf6ef;
-  --color-amber: #d4a23a;
-  --color-amber-light: #e8b84a;
-  --color-muted: #8a95a3;
-  --color-warm-600: #5a6673;
-  --color-sand: #e2d9c8;
-  --font-sans: var(--font-sans);
-  --font-serif: var(--font-serif);
+  --color-navy-800: #1a2d4a;
+  --color-amber: #D4A23A;
+  --color-amber-light: #E8B84A;
+  --color-amber-dark: #B8892E;
+  --color-cream: #FAF6EF;
+  --color-offwhite: #F7F8FA;
+  --color-muted: #8A95A3;
+  --color-warm-600: #5A6673;
+  --color-sand: #E2D9C8;
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
 }
 
-body {
-  background: var(--color-navy);
-  color: var(--color-cream);
-  font-family: var(--font-sans), system-ui, sans-serif;
-}
-
-/* Smooth scrolling */
 html { scroll-behavior: smooth; }
-
-/* Selection */
+body { font-family: var(--font-body), system-ui, sans-serif; }
 ::selection { background: var(--color-amber); color: var(--color-navy); }
+
+/* Animated counters */
+@keyframes countUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.animate-count { animation: countUp 0.6s ease-out forwards; }
+
+/* Slide in */
+@keyframes slideIn { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+.animate-slide-in { animation: slideIn 0.3s ease-out; }
+
+/* Pulse glow */
+@keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(212,162,58,0.4); } 50% { box-shadow: 0 0 0 8px rgba(212,162,58,0); } }
+.animate-pulse-glow { animation: pulseGlow 2s infinite; }
+
+/* Brand marquee */
+@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+.animate-marquee { animation: marquee 30s linear infinite; }

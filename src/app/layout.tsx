@@ -1,28 +1,30 @@
 import type { Metadata } from "next";
-import { Outfit, Playfair_Display } from "next/font/google";
+import { Outfit } from "next/font/google";
 import { TRPCProvider } from "@/components/providers";
+import { Nav } from "@/components/layout/nav";
+import { Footer } from "@/components/layout/footer";
 import "./globals.css";
 
 const outfit = Outfit({
-  variable: "--font-sans",
-  subsets: ["latin"],
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-serif",
+  variable: "--font-body",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "GoFetch Auto | Professional Car Buying Advocacy",
+  title: "GoFetch Auto | Your Personal Car Buying Advocate",
   description:
-    "Dealerships train to take your money. GoFetch Auto trains to stop them. Professional car buying advocacy — $3,400 avg savings.",
+    "GoFetch Auto is the professional representation that's been missing from the second-biggest purchase of your life. We find your car, negotiate the deal, and handle the dealership — so you get the keys without the dread.",
   openGraph: {
-    title: "GoFetch Auto | Dealerships Train to Take Your Money. We Train to Stop Them.",
+    title: "GoFetch Auto | What If Buying a Car Actually Felt Good?",
     description: "Professional car buying advocacy. We negotiate, you save. $3,400 average savings.",
     url: "https://gofetchauto.com",
     siteName: "GoFetch Auto",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GoFetch Auto | Car Buying Advocacy",
+    description: "Professional car buying advocacy. We negotiate, you save.",
   },
 };
 
@@ -32,20 +34,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${outfit.variable} ${playfair.variable} h-full antialiased`}>
+    <html lang="en" className={`${outfit.variable} h-full antialiased`}>
       <head>
-        <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-F6K8C4RVYZ"
+        <link
+          href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap"
+          rel="stylesheet"
         />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-F6K8C4RVYZ" />
         <script
           dangerouslySetInnerHTML={{
             __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-F6K8C4RVYZ');`,
           }}
         />
+        <style dangerouslySetInnerHTML={{ __html: `:root { --font-display: 'Instrument Serif', serif; }` }} />
       </head>
-      <body className="min-h-full flex flex-col bg-[#0a1628] text-[#faf6ef]">
-        <TRPCProvider>{children}</TRPCProvider>
+      <body className="min-h-full flex flex-col bg-white text-navy">
+        <TRPCProvider>
+          <Nav />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </TRPCProvider>
       </body>
     </html>
   );
