@@ -37,6 +37,9 @@ model Customer {
   fleetCompany    String?
   gofetchClientId String?  @unique
   anonymousEmail  String?  @unique
+  referralCode    String?  @unique
+  referredById    String?
+  lifetimeValue   Float    @default(0)
   assignedToId    String?
   leadScore       Int      @default(0)
   responseTime    Int?
