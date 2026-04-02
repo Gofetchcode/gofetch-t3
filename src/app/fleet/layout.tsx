@@ -38,7 +38,7 @@ export default function FleetLayout({ children }: { children: React.ReactNode })
                 {l.label}
               </Link>
             ))}
-            <button className="ml-2 px-3 py-2 text-sm text-white/30 hover:text-white/60 transition">Sign Out</button>
+            <button onClick={() => window.location.href = "/"} className="ml-2 px-3 py-2 text-sm text-white/30 hover:text-white/60 transition border border-white/10 rounded-lg">Sign Out</button>
           </div>
         </div>
       </nav>

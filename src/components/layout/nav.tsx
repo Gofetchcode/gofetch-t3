@@ -11,7 +11,7 @@ const links = [
   { href: "/exotic", label: "Exotic" },
   { href: "/car-finder", label: "Car Finder" },
   { href: "/contact", label: "Contact" },
-  { href: "/fleet", label: "Fleet" },
+  { href: "https://fleet.gofetchauto.com", label: "Fleet", external: true },
   { href: "/portal", label: "My Portal", cta: true },
   { href: "/dealer", label: "Dealer", muted: true },
 ];
@@ -45,21 +45,18 @@ export function Nav() {
 
         {/* Desktop links */}
         <div className="hidden lg:flex items-center gap-1">
-          {links.map((l) => (
-            <Link
-              key={l.label}
-              href={l.href}
-              className={
-                (l as any).cta
-                  ? "ml-2 bg-amber text-navy px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-light transition"
-                  : (l as any).muted
-                  ? "ml-1 px-3 py-2 text-sm text-white/30 hover:text-white/60 transition"
-                  : "px-3 py-2 text-sm text-white/60 hover:text-white transition"
-              }
-            >
-              {l.label}
-            </Link>
-          ))}
+          {links.map((l) => {
+            const cls = (l as any).cta
+              ? "ml-2 bg-amber text-navy px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-light transition"
+              : (l as any).muted
+              ? "ml-1 px-3 py-2 text-sm text-white/30 hover:text-white/60 transition"
+              : "px-3 py-2 text-sm text-white/60 hover:text-white transition";
+            return (l as any).external ? (
+              <a key={l.label} href={l.href} className={cls}>{l.label}</a>
+            ) : (
+              <Link key={l.label} href={l.href} className={cls}>{l.label}</Link>
+            );
+          })}
         </div>
 
         {/* Mobile hamburger */}

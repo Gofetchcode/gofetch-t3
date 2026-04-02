@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import Link from "next/link";
 import { Confetti } from "@/components/confetti";
@@ -27,6 +27,11 @@ export default function PortalPage() {
   const [showPw, setShowPw] = useState(false);
   const [payLoading, setPayLoading] = useState(false);
   const [needsPasswordChange, setNeedsPasswordChange] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadMsg, setUploadMsg] = useState("");
+  const [selectedDocType, setSelectedDocType] = useState("Other");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [newPw, setNewPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
 
@@ -267,8 +272,8 @@ export default function PortalPage() {
               </div>
               <div className="mt-4 bg-offwhite rounded-lg p-3 text-center">
                 <p className="text-sm text-navy font-medium">{Math.round(progress)}% Complete</p>
-                <div className="w-full h-2 bg-gray-200 rounded-full mt-2">
-                  <div className="h-full bg-gradient-to-r from-amber to-amber-light rounded-full transition-all" style={{ width: `${progress}%` }} />
+                <div className="w-full h-2 bg-gray-200 rounded-full mt-2 overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-amber to-amber-light rounded-full animate-path-fill" style={{ maxWidth: `${progress}%` }} />
                 </div>
               </div>
             </div>
@@ -370,16 +375,61 @@ export default function PortalPage() {
               {/* Doc type pill selector */}
               <div className="flex flex-wrap gap-2 mb-4">
                 {["Driver's License", "Insurance", "Proof of Income", "Pre-Approval", "Trade-In Title", "Other"].map((t) => (
-                  <button key={t} className="px-3 py-1.5 text-xs font-medium rounded-full border border-gray-200 text-muted hover:bg-amber hover:text-navy hover:border-amber transition">
+                  <button key={t} onClick={() => setSelectedDocType(t)} className={`px-3 py-1.5 text-xs font-medium rounded-full border transition ${selectedDocType === t ? "bg-amber text-navy border-amber" : "border-gray-200 text-muted hover:bg-amber hover:text-navy hover:border-amber"}`}>
                     {t}
                   </button>
                 ))}
               </div>
 
-              <div className="border-2 border-dashed border-amber/30 rounded-xl p-8 text-center mb-6 hover:border-amber/60 transition cursor-pointer">
-                <p className="text-3xl mb-2">📎</p>
-                <p className="text-sm text-navy font-medium">Drop files here or click to browse</p>
-                <p className="text-xs text-muted mt-1">PDF, JPEG, PNG &bull; Max 10MB</p>
+              <div
+                className={`border-2 border-dashed rounded-xl p-8 text-center mb-6 transition cursor-pointer relative ${dragOver ? "border-amber bg-amber/5" : "border-amber/30 hover:border-amber/60"}`}
+                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={async (e) => {
+                  e.preventDefault(); setDragOver(false);
+                  const file = e.dataTransfer.files[0];
+                  if (!file) return;
+                  setUploading(true);
+                  const fd = new FormData();
+                  fd.append("file", file);
+                  fd.append("customerId", customer.id);
+                  fd.append("docType", selectedDocType);
+                  try {
+                    await fetch("/api/upload", { method: "POST", body: fd });
+                    setUploadMsg("Uploaded successfully!");
+                  } catch { setUploadMsg("Upload failed"); }
+                  setUploading(false);
+                  setTimeout(() => setUploadMsg(""), 3000);
+                }}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setUploading(true);
+                    const fd = new FormData();
+                    fd.append("file", file);
+                    fd.append("customerId", customer.id);
+                    fd.append("docType", selectedDocType);
+                    try {
+                      await fetch("/api/upload", { method: "POST", body: fd });
+                      setUploadMsg("Uploaded successfully!");
+                    } catch { setUploadMsg("Upload failed"); }
+                    setUploading(false);
+                    setTimeout(() => setUploadMsg(""), 3000);
+                  }}
+                />
+                {uploading ? (
+                  <><span className="w-6 h-6 border-2 border-amber/30 border-t-amber rounded-full animate-spin inline-block mb-2" /><p className="text-sm text-navy font-medium">Uploading...</p></>
+                ) : (
+                  <><p className="text-3xl mb-2">📎</p><p className="text-sm text-navy font-medium">{dragOver ? "Drop file here" : "Drop files here or click to browse"}</p><p className="text-xs text-muted mt-1">PDF, JPEG, PNG &bull; Max 10MB</p></>
+                )}
+                {uploadMsg && <p className="text-xs text-green-600 mt-2 font-medium">{uploadMsg}</p>}
               </div>
             {customer.documents?.length > 0 ? (
               <div className="space-y-2">
