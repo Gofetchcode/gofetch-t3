@@ -1,9 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { db } from "@/lib/db";
 
-const anthropic = process.env.ANTHROPIC_API_KEY
-  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-  : null;
+const apiKey = (process.env.ANTHROPIC_API_KEY || "").replace(/\s+/g, "").trim();
+const anthropic = apiKey ? new Anthropic({ apiKey }) : null;
 
 export async function POST(req: Request) {
   try {
