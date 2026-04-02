@@ -27,25 +27,19 @@ export function AICoPilot() {
     setMessages((m) => [...m, { role: "user", content: userMsg }]);
     setLoading(true);
 
-    // Simulate AI response (replace with real Claude/OpenAI API call)
-    setTimeout(() => {
-      const responses: Record<string, string> = {
-        "hottest lead": "Your hottest lead right now is **Sarah Johnson** (Score: 92). She's viewed your last email 4 times and uploaded her insurance docs yesterday. Recommend: Call her now.",
-        "conversion": "Your conversion rate this month is **24%** (up 3% from last month). You've closed 8 out of 33 leads. Top converting source: Referrals at 34%.",
-        "response time": "Average response time this week: **18 minutes** (down from 31 last week). Great improvement! 78% of leads contacted within 15 minutes.",
-        "draft": "Here's a draft follow-up:\n\n\"Hi! Just checking in on the vehicle options we discussed. I found 3 great matches under your budget. Want me to send the details? No pressure — just want to make sure you have the latest info.\"",
-        "stalled": "You have **3 stalled deals**: Mike Davis (8 days in Negotiating), Lisa Wang (12 days in Approval), Robert Brown (5 days no response). Recommend: Focus on Mike — he opened your email yesterday.",
-        "next": "**Today's priority actions:**\n1. Call Sarah Johnson — score jumped to 92\n2. Send Offer #2 to Mike Davis — been waiting 3 days\n3. Follow up with Lisa Wang — docs needed\n4. Text Robert Brown — no response in 5 days\n5. Review new lead from Google Ads",
-      };
-
-      const key = Object.keys(responses).find((k) => userMsg.toLowerCase().includes(k));
-      const reply = key
-        ? responses[key]
-        : `Based on your CRM data, here's what I found:\n\nYou have **12 active deals** across the pipeline. 3 are in negotiation, 2 awaiting approval. Your top performer this week is Marcus with 4 deals closed.\n\nWant me to dig deeper into any specific area?`;
-
-      setMessages((m) => [...m, { role: "assistant", content: reply }]);
-      setLoading(false);
-    }, 1200);
+    // Real AI API call
+    try {
+      const res = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userMsg }),
+      });
+      const data = await res.json();
+      setMessages((m) => [...m, { role: "assistant", content: data.response || data.error || "Unable to process." }]);
+    } catch {
+      setMessages((m) => [...m, { role: "assistant", content: "Connection error. Please try again." }]);
+    }
+    setLoading(false);
   };
 
   if (!open) {

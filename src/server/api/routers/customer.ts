@@ -2,6 +2,7 @@ import { z } from "zod";
 import { router, publicProcedure, dealerProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import bcrypt from "bcryptjs";
+import { calculateLeadScore } from "@/lib/ai-engine";
 
 export const customerRouter = router({
   // ═══ SUBMIT CONSULTATION ═══
@@ -62,6 +63,13 @@ export const customerRouter = router({
           content: `Welcome to GoFetch Auto, ${input.firstName}! We've received your consultation request and our team will reach out within 24 hours. Your temporary portal password is: ${tempPassword}`,
         },
       });
+
+      // Auto-calculate lead score
+      const score = calculateLeadScore({
+        budget: input.budget, timeline: input.timeline, vehicleType: input.vehicleType,
+        contractSigned: !!input.contractData, source: input.source,
+      });
+      await ctx.db.customer.update({ where: { id: customer.id }, data: { leadScore: score } });
 
       return { success: true, tempPassword, clientId: customer.gofetchClientId };
     }),
