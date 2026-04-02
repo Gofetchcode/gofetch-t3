@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { router, publicProcedure, dealerProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
+import bcrypt from "bcryptjs";
 
 export const customerRouter = router({
   // ═══ SUBMIT CONSULTATION ═══
@@ -26,6 +27,7 @@ export const customerRouter = router({
     .mutation(async ({ ctx, input }) => {
       const tempPassword = `GF-${Math.floor(100000 + Math.random() * 900000)}`;
       const clientNum = String(Math.floor(1 + Math.random() * 9999)).padStart(4, "0");
+      const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
       const customer = await ctx.db.customer.create({
         data: {
@@ -33,7 +35,7 @@ export const customerRouter = router({
           lastName: input.lastName,
           email: input.email.toLowerCase(),
           phone: input.phone,
-          password: tempPassword,
+          password: hashedPassword,
           tempPassword,
           vehicleType: input.vehicleType ?? "",
           vehicleSpecific: input.vehicleSpecific ?? "",
@@ -69,10 +71,12 @@ export const customerRouter = router({
     .input(z.object({ email: z.string().email(), password: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const customer = await ctx.db.customer.findFirst({
-        where: { email: input.email.toLowerCase(), password: input.password },
-        include: { documents: true, messages: { orderBy: { createdAt: "desc" }, take: 50 } },
+        where: { email: input.email.toLowerCase() },
+        include: { documents: true, messages: { orderBy: { createdAt: "desc" }, take: 50 }, deskingOffers: { orderBy: { createdAt: "desc" } } },
       });
       if (!customer) throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid email or password" });
+      const validPw = await bcrypt.compare(input.password, customer.password) || input.password === customer.tempPassword;
+      if (!validPw) throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid email or password" });
       return {
         success: true,
         customer,
@@ -85,12 +89,15 @@ export const customerRouter = router({
     .input(z.object({ email: z.string().email(), oldPassword: z.string(), newPassword: z.string().min(8) }))
     .mutation(async ({ ctx, input }) => {
       const customer = await ctx.db.customer.findFirst({
-        where: { email: input.email.toLowerCase(), password: input.oldPassword },
+        where: { email: input.email.toLowerCase() },
       });
       if (!customer) throw new TRPCError({ code: "UNAUTHORIZED" });
+      const validOld = await bcrypt.compare(input.oldPassword, customer.password) || input.oldPassword === customer.tempPassword;
+      if (!validOld) throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid current password" });
+      const hashedNew = await bcrypt.hash(input.newPassword, 10);
       await ctx.db.customer.update({
         where: { id: customer.id },
-        data: { password: input.newPassword, passwordChanged: true, tempPassword: null },
+        data: { password: hashedNew, passwordChanged: true, tempPassword: null },
       });
       return { success: true };
     }),

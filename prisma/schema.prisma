@@ -38,6 +38,8 @@ model Customer {
   gofetchClientId String?  @unique
   anonymousEmail  String?  @unique
   assignedToId    String?
+  leadScore       Int      @default(0)
+  responseTime    Int?
   utmSource       String?
   utmMedium       String?
   utmCampaign     String?
@@ -143,10 +145,15 @@ model FleetCompany {
 model CRMUser {
   id          String   @id @default(cuid())
   email       String   @unique
+  firstName   String   @default("")
+  lastName    String   @default("")
   name        String
+  phone       String?
+  password    String?
   pin         String
   role        String   @default("advocate")
   avatar      String?
+  dashboardLayout Json?
   isActive    Boolean  @default(true)
   lastLoginAt DateTime?
   createdAt   DateTime @default(now())
@@ -221,13 +228,20 @@ model DeskingOffer {
   stockNumber     String?
   vin             String?
   isRevealed      Boolean  @default(false)
+  offerNumber     Int      @default(1)
   vehicleDesc     String?
   msrp            String?
+  invoicePrice    String?
   negotiatedPrice String?
+  dealerFees      String?
+  feesRemoved     String?
   otdPrice        String?
   savings         String?
+  monthlyEst      String?
   notes           String?  @db.Text
   status          String   @default("pending")
+  sentAt          DateTime?
+  clientResponse  String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
