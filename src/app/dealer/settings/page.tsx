@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { TemplateEditor } from "@/components/template-editor";
+import { AttributionDashboard } from "@/components/attribution-dashboard";
 
 const sections = [
   { id: "users", label: "Users & Roles", icon: "👥" },
@@ -90,12 +92,17 @@ export default function SettingsPage() {
 
             {active === "comms" && (
               <div>
-                <h3 className="text-lg font-bold mb-4">Communications</h3>
-                <div className="space-y-4">
-                  <div><label className="text-sm text-white/50 block mb-1">SMS Provider</label>
-                    <select className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full"><option>Twilio</option><option>Not configured</option></select></div>
-                  <div><label className="text-sm text-white/50 block mb-1">Email Provider</label>
-                    <select className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full"><option>SendGrid</option><option>AWS SES</option><option>Not configured</option></select></div>
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-bold mb-4">Communications</h3>
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      <div><label className="text-sm text-white/50 block mb-1">SMS Provider</label>
+                        <select className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full"><option>Twilio</option><option>Not configured</option></select></div>
+                      <div><label className="text-sm text-white/50 block mb-1">Email Provider</label>
+                        <select className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full"><option>SendGrid</option><option>AWS SES</option><option>Not configured</option></select></div>
+                    </div>
+                  </div>
+                  <TemplateEditor />
                 </div>
               </div>
             )}
@@ -103,14 +110,51 @@ export default function SettingsPage() {
             {active === "ai" && (
               <div>
                 <h3 className="text-lg font-bold mb-4">AI Settings</h3>
-                <div className="space-y-4">
-                  <div><label className="text-sm text-white/50 block mb-1">Auto-text after (minutes)</label>
-                    <input type="number" defaultValue={240} className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-40" /></div>
-                  <div><label className="text-sm text-white/50 block mb-1">Escalation after (hours)</label>
-                    <input type="number" defaultValue={24} className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-40" /></div>
-                  <div><label className="text-sm text-white/50 block mb-1">Auto-reassign after (hours)</label>
-                    <input type="number" defaultValue={48} className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-40" /></div>
+
+                {/* Autonomy Level */}
+                <div className="mb-6">
+                  <label className="text-sm text-white/50 block mb-2">AI Autonomy Level</label>
+                  <div className="space-y-2">
+                    {[
+                      { level: 1, name: "Suggest Only", desc: "AI recommends but never executes. Human approves everything.", color: "border-green-500/30" },
+                      { level: 2, name: "Auto Low-Risk", desc: "AI handles follow-ups, reminders, welcomes. Waits for approval on offers/money.", color: "border-amber/30" },
+                      { level: 3, name: "Full Auto", desc: "AI handles everything except payments, contracts, and deletions.", color: "border-red-500/30" },
+                    ].map(a => (
+                      <label key={a.level} className={`flex items-start gap-3 bg-white/[0.02] border ${a.color} rounded-lg p-3 cursor-pointer hover:bg-white/[0.04] transition`}>
+                        <input type="radio" name="autonomy" defaultChecked={a.level === 1} className="mt-1 accent-amber" />
+                        <div>
+                          <p className="text-sm font-medium text-white">Level {a.level}: {a.name}</p>
+                          <p className="text-xs text-white/30">{a.desc}</p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
                 </div>
+
+                {/* Timing */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-bold text-white/60 uppercase tracking-wider">Escalation Timing</h4>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div><label className="text-xs text-white/50 block mb-1">Auto-text after</label>
+                      <div className="flex items-center gap-2"><input type="number" defaultValue={240} className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm w-20" /><span className="text-xs text-white/30">min</span></div></div>
+                    <div><label className="text-xs text-white/50 block mb-1">Escalation after</label>
+                      <div className="flex items-center gap-2"><input type="number" defaultValue={24} className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm w-20" /><span className="text-xs text-white/30">hrs</span></div></div>
+                    <div><label className="text-xs text-white/50 block mb-1">Auto-reassign after</label>
+                      <div className="flex items-center gap-2"><input type="number" defaultValue={48} className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm w-20" /><span className="text-xs text-white/30">hrs</span></div></div>
+                  </div>
+                </div>
+
+                {/* Safety */}
+                <div className="mt-6 space-y-3">
+                  <h4 className="text-sm font-bold text-white/60 uppercase tracking-wider">Safety Guardrails</h4>
+                  <label className="flex items-center gap-3"><input type="checkbox" defaultChecked className="accent-amber" /><span className="text-sm text-white/60">Quiet hours: No messages 9PM-8AM</span></label>
+                  <label className="flex items-center gap-3"><input type="checkbox" defaultChecked className="accent-amber" /><span className="text-sm text-white/60">Max 3 auto-messages per customer per day</span></label>
+                  <label className="flex items-center gap-3"><input type="checkbox" defaultChecked className="accent-amber" /><span className="text-sm text-white/60">AI always identifies itself in messages</span></label>
+                  <label className="flex items-center gap-3"><input type="checkbox" defaultChecked className="accent-amber" /><span className="text-sm text-white/60">Stop AI on negative customer sentiment</span></label>
+                  <label className="flex items-center gap-3"><input type="checkbox" defaultChecked className="accent-amber" /><span className="text-sm text-white/60">5-second undo window on all AI actions</span></label>
+                </div>
+
+                <button className="mt-6 bg-amber text-navy font-semibold px-6 py-2 rounded-lg text-sm hover:bg-amber-light transition">Save AI Settings</button>
               </div>
             )}
 

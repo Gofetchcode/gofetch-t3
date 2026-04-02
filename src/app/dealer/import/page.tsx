@@ -24,9 +24,21 @@ export default function ImportPage() {
     reader.readAsText(file);
   };
 
-  const handleImport = () => {
-    // TODO: send mapped data to API
-    setStep("done");
+  const [importResult, setImportResult] = useState<{ imported: number; skipped: number } | null>(null);
+
+  const handleImport = async () => {
+    try {
+      const res = await fetch("/api/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rows, mapping }),
+      });
+      const data = await res.json();
+      setImportResult({ imported: data.imported || 0, skipped: data.skipped || 0 });
+      setStep("done");
+    } catch {
+      setStep("done");
+    }
   };
 
   return (
