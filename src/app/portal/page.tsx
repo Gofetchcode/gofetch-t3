@@ -24,6 +24,8 @@ export default function PortalPage() {
   const [customer, setCustomer] = useState<any>(null);
   const [tab, setTab] = useState<"deal" | "documents" | "payment" | "messages">("deal");
   const [newMessage, setNewMessage] = useState("");
+  const [showPw, setShowPw] = useState(false);
+  const [payLoading, setPayLoading] = useState(false);
   const [needsPasswordChange, setNeedsPasswordChange] = useState(false);
   const [newPw, setNewPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
@@ -50,44 +52,84 @@ export default function PortalPage() {
 
   if (!customer) {
     return (
-      <div className="min-h-screen bg-offwhite flex items-center justify-center px-4 pt-20">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <div className="flex justify-center mb-6">
-            <div className="w-12 h-12 rounded-xl bg-amber flex items-center justify-center">
-              <span className="text-navy font-bold text-2xl" style={{ fontFamily: "var(--font-display)" }}>G</span>
+      <div className="min-h-screen flex pt-16">
+        {/* LEFT — Dark branding side (60%) */}
+        <div className="hidden lg:flex lg:w-3/5 bg-navy relative overflow-hidden items-center justify-center">
+          {/* Animated gold particles */}
+          <style>{`
+            @keyframes drift { 0%{transform:translateY(0) translateX(0);opacity:0} 10%{opacity:1} 90%{opacity:1} 100%{transform:translateY(-100vh) translateX(30px);opacity:0} }
+            .particle{position:absolute;width:3px;height:3px;border-radius:50%;background:#D4A23A;animation:drift linear infinite}
+          `}</style>
+          {Array.from({length:20}).map((_,i) => (
+            <div key={i} className="particle" style={{left:`${5+Math.random()*90}%`,bottom:`-5%`,animationDuration:`${8+Math.random()*12}s`,animationDelay:`${Math.random()*10}s`,opacity:0.15+Math.random()*0.3,width:`${2+Math.random()*3}px`,height:`${2+Math.random()*3}px`}} />
+          ))}
+          <div className="relative text-center px-12 z-10">
+            <div className="w-16 h-16 rounded-2xl bg-amber flex items-center justify-center mx-auto mb-8">
+              <span className="text-navy font-bold text-3xl" style={{ fontFamily: "var(--font-display)" }}>G</span>
             </div>
+            <h2 className="text-4xl font-bold text-white mb-4" style={{ fontFamily: "var(--font-display)" }}>
+              Your Deal.<br />Your Dashboard.
+            </h2>
+            <p className="text-white/50 text-lg max-w-md mx-auto">
+              Track every step of your car purchase in real-time.
+            </p>
           </div>
-          <h3 className="text-2xl font-bold text-navy text-center mb-1" style={{ fontFamily: "var(--font-display)" }}>Client Portal</h3>
-          <p className="text-sm text-muted text-center mb-8">Track your deal, upload documents, and manage payments.</p>
+        </div>
 
-          <div className="space-y-4">
-            <input
-              type="email"
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-navy text-sm focus:border-amber focus:ring-1 focus:ring-amber outline-none"
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && loginMutation.mutate({ email, password })}
-              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-navy text-sm focus:border-amber focus:ring-1 focus:ring-amber outline-none"
-            />
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            <button
-              onClick={() => { setError(""); loginMutation.mutate({ email, password }); }}
-              disabled={loginMutation.isPending}
-              className="w-full bg-amber text-navy font-bold py-3 rounded-lg hover:bg-amber-light transition disabled:opacity-50"
-            >
-              {loginMutation.isPending ? "Signing in..." : "Sign In"}
-            </button>
+        {/* RIGHT — Login form (40%) */}
+        <div className="w-full lg:w-2/5 bg-white flex items-center justify-center px-6">
+          <div className="w-full max-w-sm">
+            <div className="lg:hidden flex justify-center mb-6">
+              <div className="w-12 h-12 rounded-xl bg-amber flex items-center justify-center">
+                <span className="text-navy font-bold text-2xl" style={{ fontFamily: "var(--font-display)" }}>G</span>
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-navy mb-1" style={{ fontFamily: "var(--font-display)" }}>Welcome back</h3>
+            <p className="text-sm text-muted mb-8">Sign in to your Client Portal</p>
+
+            <div className="space-y-4">
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-sm">✉</span>
+                <input
+                  type="email"
+                  placeholder="Email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg pl-10 pr-4 py-3 text-navy text-sm focus:border-amber focus:ring-1 focus:ring-amber outline-none transition"
+                />
+              </div>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-sm">🔒</span>
+                <input
+                  type={showPw ? "text" : "password"}
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && loginMutation.mutate({ email, password })}
+                  className="w-full border border-gray-200 rounded-lg pl-10 pr-10 py-3 text-navy text-sm focus:border-amber focus:ring-1 focus:ring-amber outline-none transition"
+                />
+                <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted text-xs hover:text-navy transition">
+                  {showPw ? "Hide" : "Show"}
+                </button>
+              </div>
+              {error && <div className="text-red-500 text-sm animate-shake">{error}</div>}
+              <button
+                onClick={() => { setError(""); loginMutation.mutate({ email, password }); }}
+                disabled={loginMutation.isPending}
+                className="w-full bg-amber text-navy font-bold py-3.5 rounded-lg hover:bg-amber-light hover:scale-[1.02] transition-all disabled:opacity-50 disabled:scale-100 shadow-md shadow-amber/20"
+              >
+                {loginMutation.isPending ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="w-4 h-4 border-2 border-navy/30 border-t-navy rounded-full animate-spin" />
+                    Signing in...
+                  </span>
+                ) : "Log In"}
+              </button>
+            </div>
+            <p className="text-xs text-muted text-center mt-6">
+              New client? <Link href="/car-finder" className="text-amber hover:underline">Start a free consultation →</Link>
+            </p>
           </div>
-          <p className="text-xs text-muted text-center mt-6">
-            New client? <Link href="/car-finder" className="text-amber hover:underline">Get started with a free consultation</Link>
-          </p>
         </div>
       </div>
     );
@@ -167,17 +209,20 @@ export default function PortalPage() {
           ))}
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-8">
-          {(["deal", "documents", "payment", "messages"] as const).map((t) => (
+        {/* Tabs with animated underline */}
+        <div className="relative flex border-b border-gray-200 mb-8">
+          {(["deal", "documents", "payment", "messages"] as const).map((t, i) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition capitalize ${
-                tab === t ? "bg-white text-navy shadow-sm" : "text-muted hover:text-navy"
+              className={`relative flex-1 py-3 text-sm font-semibold transition-colors ${
+                tab === t ? "text-navy" : "text-muted hover:text-navy"
               }`}
             >
-              {t === "deal" ? "My Deal" : t}
+              {t === "deal" ? "📍 My Deal" : t === "documents" ? "📄 Documents" : t === "payment" ? "💳 Payment" : "💬 Messages"}
+              {tab === t && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber rounded-full transition-all duration-300" />
+              )}
             </button>
           ))}
         </div>
@@ -403,8 +448,29 @@ export default function PortalPage() {
               <>
                 <p className="text-5xl font-bold text-amber mb-2" style={{ fontFamily: "var(--font-display)" }}>$99</p>
                 <p className="text-sm text-muted mb-6">Standard Tier — Car Buying Advocacy</p>
-                <button className="bg-amber text-navy font-bold px-8 py-4 rounded-lg text-lg hover:bg-amber-light transition animate-pulse-glow">
-                  Pay Now — Secure Checkout →
+                <button
+                  onClick={async () => {
+                    setPayLoading(true);
+                    try {
+                      const res = await fetch("/api/stripe/checkout", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ customerId: customer.id, tier: "standard" }),
+                      });
+                      const data = await res.json();
+                      if (data.url) window.location.href = data.url;
+                      else setPayLoading(false);
+                    } catch { setPayLoading(false); }
+                  }}
+                  disabled={payLoading}
+                  className="bg-amber text-navy font-bold px-8 py-4 rounded-lg text-lg hover:bg-amber-light transition animate-pulse-glow disabled:opacity-50"
+                >
+                  {payLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="w-5 h-5 border-2 border-navy/30 border-t-navy rounded-full animate-spin" />
+                      Redirecting to Stripe...
+                    </span>
+                  ) : "Pay Now — Secure Checkout →"}
                 </button>
                 <div className="flex items-center justify-center gap-3 mt-4 text-xs text-muted">
                   <span>🔒 256-bit SSL</span>
