@@ -2,12 +2,18 @@
 
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
-import { Nav } from "@/components/landing/nav";
+import Link from "next/link";
 
 const STEPS = [
-  "Lead Sent", "Lead Received", "Working", "Negotiating",
-  "Client Approval", "Deal Agreed", "Paperwork Sent & Signed",
-  "Scheduled for Pickup", "Delivered",
+  "Consultation Submitted",
+  "Lead Received",
+  "Market Research",
+  "Negotiating",
+  "Client Approval",
+  "Deal Agreed",
+  "Paperwork & Signing",
+  "Delivery Coordination",
+  "Keys in Hand",
 ];
 
 export default function PortalPage() {
@@ -15,124 +21,302 @@ export default function PortalPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [customer, setCustomer] = useState<any>(null);
+  const [tab, setTab] = useState<"deal" | "documents" | "payment" | "messages">("deal");
+  const [newMessage, setNewMessage] = useState("");
+  const [needsPasswordChange, setNeedsPasswordChange] = useState(false);
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
 
   const loginMutation = trpc.customer.login.useMutation({
-    onSuccess: (data) => setCustomer(data.customer),
+    onSuccess: (data) => {
+      if (data.requirePasswordChange) {
+        setNeedsPasswordChange(true);
+        setCustomer(data.customer);
+      } else {
+        setCustomer(data.customer);
+      }
+    },
     onError: (err) => setError(err.message),
   });
 
-  const handleLogin = () => {
-    setError("");
-    loginMutation.mutate({ email, password });
-  };
+  const changePwMutation = trpc.customer.changePassword.useMutation({
+    onSuccess: () => {
+      setNeedsPasswordChange(false);
+      setCustomer({ ...customer, passwordChanged: true });
+    },
+    onError: (err) => setError(err.message),
+  });
 
   if (!customer) {
     return (
-      <>
-        <Nav />
-        <div className="min-h-screen flex items-center justify-center px-4 pt-20">
-          <div className="w-full max-w-sm bg-navy-light border border-white/[0.06] rounded-2xl p-8">
-            <h3 className="text-xl font-semibold text-cream text-center mb-2">Customer Portal</h3>
-            <p className="text-sm text-cream/40 text-center mb-6">Track your deal, review documents, and manage payments.</p>
+      <div className="min-h-screen bg-offwhite flex items-center justify-center px-4 pt-20">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+          <div className="flex justify-center mb-6">
+            <div className="w-12 h-12 rounded-xl bg-amber flex items-center justify-center">
+              <span className="text-navy font-bold text-2xl" style={{ fontFamily: "var(--font-display)" }}>G</span>
+            </div>
+          </div>
+          <h3 className="text-2xl font-bold text-navy text-center mb-1" style={{ fontFamily: "var(--font-display)" }}>Client Portal</h3>
+          <p className="text-sm text-muted text-center mb-8">Track your deal, upload documents, and manage payments.</p>
+
+          <div className="space-y-4">
             <input
               type="email"
               placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-cream text-sm mb-3 focus:border-amber focus:outline-none"
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-navy text-sm focus:border-amber focus:ring-1 focus:ring-amber outline-none"
             />
             <input
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-cream text-sm mb-3 focus:border-amber focus:outline-none"
+              onKeyDown={(e) => e.key === "Enter" && loginMutation.mutate({ email, password })}
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-navy text-sm focus:border-amber focus:ring-1 focus:ring-amber outline-none"
             />
-            {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
+            {error && <p className="text-red-500 text-sm">{error}</p>}
             <button
-              onClick={handleLogin}
+              onClick={() => { setError(""); loginMutation.mutate({ email, password }); }}
               disabled={loginMutation.isPending}
-              className="w-full bg-amber text-navy font-semibold py-3 rounded-lg hover:bg-amber-light transition disabled:opacity-50"
+              className="w-full bg-amber text-navy font-bold py-3 rounded-lg hover:bg-amber-light transition disabled:opacity-50"
             >
-              {loginMutation.isPending ? "Logging in..." : "Log In"}
+              {loginMutation.isPending ? "Signing in..." : "Sign In"}
+            </button>
+          </div>
+          <p className="text-xs text-muted text-center mt-6">
+            New client? <Link href="/car-finder" className="text-amber hover:underline">Get started with a free consultation</Link>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Password change screen
+  if (needsPasswordChange) {
+    return (
+      <div className="min-h-screen bg-offwhite flex items-center justify-center px-4 pt-20">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+          <h3 className="text-xl font-bold text-navy mb-2">Set Your New Password</h3>
+          <p className="text-sm text-muted mb-6">Please change your temporary password to continue.</p>
+          <div className="space-y-4">
+            <input type="password" placeholder="New password (8+ characters)" value={newPw} onChange={(e) => setNewPw(e.target.value)} className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:border-amber outline-none" />
+            <input type="password" placeholder="Confirm new password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:border-amber outline-none" />
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+            <button
+              onClick={() => {
+                if (newPw !== confirmPw) { setError("Passwords don't match"); return; }
+                if (newPw.length < 8) { setError("Password must be 8+ characters"); return; }
+                changePwMutation.mutate({ email: customer.email, oldPassword: password, newPassword: newPw });
+              }}
+              className="w-full bg-amber text-navy font-bold py-3 rounded-lg hover:bg-amber-light transition"
+            >
+              Set Password
             </button>
           </div>
         </div>
-      </>
+      </div>
     );
   }
 
   const progress = Math.round((customer.step / (STEPS.length - 1)) * 100);
 
   return (
-    <>
-      <Nav />
-      <div className="max-w-4xl mx-auto px-4 pt-24 pb-12">
-        <div className="flex justify-between items-center mb-6">
+    <div className="min-h-screen bg-offwhite pt-20">
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        {/* Welcome bar */}
+        <div className="flex justify-between items-center mb-8">
           <div>
-            <p className="text-sm text-cream/40">Welcome back,</p>
-            <h2 className="text-xl font-bold text-cream">{customer.name}</h2>
+            <p className="text-sm text-muted">Welcome back,</p>
+            <h2 className="text-2xl font-bold text-navy">{customer.firstName} {customer.lastName}</h2>
           </div>
-          <button
-            onClick={() => setCustomer(null)}
-            className="border border-white/10 px-4 py-2 rounded-lg text-sm text-cream/50 hover:text-cream transition"
-          >
-            Logout
-          </button>
+          <button onClick={() => setCustomer(null)} className="border border-gray-200 px-4 py-2 rounded-lg text-sm text-muted hover:text-navy transition">Sign Out</button>
         </div>
 
-        {/* Progress */}
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6 mb-6">
-          <h3 className="font-semibold text-cream mb-3">Your Vehicle Progress</h3>
-          <div className="w-full h-2 bg-white/10 rounded-full mb-3">
-            <div className="h-full bg-amber rounded-full transition-all" style={{ width: `${progress}%` }} />
-          </div>
-          <div className="flex justify-between text-xs text-cream/30">
-            <span>Lead Sent</span>
-            <span>Delivered</span>
-          </div>
-          <p className="text-sm text-amber font-medium mt-2">Current: {STEPS[customer.step]}</p>
+        {/* Stat cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {[
+            { label: "Current Step", value: `${customer.step + 1}/9`, sub: STEPS[customer.step] },
+            { label: "Days Active", value: String(Math.floor((Date.now() - new Date(customer.createdAt).getTime()) / 86400000)) },
+            { label: "Your Agent", value: "GoFetch Auto" },
+            { label: "Est. Savings", value: "~$3,400" },
+          ].map((s) => (
+            <div key={s.label} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <p className="text-xs text-amber font-semibold uppercase tracking-wider mb-1">{s.label}</p>
+              <p className="text-xl font-bold text-navy">{s.value}</p>
+              {s.sub && <p className="text-xs text-muted mt-1">{s.sub}</p>}
+            </div>
+          ))}
         </div>
 
-        {/* Deal Details */}
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6 mb-6">
-          <h3 className="font-semibold text-cream mb-4">Deal Details</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {[
-              { label: "Vehicle", value: customer.vehicle || "Pending", icon: "🚗" },
-              { label: "Negotiated Price", value: customer.price || "Pending", icon: "💰" },
-              { label: "Your Savings", value: customer.savings || "Pending", icon: "⭐" },
-              { label: "Your Agent", value: customer.agent || "Assigned", icon: "🧑" },
-              { label: "Est. Delivery", value: customer.delivery || "Pending", icon: "📅" },
-              { label: "Status", value: STEPS[customer.step], icon: "⏳" },
-            ].map((d) => (
-              <div key={d.label} className="bg-white/[0.02] rounded-lg p-4">
-                <div className="text-xs text-cream/30 uppercase tracking-wider mb-1">{d.label}</div>
-                <div className="text-sm font-medium text-cream">{d.icon} {d.value}</div>
+        {/* Tabs */}
+        <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-8">
+          {(["deal", "documents", "payment", "messages"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition capitalize ${
+                tab === t ? "bg-white text-navy shadow-sm" : "text-muted hover:text-navy"
+              }`}
+            >
+              {t === "deal" ? "My Deal" : t}
+            </button>
+          ))}
+        </div>
+
+        {/* MY DEAL TAB */}
+        {tab === "deal" && (
+          <div className="space-y-6">
+            {/* Progress */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-bold text-navy mb-4">Deal Progress</h3>
+              <div className="w-full h-3 bg-gray-100 rounded-full mb-4">
+                <div className="h-full bg-amber rounded-full transition-all" style={{ width: `${progress}%` }} />
               </div>
-            ))}
-          </div>
-        </div>
+              <div className="space-y-3">
+                {STEPS.map((s, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                      i < customer.step ? "bg-amber text-navy" :
+                      i === customer.step ? "bg-amber text-navy animate-pulse-glow" :
+                      "bg-gray-100 text-muted"
+                    }`}>
+                      {i < customer.step ? "✓" : i + 1}
+                    </div>
+                    <span className={`text-sm ${i <= customer.step ? "text-navy font-medium" : "text-muted"}`}>{s}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-        {/* Documents */}
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6">
-          <h3 className="font-semibold text-cream mb-3">Your Documents</h3>
-          {customer.files?.length > 0 ? (
-            <div className="space-y-2">
-              {customer.files.map((f: any) => (
-                <div key={f.id} className="flex items-center gap-3 text-sm text-cream/60">
-                  <span>📄</span>
-                  <span>{f.fileName}</span>
-                  <span className="text-cream/20 text-xs">{f.fileType}</span>
+            {/* Deal details */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-bold text-navy mb-4">Deal Details</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: "Vehicle", value: customer.vehicleSpecific || "Pending" },
+                  { label: "Negotiated Price", value: customer.negotiatedPrice || "Pending" },
+                  { label: "Your Agent", value: "GoFetch Auto" },
+                  { label: "Est. Delivery", value: customer.deliveryDate || "Pending" },
+                ].map((d) => (
+                  <div key={d.label} className="bg-offwhite rounded-lg p-4">
+                    <p className="text-xs text-amber font-semibold uppercase tracking-wider mb-1">{d.label}</p>
+                    <p className={`text-sm font-medium ${d.value === "Pending" ? "text-muted italic" : "text-navy"}`}>{d.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* DOCUMENTS TAB */}
+        {tab === "documents" && (
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <h3 className="font-bold text-navy mb-4">Your Documents</h3>
+            <div className="border-2 border-dashed border-amber/30 rounded-xl p-8 text-center mb-6 hover:border-amber/60 transition">
+              <p className="text-3xl mb-2">📄</p>
+              <p className="text-sm text-navy font-medium">Drag & drop files or click to upload</p>
+              <p className="text-xs text-muted mt-1">PDF, JPEG, PNG up to 10MB</p>
+            </div>
+            {customer.documents?.length > 0 ? (
+              <div className="space-y-2">
+                {customer.documents.map((d: any) => (
+                  <div key={d.id} className="flex items-center justify-between bg-offwhite rounded-lg p-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg">📎</span>
+                      <div>
+                        <p className="text-sm font-medium text-navy">{d.originalName || d.fileName}</p>
+                        <p className="text-xs text-muted">{d.docType}</p>
+                      </div>
+                    </div>
+                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                      d.status === "approved" ? "bg-green-100 text-green-700" :
+                      d.status === "under_review" ? "bg-amber/10 text-amber-dark" :
+                      "bg-gray-100 text-muted"
+                    }`}>
+                      {d.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted">No documents uploaded yet.</p>
+            )}
+          </div>
+        )}
+
+        {/* PAYMENT TAB */}
+        {tab === "payment" && (
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 text-center">
+            {customer.step < 5 ? (
+              <>
+                <p className="text-4xl mb-4">💳</p>
+                <h3 className="font-bold text-navy text-lg mb-2">No Payment Due Yet</h3>
+                <p className="text-sm text-muted max-w-md mx-auto">Payment is only required after we&rsquo;ve negotiated your deal and you&rsquo;ve approved it. You&rsquo;re currently on step {customer.step + 1} of 9.</p>
+              </>
+            ) : customer.paid ? (
+              <>
+                <p className="text-4xl mb-4">✅</p>
+                <h3 className="font-bold text-navy text-lg mb-2">Payment Complete</h3>
+                <p className="text-sm text-muted">Paid {customer.paidAmount} on {customer.paidDate ? new Date(customer.paidDate).toLocaleDateString() : "N/A"}</p>
+              </>
+            ) : (
+              <>
+                <p className="text-5xl font-bold text-amber mb-2" style={{ fontFamily: "var(--font-display)" }}>$99</p>
+                <p className="text-sm text-muted mb-6">Standard Tier — Car Buying Advocacy</p>
+                <button className="bg-amber text-navy font-bold px-8 py-4 rounded-lg text-lg hover:bg-amber-light transition animate-pulse-glow">
+                  Pay Now — Secure Checkout →
+                </button>
+                <div className="flex items-center justify-center gap-3 mt-4 text-xs text-muted">
+                  <span>🔒 256-bit SSL</span>
+                  <span>|</span>
+                  <span>Powered by Stripe</span>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* MESSAGES TAB */}
+        {tab === "messages" && (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-4 border-b border-gray-100">
+              <h3 className="font-bold text-navy">Messages</h3>
+            </div>
+            <div className="h-80 overflow-y-auto p-4 space-y-3">
+              {customer.messages?.map((m: any) => (
+                <div key={m.id} className={`flex ${m.sender === "customer" ? "justify-end" : "justify-start"}`}>
+                  <div className={`max-w-xs rounded-xl px-4 py-2.5 text-sm ${
+                    m.sender === "customer"
+                      ? "bg-amber text-navy rounded-br-sm"
+                      : "bg-gray-100 text-navy rounded-bl-sm"
+                  }`}>
+                    {m.content}
+                    <div className={`text-xs mt-1 ${m.sender === "customer" ? "text-navy/50" : "text-muted"}`}>
+                      {new Date(m.createdAt).toLocaleString()}
+                    </div>
+                  </div>
                 </div>
               ))}
+              {(!customer.messages || customer.messages.length === 0) && (
+                <p className="text-sm text-muted text-center py-8">No messages yet.</p>
+              )}
             </div>
-          ) : (
-            <p className="text-sm text-cream/30">No documents uploaded yet.</p>
-          )}
-        </div>
+            <div className="p-4 border-t border-gray-100 flex gap-2">
+              <input
+                type="text"
+                placeholder="Type a message..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                className="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-amber outline-none"
+              />
+              <button className="bg-amber text-navy px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-amber-light transition">
+                Send
+              </button>
+            </div>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }

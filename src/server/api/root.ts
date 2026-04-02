@@ -1,18 +1,16 @@
 import { router, createCallerFactory } from "./trpc";
 import { customerRouter } from "./routers/customer";
 import { noteRouter } from "./routers/note";
-import { surveyRouter } from "./routers/survey";
-import { tagRouter } from "./routers/tag";
-import { activityRouter } from "./routers/activity";
-import { dealerUserRouter } from "./routers/dealerUser";
+import { messageRouter } from "./routers/message";
+import { deskingRouter } from "./routers/desking";
+import { outreachRouter } from "./routers/outreach";
 
 export const appRouter = router({
   customer: customerRouter,
   note: noteRouter,
-  survey: surveyRouter,
-  tag: tagRouter,
-  activity: activityRouter,
-  dealerUser: dealerUserRouter,
+  message: messageRouter,
+  desking: deskingRouter,
+  outreach: outreachRouter,
 });
 
 export type AppRouter = typeof appRouter;

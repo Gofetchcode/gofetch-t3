@@ -7,85 +7,61 @@ export const customerRouter = router({
   submitConsultation: publicProcedure
     .input(
       z.object({
-        name: z.string().min(1),
+        firstName: z.string().min(1),
+        lastName: z.string().min(1),
         email: z.string().email(),
-        phone: z.string().optional(),
-        vehicle: z.string().optional(),
-        price: z.string().optional(),
+        phone: z.string(),
+        vehicleType: z.string().optional(),
+        vehicleSpecific: z.string().optional(),
+        budget: z.string().optional(),
         timeline: z.string().optional(),
         notes: z.string().optional(),
         source: z.string().optional(),
-        tradein: z.string().optional(),
-        tradeinYear: z.string().optional(),
-        tradeinMake: z.string().optional(),
-        tradeinModel: z.string().optional(),
-        tradeinMiles: z.string().optional(),
-        tradeinLien: z.string().optional(),
-        tradeinBalance: z.string().optional(),
-        tradeinLender: z.string().optional(),
-        signatureName: z.string().optional(),
-        signatureData: z.string().optional(),
+        contractData: z.any().optional(),
         utmSource: z.string().optional(),
         utmMedium: z.string().optional(),
         utmCampaign: z.string().optional(),
-        utmTerm: z.string().optional(),
-        utmContent: z.string().optional(),
-        landingPage: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const tempPassword = "GoFetch" + Math.floor(1000 + Math.random() * 9000);
+      const tempPassword = `GF-${Math.floor(100000 + Math.random() * 900000)}`;
+      const clientNum = String(Math.floor(1 + Math.random() * 9999)).padStart(4, "0");
 
       const customer = await ctx.db.customer.create({
         data: {
-          name: input.name,
+          firstName: input.firstName,
+          lastName: input.lastName,
           email: input.email.toLowerCase(),
-          phone: input.phone ?? "",
+          phone: input.phone,
           password: tempPassword,
-          vehicle: input.vehicle ?? "",
-          price: input.price ?? "",
+          tempPassword,
+          vehicleType: input.vehicleType ?? "",
+          vehicleSpecific: input.vehicleSpecific ?? "",
+          budget: input.budget ?? "",
           timeline: input.timeline ?? "",
           notes: input.notes ?? "",
-          source: input.source ?? "",
-          step: 0,
-          tradein: input.tradein ?? "",
-          tradeinYear: input.tradeinYear ?? "",
-          tradeinMake: input.tradeinMake ?? "",
-          tradeinModel: input.tradeinModel ?? "",
-          tradeinMiles: input.tradeinMiles ?? "",
-          tradeinLien: input.tradeinLien ?? "",
-          tradeinBalance: input.tradeinBalance ?? "",
-          tradeinLender: input.tradeinLender ?? "",
+          source: input.source ?? "Website",
+          gofetchClientId: `GF-2026-${clientNum}`,
+          anonymousEmail: `deals+${clientNum}@gofetchauto.com`,
+          contractSigned: !!input.contractData,
+          contractDate: input.contractData ? new Date() : null,
+          contractData: input.contractData ?? undefined,
           utmSource: input.utmSource ?? "",
           utmMedium: input.utmMedium ?? "",
           utmCampaign: input.utmCampaign ?? "",
-          utmTerm: input.utmTerm ?? "",
-          utmContent: input.utmContent ?? "",
-          landingPage: input.landingPage ?? "",
         },
       });
 
-      // Save contract signature
-      if (input.signatureData) {
-        await ctx.db.contract.create({
-          data: {
-            customerId: customer.id,
-            signatureName: input.signatureName ?? "",
-            signatureData: input.signatureData,
-          },
-        });
-      }
-
-      // Log activity
-      await ctx.db.activity.create({
+      // Welcome message
+      await ctx.db.message.create({
         data: {
           customerId: customer.id,
-          type: "lead",
-          text: "Consultation submitted",
+          sender: "system",
+          content: `Welcome to GoFetch Auto, ${input.firstName}! We've received your consultation request and our team will reach out within 24 hours. Your temporary portal password is: ${tempPassword}`,
         },
       });
 
-      return { success: true, tempPassword };
+      return { success: true, tempPassword, clientId: customer.gofetchClientId };
     }),
 
   // ═══ CUSTOMER LOGIN ═══
@@ -93,109 +69,114 @@ export const customerRouter = router({
     .input(z.object({ email: z.string().email(), password: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const customer = await ctx.db.customer.findFirst({
-        where: {
-          email: input.email.toLowerCase(),
-          password: input.password,
-        },
-        include: { files: true, contracts: true },
+        where: { email: input.email.toLowerCase(), password: input.password },
+        include: { documents: true, messages: { orderBy: { createdAt: "desc" }, take: 50 } },
       });
-
-      if (!customer) {
-        throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid email or password" });
-      }
-
-      return { success: true, customer };
+      if (!customer) throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid email or password" });
+      return {
+        success: true,
+        customer,
+        requirePasswordChange: !customer.passwordChanged && customer.tempPassword === input.password,
+      };
     }),
 
-  // ═══ UPDATE PASSWORD ═══
-  updatePassword: publicProcedure
-    .input(
-      z.object({
-        email: z.string().email(),
-        oldPassword: z.string(),
-        newPassword: z.string().min(4),
-      })
-    )
+  // ═══ CHANGE PASSWORD ═══
+  changePassword: publicProcedure
+    .input(z.object({ email: z.string().email(), oldPassword: z.string(), newPassword: z.string().min(8) }))
     .mutation(async ({ ctx, input }) => {
       const customer = await ctx.db.customer.findFirst({
         where: { email: input.email.toLowerCase(), password: input.oldPassword },
       });
-      if (!customer) throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid credentials" });
-
+      if (!customer) throw new TRPCError({ code: "UNAUTHORIZED" });
       await ctx.db.customer.update({
         where: { id: customer.id },
-        data: { password: input.newPassword },
+        data: { password: input.newPassword, passwordChanged: true, tempPassword: null },
       });
-
       return { success: true };
     }),
 
-  // ═══ GET CUSTOMERS (dealer) ═══
+  // ═══ GET ALL (dealer) ═══
   getAll: dealerProcedure.query(async ({ ctx }) => {
     return ctx.db.customer.findMany({
-      include: { files: true, contracts: true, customerNotes: true, tags: { include: { tag: true } } },
+      include: {
+        documents: true,
+        notesLog: { orderBy: { createdAt: "desc" } },
+        messages: { orderBy: { createdAt: "desc" }, take: 5 },
+        deskingOffers: { orderBy: { createdAt: "desc" } },
+      },
       orderBy: { createdAt: "desc" },
     });
   }),
+
+  // ═══ GET ONE (dealer) ═══
+  getById: dealerProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db.customer.findUnique({
+        where: { id: input.id },
+        include: {
+          documents: true,
+          messages: { orderBy: { createdAt: "asc" } },
+          notesLog: { orderBy: { createdAt: "desc" } },
+          deskingOffers: { include: { dealership: true }, orderBy: { createdAt: "desc" } },
+          touchPoints: { orderBy: { createdAt: "desc" }, take: 20 },
+        },
+      });
+    }),
 
   // ═══ ADD CUSTOMER (dealer) ═══
   add: dealerProcedure
     .input(
       z.object({
-        name: z.string().min(1),
+        firstName: z.string().min(1),
+        lastName: z.string().min(1),
         email: z.string().email(),
-        password: z.string(),
-        phone: z.string().optional(),
-        vehicle: z.string().optional(),
-        color: z.string().optional(),
-        price: z.string().optional(),
-        savings: z.string().optional(),
-        agent: z.string().optional(),
-        delivery: z.string().optional(),
+        phone: z.string(),
+        vehicleType: z.string().optional(),
+        budget: z.string().optional(),
         step: z.number().default(0),
+        isFleet: z.boolean().default(false),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const customer = await ctx.db.customer.create({
+      const tempPassword = `GF-${Math.floor(100000 + Math.random() * 900000)}`;
+      const clientNum = String(Math.floor(1 + Math.random() * 9999)).padStart(4, "0");
+      return ctx.db.customer.create({
         data: {
-          name: input.name,
-          email: input.email.toLowerCase(),
-          password: input.password,
-          phone: input.phone ?? "",
-          vehicle: input.vehicle ?? "",
-          color: input.color ?? "",
-          price: input.price ?? "",
-          savings: input.savings ?? "",
-          agent: input.agent ?? "",
-          delivery: input.delivery ?? "",
-          step: input.step,
+          ...input,
+          password: tempPassword,
+          tempPassword,
+          gofetchClientId: `GF-2026-${clientNum}`,
+          anonymousEmail: `deals+${clientNum}@gofetchauto.com`,
         },
       });
-
-      await ctx.db.activity.create({
-        data: { customerId: customer.id, type: "lead", text: "Customer added by dealer" },
-      });
-
-      return { success: true, customer };
     }),
 
-  // ═══ UPDATE STEP (dealer) ═══
+  // ═══ UPDATE STEP ═══
   updateStep: dealerProcedure
     .input(z.object({ id: z.string(), step: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.customer.update({
-        where: { id: input.id },
-        data: { step: input.step },
-      });
-
-      await ctx.db.activity.create({
-        data: { customerId: input.id, type: "status", text: `Status changed to step ${input.step}` },
-      });
-
+      await ctx.db.customer.update({ where: { id: input.id }, data: { step: input.step } });
       return { success: true };
     }),
 
-  // ═══ DELETE CUSTOMER (dealer) ═══
+  // ═══ UPDATE CUSTOMER ═══
+  update: dealerProcedure
+    .input(z.object({
+      id: z.string(),
+      negotiatedPrice: z.string().optional(),
+      deliveryDate: z.string().optional(),
+      vehicleSpecific: z.string().optional(),
+      notes: z.string().optional(),
+      step: z.number().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const { id, ...data } = input;
+      await ctx.db.customer.update({ where: { id }, data });
+      return { success: true };
+    }),
+
+  // ═══ DELETE ═══
   delete: dealerProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -203,25 +184,14 @@ export const customerRouter = router({
       return { success: true };
     }),
 
-  // ═══ BULK UPDATE STEP ═══
+  // ═══ BULK ACTIONS ═══
   bulkUpdateStep: dealerProcedure
     .input(z.object({ ids: z.array(z.string()), step: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.customer.updateMany({
-        where: { id: { in: input.ids } },
-        data: { step: input.step },
-      });
-
-      for (const id of input.ids) {
-        await ctx.db.activity.create({
-          data: { customerId: id, type: "status", text: `Bulk status change to step ${input.step}` },
-        });
-      }
-
+      await ctx.db.customer.updateMany({ where: { id: { in: input.ids } }, data: { step: input.step } });
       return { success: true, updated: input.ids.length };
     }),
 
-  // ═══ BULK DELETE ═══
   bulkDelete: dealerProcedure
     .input(z.object({ ids: z.array(z.string()) }))
     .mutation(async ({ ctx, input }) => {
