@@ -5,9 +5,9 @@ import Link from "next/link";
 
 const fleetLinks = [
   { href: "/fleet", label: "Dashboard" },
-  { href: "/fleet?tab=orders", label: "Orders" },
+  { href: "/fleet/orders", label: "Orders" },
   { href: "/dealer", label: "CRM" },
-  { href: "/fleet?tab=analytics", label: "Analytics" },
+  { href: "/fleet/analytics", label: "Analytics" },
 ];
 
 export default function FleetLayout({ children }: { children: React.ReactNode }) {
