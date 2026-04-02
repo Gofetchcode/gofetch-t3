@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import Link from "next/link";
+import { Confetti } from "@/components/confetti";
 
 const STEPS = [
   "Consultation Submitted",
@@ -133,15 +134,32 @@ export default function PortalPage() {
           <button onClick={() => setCustomer(null)} className="border border-gray-200 px-4 py-2 rounded-lg text-sm text-muted hover:text-navy transition">Sign Out</button>
         </div>
 
-        {/* Stat cards */}
+        {/* Confetti on milestone steps */}
+        <Confetti trigger={customer.step === 5 || customer.step === 8} />
+
+        {/* Smart greeting */}
+        <div className="bg-gradient-to-r from-amber/10 to-transparent rounded-xl p-4 mb-6 border border-amber/20">
+          <p className="text-sm text-navy">
+            {new Date().getHours() < 12 ? "Good morning" : new Date().getHours() < 17 ? "Good afternoon" : "Good evening"}, {customer.firstName}!
+            {customer.step === 0 && " We've received your consultation and our team is reviewing it."}
+            {customer.step >= 1 && customer.step <= 3 && " Your advocate is actively working on your deal."}
+            {customer.step === 4 && " Great news — we have a deal for you to review!"}
+            {customer.step === 5 && " 🎉 Deal agreed! Time to complete your payment."}
+            {customer.step >= 6 && customer.step <= 7 && " We're wrapping up paperwork and coordinating delivery."}
+            {customer.step === 8 && " 🎉 Congratulations! Your vehicle has been delivered!"}
+          </p>
+        </div>
+
+        {/* Glass-morphism stat cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "Current Step", value: `${customer.step + 1}/9`, sub: STEPS[customer.step] },
-            { label: "Days Active", value: String(Math.floor((Date.now() - new Date(customer.createdAt).getTime()) / 86400000)) },
-            { label: "Your Agent", value: "GoFetch Auto" },
-            { label: "Est. Savings", value: "~$3,400" },
+            { label: "Current Step", value: `${customer.step + 1}/9`, sub: STEPS[customer.step], icon: "📍" },
+            { label: "Days Active", value: String(Math.floor((Date.now() - new Date(customer.createdAt).getTime()) / 86400000)), icon: "📅" },
+            { label: "Your Agent", value: "GoFetch Auto", icon: "🧑" },
+            { label: "Est. Savings", value: "~$3,400", icon: "💰" },
           ].map((s) => (
-            <div key={s.label} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+            <div key={s.label} className="relative overflow-hidden bg-white/70 backdrop-blur-lg rounded-xl p-5 shadow-lg border border-white/50">
+              <div className="absolute -top-2 -right-2 text-3xl opacity-10">{s.icon}</div>
               <p className="text-xs text-amber font-semibold uppercase tracking-wider mb-1">{s.label}</p>
               <p className="text-xl font-bold text-navy">{s.value}</p>
               {s.sub && <p className="text-xs text-muted mt-1">{s.sub}</p>}
@@ -167,25 +185,46 @@ export default function PortalPage() {
         {/* MY DEAL TAB */}
         {tab === "deal" && (
           <div className="space-y-6">
-            {/* Progress */}
+            {/* Journey Map — Snake Path */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-bold text-navy mb-4">Deal Progress</h3>
-              <div className="w-full h-3 bg-gray-100 rounded-full mb-4">
-                <div className="h-full bg-amber rounded-full transition-all" style={{ width: `${progress}%` }} />
-              </div>
-              <div className="space-y-3">
-                {STEPS.map((s, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                      i < customer.step ? "bg-amber text-navy" :
-                      i === customer.step ? "bg-amber text-navy animate-pulse-glow" :
-                      "bg-gray-100 text-muted"
-                    }`}>
-                      {i < customer.step ? "✓" : i + 1}
+              <h3 className="font-bold text-navy mb-6">Your Journey</h3>
+              <div className="relative">
+                {STEPS.map((s, i) => {
+                  const isComplete = i < customer.step;
+                  const isCurrent = i === customer.step;
+                  const isRight = i % 2 === 0;
+                  return (
+                    <div key={i} className={`flex items-center gap-4 mb-1 ${isRight ? "" : "flex-row-reverse"}`}>
+                      {/* Content */}
+                      <div className={`flex-1 ${isRight ? "text-right pr-4" : "text-left pl-4"}`}>
+                        <p className={`text-sm font-medium ${isComplete ? "text-navy" : isCurrent ? "text-amber" : "text-muted"}`}>{s}</p>
+                        {isComplete && <p className="text-xs text-green-500">Complete ✓</p>}
+                        {isCurrent && <p className="text-xs text-amber font-semibold">In Progress</p>}
+                      </div>
+                      {/* Node */}
+                      <div className="flex flex-col items-center">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${
+                          isComplete ? "bg-amber border-amber text-navy" :
+                          isCurrent ? "bg-amber/20 border-amber text-amber animate-pulse-glow" :
+                          "bg-gray-50 border-gray-200 text-muted"
+                        }`}>
+                          {isComplete ? "✓" : i + 1}
+                        </div>
+                        {i < STEPS.length - 1 && (
+                          <div className={`w-0.5 h-8 ${isComplete ? "bg-amber" : "bg-gray-200 border-dashed"}`} />
+                        )}
+                      </div>
+                      {/* Spacer */}
+                      <div className="flex-1" />
                     </div>
-                    <span className={`text-sm ${i <= customer.step ? "text-navy font-medium" : "text-muted"}`}>{s}</span>
-                  </div>
-                ))}
+                  );
+                })}
+              </div>
+              <div className="mt-4 bg-offwhite rounded-lg p-3 text-center">
+                <p className="text-sm text-navy font-medium">{Math.round(progress)}% Complete</p>
+                <div className="w-full h-2 bg-gray-200 rounded-full mt-2">
+                  <div className="h-full bg-gradient-to-r from-amber to-amber-light rounded-full transition-all" style={{ width: `${progress}%` }} />
+                </div>
               </div>
             </div>
 
