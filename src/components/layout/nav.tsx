@@ -11,7 +11,7 @@ const links = [
   { href: "/exotic", label: "Exotic" },
   { href: "/car-finder", label: "Car Finder" },
   { href: "/contact", label: "Contact" },
-  { href: "https://fleet.gofetchauto.com", label: "Fleet", external: true },
+  { href: "/fleet", label: "Fleet" },
 ];
 
 export function Nav() {
