@@ -48,6 +48,8 @@ export default function RootLayout({
             __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-F6K8C4RVYZ');`,
           }}
         />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#0A1628" />
         <style dangerouslySetInnerHTML={{ __html: `:root { --font-display: 'Instrument Serif', serif; }` }} />
       </head>
       <body className="min-h-full flex flex-col bg-white text-navy">
