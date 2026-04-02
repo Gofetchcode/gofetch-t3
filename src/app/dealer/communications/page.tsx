@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { SmartCompose } from "@/components/smart-compose";
+import { VideoRecorder } from "@/components/video-recorder";
+import { VoiceRecorder } from "@/components/voice-recorder";
 
 const mockConversations = [
   { id: "1", name: "John Smith", lastMsg: "Thanks, looking forward to the offer!", time: "2m ago", unread: 2, channel: "text" },
@@ -96,9 +98,12 @@ export default function CommunicationsPage() {
                 </div>
               ))}
             </div>
-            {/* Smart Compose */}
-            <div className="p-3 border-t border-white/5">
+            {/* Smart Compose + Video/Voice */}
+            <div className="p-3 border-t border-white/5 space-y-3">
               <SmartCompose customerName={selectedConvo.name} vehicle="2026 Toyota RAV4" step={3} onSend={(msg) => setNewMsg(msg)} />
+              <div className="flex gap-3">
+                <VideoRecorder onSend={(blob) => console.log("Video recorded:", blob.size)} />
+              </div>
             </div>
             <div className="p-3 border-t border-white/5 flex gap-2">
               <select className="bg-white/5 border border-white/10 rounded-lg px-2 py-2 text-xs text-white/50">
@@ -107,6 +112,7 @@ export default function CommunicationsPage() {
                 <option>📋 Note</option>
               </select>
               <input value={newMsg} onChange={e => setNewMsg(e.target.value)} placeholder="Type a message..." className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:border-amber outline-none" />
+              <VoiceRecorder onSave={(blob, transcript) => setNewMsg(transcript)} />
               <button className="bg-amber text-navy px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-light transition">Send</button>
             </div>
           </div>

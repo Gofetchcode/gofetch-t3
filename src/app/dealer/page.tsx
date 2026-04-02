@@ -2,6 +2,17 @@
 
 import { useState, useMemo, useCallback, useRef, type DragEvent } from "react";
 import { trpc } from "@/lib/trpc";
+import { FocusList } from "@/components/focus-list";
+import { FocusActions } from "@/components/next-best-action";
+import { WorkspaceSwitcher } from "@/components/workspace-switcher";
+import { OnboardingTour } from "@/components/onboarding-tour";
+import { DeskingTool } from "@/components/desking-tool";
+import { OutreachPanel } from "@/components/outreach-panel";
+import { DealerResponses } from "@/components/dealer-responses";
+import { MeetingPrep } from "@/components/meeting-prep";
+import { CompetitiveIntel } from "@/components/competitive-intel";
+import { ReferralTracker } from "@/components/referral-tracker";
+import { getScoreBadge, calculateDealHealth } from "@/lib/ai-engine";
 
 const STEPS = [
   "Consultation", "Lead Received", "Researching", "Negotiating",
@@ -16,15 +27,18 @@ const STEP_COLORS = [
 /* ─────────────────────── Detail Panel ─────────────────────── */
 
 function DetailPanel({ customer, onClose }: { customer: any; onClose: () => void }) {
-  const [detailTab, setDetailTab] = useState<"overview" | "notes" | "messages" | "documents" | "offers">("overview");
+  const [detailTab, setDetailTab] = useState<string>("overview");
   const [newNote, setNewNote] = useState("");
 
   const detailTabs = [
-    { id: "overview" as const, label: "Overview" },
-    { id: "notes" as const, label: "Notes" },
-    { id: "messages" as const, label: "Messages" },
-    { id: "documents" as const, label: "Docs" },
-    { id: "offers" as const, label: "Offers" },
+    { id: "overview", label: "Overview" },
+    { id: "notes", label: "Notes" },
+    { id: "messages", label: "Messages" },
+    { id: "documents", label: "Docs" },
+    { id: "offers", label: "Offers" },
+    { id: "outreach", label: "🔍 Find Car" },
+    { id: "intel", label: "Intel" },
+    { id: "prep", label: "Prep" },
   ];
 
   return (
@@ -179,6 +193,27 @@ function DetailPanel({ customer, onClose }: { customer: any; onClose: () => void
               )}
             </div>
           )}
+
+          {/* OUTREACH / FIND THIS CAR TAB */}
+          {detailTab === "outreach" && (
+            <div className="space-y-4">
+              <OutreachPanel customerId={customer.id} customerName={`${customer.firstName} ${customer.lastName}`} vehicleDesc={customer.vehicleSpecific} onClose={() => setDetailTab("overview")} />
+              <DealerResponses campaignId="" vehicle={customer.vehicleSpecific || "Vehicle"} dealersSent={23} />
+            </div>
+          )}
+
+          {/* COMPETITIVE INTEL TAB */}
+          {detailTab === "intel" && (
+            <div className="space-y-4">
+              <CompetitiveIntel vehicle={customer.vehicleSpecific || "Vehicle"} ourPrice={33800} marketAvg={36200} msrp={38500} />
+              <ReferralTracker customerName={`${customer.firstName} ${customer.lastName}`} referralCode={customer.gofetchClientId || "GF-0000"} referrals={[]} ltv={customer.paidAmount || "$0"} />
+            </div>
+          )}
+
+          {/* MEETING PREP TAB */}
+          {detailTab === "prep" && (
+            <MeetingPrep customer={customer} />
+          )}
         </div>
       </div>
     </div>
@@ -292,6 +327,10 @@ export default function DealerPage() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterPill, setFilterPill] = useState<FilterPill>("all");
+  const [workspace, setWorkspace] = useState("manager");
+  const [showDesking, setShowDesking] = useState<any>(null);
+  const [showOutreach, setShowOutreach] = useState<any>(null);
+  const [showResponses, setShowResponses] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 
@@ -509,6 +548,9 @@ export default function DealerPage() {
             </div>
             <span className="text-sm font-bold text-white">GoFetch <span className="text-[#D4A23A]">CRM</span></span>
           </div>
+          <div className="mt-2">
+            <WorkspaceSwitcher current={workspace} onChange={setWorkspace} />
+          </div>
         </div>
 
         {/* Pipeline stage counts */}
@@ -623,6 +665,10 @@ export default function DealerPage() {
                 </button>
               ))}
             </div>
+
+            {/* Focus List + AI Recommendations */}
+            <FocusList customers={data} onSelect={(id) => setSelectedCustomer(data.find((c: any) => c.id === id))} />
+            <FocusActions customers={data} />
 
             {/* View toggle */}
             <div className="flex bg-black/30 rounded-lg p-0.5 border border-white/5">
@@ -864,6 +910,9 @@ export default function DealerPage() {
 
       {/* ── Add Customer Drawer ── */}
       <AddCustomerDrawer open={addCustomerDrawer} onClose={() => setAddCustomerDrawer(false)} />
+
+      {/* ── Onboarding Tour ── */}
+      <OnboardingTour />
     </div>
   );
 }

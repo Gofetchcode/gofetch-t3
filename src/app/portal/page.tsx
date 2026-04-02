@@ -5,6 +5,7 @@ import { trpc } from "@/lib/trpc";
 import Link from "next/link";
 import { Confetti } from "@/components/confetti";
 import { HelpCenter } from "@/components/help-center";
+import { DealReplay } from "@/components/deal-replay";
 import { NPSSurvey } from "@/components/nps-survey";
 import { ShareableCard } from "@/components/shareable-card";
 
@@ -598,9 +599,14 @@ export default function PortalPage() {
           </div>
         )}
 
-        {/* NPS Survey + Shareable Card (shown at step 8 — Delivered) */}
+        {/* Deal Replay + NPS Survey + Shareable Card (shown at step 8 — Delivered) */}
         {customer.step === 8 && (
           <div className="space-y-6 mt-6">
+            <DealReplay
+              events={STEPS.map((s, i) => ({ step: s, date: `Step ${i + 1}`, detail: i < customer.step ? "Completed" : "Pending" }))}
+              totalDays={Math.floor((Date.now() - new Date(customer.createdAt).getTime()) / 86400000)}
+              avgDays={21}
+            />
             <NPSSurvey customerName={customer.firstName} onSubmit={(score, comment) => console.log("NPS:", score, comment)} />
             <ShareableCard vehicle={customer.vehicleSpecific || "vehicle"} savings={customer.negotiatedPrice ? "$4,400" : "~$3,400"} customerName={customer.firstName} />
           </div>
