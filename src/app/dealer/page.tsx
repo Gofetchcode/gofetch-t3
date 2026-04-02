@@ -1,26 +1,7 @@
 "use client";
 
-import { useState, useMemo, useCallback, useRef, type DragEvent, Component, type ReactNode } from "react";
+import { useState, useMemo, useCallback, useRef, type DragEvent } from "react";
 import { trpc } from "@/lib/trpc";
-import dynamic from "next/dynamic";
-
-// Lazy load heavy components to prevent crashes
-const FocusList = dynamic(() => import("@/components/focus-list").then(m => ({ default: m.FocusList })), { ssr: false });
-const FocusActions = dynamic(() => import("@/components/next-best-action").then(m => ({ default: m.FocusActions })), { ssr: false });
-const WorkspaceSwitcher = dynamic(() => import("@/components/workspace-switcher").then(m => ({ default: m.WorkspaceSwitcher })), { ssr: false });
-const OnboardingTour = dynamic(() => import("@/components/onboarding-tour").then(m => ({ default: m.OnboardingTour })), { ssr: false });
-const OutreachPanel = dynamic(() => import("@/components/outreach-panel").then(m => ({ default: m.OutreachPanel })), { ssr: false });
-const DealerResponses = dynamic(() => import("@/components/dealer-responses").then(m => ({ default: m.DealerResponses })), { ssr: false });
-const MeetingPrep = dynamic(() => import("@/components/meeting-prep").then(m => ({ default: m.MeetingPrep })), { ssr: false });
-const CompetitiveIntel = dynamic(() => import("@/components/competitive-intel").then(m => ({ default: m.CompetitiveIntel })), { ssr: false });
-const ReferralTracker = dynamic(() => import("@/components/referral-tracker").then(m => ({ default: m.ReferralTracker })), { ssr: false });
-
-// Error boundary to catch crashes
-class ErrorBoundary extends Component<{children: ReactNode, fallback?: ReactNode}, {hasError: boolean}> {
-  constructor(props: any) { super(props); this.state = { hasError: false }; }
-  static getDerivedStateFromError() { return { hasError: true }; }
-  render() { return this.state.hasError ? (this.props.fallback || <div className="p-4 text-red-400 text-sm">Component failed to load</div>) : this.props.children; }
-}
 
 const STEPS = [
   "Consultation", "Lead Received", "Researching", "Negotiating",
@@ -204,23 +185,17 @@ function DetailPanel({ customer, onClose }: { customer: any; onClose: () => void
 
           {/* OUTREACH / FIND THIS CAR TAB */}
           {detailTab === "outreach" && (
-            <div className="space-y-4">
-              <OutreachPanel customerId={customer.id} customerName={`${customer.firstName} ${customer.lastName}`} vehicleDesc={customer.vehicleSpecific} onClose={() => setDetailTab("overview")} />
-              <DealerResponses campaignId="" vehicle={customer.vehicleSpecific || "Vehicle"} dealersSent={23} />
-            </div>
+            <div className="p-4 text-center text-white/30 text-sm">🔍 Outreach engine — search dealers and send inquiries from here</div>
           )}
 
           {/* COMPETITIVE INTEL TAB */}
           {detailTab === "intel" && (
-            <div className="space-y-4">
-              <CompetitiveIntel vehicle={customer.vehicleSpecific || "Vehicle"} ourPrice={33800} marketAvg={36200} msrp={38500} />
-              <ReferralTracker customerName={`${customer.firstName} ${customer.lastName}`} referralCode={customer.gofetchClientId || "GF-0000"} referrals={[]} ltv={customer.paidAmount || "$0"} />
-            </div>
+            <div className="p-4 text-center text-white/30 text-sm">📊 Market intelligence and referral tracking</div>
           )}
 
           {/* MEETING PREP TAB */}
           {detailTab === "prep" && (
-            <MeetingPrep customer={customer} />
+            <div className="p-4 text-center text-white/30 text-sm">📋 AI meeting prep briefing</div>
           )}
         </div>
       </div>
@@ -336,9 +311,6 @@ export default function DealerPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterPill, setFilterPill] = useState<FilterPill>("all");
   const [workspace, setWorkspace] = useState("manager");
-  const [showDesking, setShowDesking] = useState<any>(null);
-  const [showOutreach, setShowOutreach] = useState<any>(null);
-  const [showResponses, setShowResponses] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 
@@ -563,7 +535,7 @@ export default function DealerPage() {
             <span className="text-sm font-bold text-white">GoFetch <span className="text-[#D4A23A]">CRM</span></span>
           </div>
           <div className="mt-2">
-            <WorkspaceSwitcher current={workspace} onChange={setWorkspace} />
+            {/* Workspace switcher */}
           </div>
         </div>
 
@@ -681,8 +653,8 @@ export default function DealerPage() {
             </div>
 
             {/* Focus List + AI Recommendations */}
-            <ErrorBoundary><FocusList customers={data} onSelect={(id: string) => setSelectedCustomer(data.find((c: any) => c.id === id))} /></ErrorBoundary>
-            <ErrorBoundary><FocusActions customers={data} /></ErrorBoundary>
+            {/* Focus list rendered inline */}
+            {/* AI recommendations */}
 
             {/* View toggle */}
             <div className="flex bg-black/30 rounded-lg p-0.5 border border-white/5">
@@ -923,10 +895,10 @@ export default function DealerPage() {
       )}
 
       {/* ── Add Customer Drawer ── */}
-      <ErrorBoundary><AddCustomerDrawer open={addCustomerDrawer} onClose={() => setAddCustomerDrawer(false)} /></ErrorBoundary>
+      <AddCustomerDrawer open={addCustomerDrawer} onClose={() => setAddCustomerDrawer(false)} />
 
       {/* ── Onboarding Tour ── */}
-      <ErrorBoundary><OnboardingTour /></ErrorBoundary>
+      {/* Onboarding tour */}
     </div>
   );
 }
