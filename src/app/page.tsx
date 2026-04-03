@@ -105,41 +105,49 @@ export default function Home() {
         {/* subtle radial glow */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(212,162,58,0.12),transparent)]" />
 
-        <div className="relative max-w-5xl mx-auto">
-          <p className="text-amber text-xs font-semibold uppercase tracking-[0.25em] mb-6">
-            Your Personal Car Buying Advocate
-          </p>
+        <div className="relative max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <p className="text-amber text-xs font-semibold uppercase tracking-[0.25em] mb-6">
+              Your Personal Car Buying Advocate
+            </p>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight max-w-3xl mb-6">
-            What If Buying a Car Actually{" "}
-            <em
-              className="text-amber not-italic"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              <i>Felt Good?</i>
-            </em>
-          </h1>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+              What If Buying a Car Actually{" "}
+              <em
+                className="text-amber not-italic"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                <i>Felt Good?</i>
+              </em>
+            </h1>
 
-          <p className="text-gray-400 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">
-            GoFetch Auto is the professional representation that&rsquo;s been
-            missing from the second-biggest purchase of your life. We find your
-            car, negotiate the deal, and handle the dealership&mdash;so you get
-            the keys without the dread.
-          </p>
+            <p className="text-gray-400 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">
+              GoFetch Auto is the professional representation that&rsquo;s been
+              missing from the second-biggest purchase of your life. We find your
+              car, negotiate the deal, and handle the dealership&mdash;so you get
+              the keys without the dread.
+            </p>
 
-          <div className="flex flex-wrap items-center gap-4 mb-14">
-            <Link
-              href="/car-finder"
-              className="inline-block bg-amber text-navy px-8 py-4 rounded-lg font-bold text-lg hover:bg-amber-light transition shadow-lg shadow-amber/20"
-            >
-              Find Your Perfect Car
-            </Link>
-            <a
-              href="#sound-familiar"
-              className="inline-flex items-center gap-2 text-gray-300 hover:text-white font-semibold text-sm uppercase tracking-wider transition"
-            >
-              See How It Works <span aria-hidden="true">&darr;</span>
-            </a>
+            <div className="flex flex-wrap items-center gap-4 mb-14">
+              <Link
+                href="/car-finder"
+                className="inline-block bg-amber text-navy px-8 py-4 rounded-lg font-bold text-lg hover:bg-amber-light transition shadow-lg shadow-amber/20"
+              >
+                Find Your Perfect Car
+              </Link>
+              <a
+                href="#sound-familiar"
+                className="inline-flex items-center gap-2 text-gray-300 hover:text-white font-semibold text-sm uppercase tracking-wider transition"
+              >
+                See How It Works <span aria-hidden="true">&darr;</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Hero Image */}
+          <div className="hidden lg:block relative">
+            <div className="absolute -inset-4 bg-gradient-to-br from-amber/20 to-transparent rounded-3xl blur-2xl" />
+            <img src="/hero-image.png" alt="Happy car buyer with keys" className="relative w-full rounded-2xl shadow-2xl shadow-black/40 object-cover aspect-square" />
           </div>
 
           {/* trust bar */}
