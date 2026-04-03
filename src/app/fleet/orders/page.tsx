@@ -1,190 +1,86 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { trpc } from "@/lib/trpc";
 
-type SortKey = "id" | "company" | "vehicles" | "type" | "status" | "date" | "savings";
-type SortDir = "asc" | "desc";
-
-interface FleetOrder {
-  id: string;
-  company: string;
-  vehicles: number;
-  type: string;
-  status: "Delivered" | "Negotiating" | "In Progress" | "Pending";
-  date: string;
-  sortDate: number;
-  savings: number;
-  contact: string;
-  budget: string;
-  timeline: string;
-  notes: string;
-}
-
-const mockOrders: FleetOrder[] = [
-  {
-    id: "GF-F-2026-001",
-    company: "Summit Logistics",
-    vehicles: 8,
-    type: "Work Trucks",
-    status: "Delivered",
-    date: "Jan 10, 2026",
-    sortDate: 20260110,
-    savings: 18400,
-    contact: "James Hartfield",
-    budget: "$45,000/vehicle",
-    timeline: "Completed",
-    notes: "8x Ford F-150 XLT crew cab, white, fleet upfit package.",
-  },
-  {
-    id: "GF-F-2026-002",
-    company: "Greenway Plumbing",
-    vehicles: 5,
-    type: "Cargo Vans",
-    status: "Negotiating",
-    date: "Feb 18, 2026",
-    sortDate: 20260218,
-    savings: 9250,
-    contact: "Maria Vasquez",
-    budget: "$38,000/vehicle",
-    timeline: "Q1 2026",
-    notes: "5x Ram ProMaster 2500 High Roof, shelving + ladder racks.",
-  },
-  {
-    id: "GF-F-2026-003",
-    company: "Apex Construction",
-    vehicles: 12,
-    type: "Heavy-Duty Trucks",
-    status: "In Progress",
-    date: "Mar 05, 2026",
-    sortDate: 20260305,
-    savings: 31200,
-    contact: "Derek Owens",
-    budget: "$62,000/vehicle",
-    timeline: "This Quarter",
-    notes: "12x Chevy Silverado 2500HD, tow package, bed liner, company wrap.",
-  },
-  {
-    id: "GF-F-2026-004",
-    company: "ClearView Realty",
-    vehicles: 3,
-    type: "SUVs",
-    status: "Pending",
-    date: "Mar 22, 2026",
-    sortDate: 20260322,
-    savings: 5100,
-    contact: "Natalie Park",
-    budget: "$55,000/vehicle",
-    timeline: "1 Month",
-    notes: "3x Hyundai Palisade Calligraphy, black on black, tinted windows.",
-  },
-  {
-    id: "GF-F-2026-005",
-    company: "Metro Medical Transport",
-    vehicles: 6,
-    type: "Passenger Vans",
-    status: "Negotiating",
-    date: "Mar 28, 2026",
-    sortDate: 20260328,
-    savings: 12600,
-    contact: "Robert Chen",
-    budget: "$48,000/vehicle",
-    timeline: "ASAP",
-    notes: "6x Toyota Sienna Hybrid, ADA compliant conversion needed.",
-  },
+const STEPS = [
+  "Consultation", "Lead Received", "Researching", "Negotiating",
+  "Client Approval", "Deal Agreed", "Paperwork", "Delivery", "Delivered",
 ];
 
-const statusColor: Record<FleetOrder["status"], string> = {
-  Delivered: "bg-green-500/20 text-green-400",
-  Negotiating: "bg-amber/20 text-amber",
-  "In Progress": "bg-blue-500/20 text-blue-400",
-  Pending: "bg-white/10 text-white/50",
-};
+type SortKey = "name" | "vehicle" | "status" | "budget" | "days" | "company";
+type SortDir = "asc" | "desc";
 
 export default function FleetOrdersPage() {
-  const [sortKey, setSortKey] = useState<SortKey>("date");
+  const [sortKey, setSortKey] = useState<SortKey>("days");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [selectedOrder, setSelectedOrder] = useState<FleetOrder | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [showForm, setShowForm] = useState(false);
-  const [formSubmitted, setFormSubmitted] = useState(false);
 
-  // Form state
-  const [formCompany, setFormCompany] = useState("");
-  const [formContact, setFormContact] = useState("");
-  const [formVehicles, setFormVehicles] = useState(1);
-  const [formType, setFormType] = useState("Work Trucks");
-  const [formBudget, setFormBudget] = useState("Under $35,000");
-  const [formTimeline, setFormTimeline] = useState("ASAP");
-  const [formNotes, setFormNotes] = useState("");
+  /* ── New order form ── */
+  const [form, setForm] = useState({
+    companyName: "", contactName: "", contactEmail: "", contactPhone: "",
+    vehicleCount: 1, vehicleType: "Work Trucks",
+    budgetPerVehicle: "Under $35,000", timeline: "ASAP", notes: "",
+  });
+
+  /* ── Data ── */
+  const fleetCustomers = trpc.fleet.getFleetCustomers.useQuery(undefined, { retry: false });
+  const submitOrder = trpc.fleet.submitOrder.useMutation({
+    onSuccess: () => {
+      fleetCustomers.refetch();
+      resetForm();
+    },
+  });
+
+  const customers = fleetCustomers.data ?? [];
+
+  const daysActive = (c: any) =>
+    Math.max(0, Math.floor((Date.now() - new Date(c.createdAt).getTime()) / 86400000));
 
   const sorted = useMemo(() => {
-    const copy = [...mockOrders];
-    copy.sort((a, b) => {
+    return [...customers].sort((a: any, b: any) => {
       let cmp = 0;
-      switch (sortKey) {
-        case "id":
-          cmp = a.id.localeCompare(b.id);
-          break;
-        case "company":
-          cmp = a.company.localeCompare(b.company);
-          break;
-        case "vehicles":
-          cmp = a.vehicles - b.vehicles;
-          break;
-        case "type":
-          cmp = a.type.localeCompare(b.type);
-          break;
-        case "status":
-          cmp = a.status.localeCompare(b.status);
-          break;
-        case "date":
-          cmp = a.sortDate - b.sortDate;
-          break;
-        case "savings":
-          cmp = a.savings - b.savings;
-          break;
-      }
+      if (sortKey === "name") cmp = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+      else if (sortKey === "vehicle") cmp = (a.vehicleSpecific || "").localeCompare(b.vehicleSpecific || "");
+      else if (sortKey === "status") cmp = a.step - b.step;
+      else if (sortKey === "budget") cmp = (a.budget || "").localeCompare(b.budget || "");
+      else if (sortKey === "days") cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      else if (sortKey === "company") cmp = (a.fleetCompany || "").localeCompare(b.fleetCompany || "");
       return sortDir === "asc" ? cmp : -cmp;
     });
-    return copy;
-  }, [sortKey, sortDir]);
+  }, [customers, sortKey, sortDir]);
 
   function toggleSort(key: SortKey) {
-    if (sortKey === key) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    } else {
-      setSortKey(key);
-      setSortDir("asc");
-    }
-  }
-
-  function handleSubmit() {
-    setFormSubmitted(true);
+    if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(key); setSortDir("asc"); }
   }
 
   function resetForm() {
-    setFormCompany("");
-    setFormContact("");
-    setFormVehicles(1);
-    setFormType("Work Trucks");
-    setFormBudget("Under $35,000");
-    setFormTimeline("ASAP");
-    setFormNotes("");
-    setFormSubmitted(false);
+    setForm({
+      companyName: "", contactName: "", contactEmail: "", contactPhone: "",
+      vehicleCount: 1, vehicleType: "Work Trucks",
+      budgetPerVehicle: "Under $35,000", timeline: "ASAP", notes: "",
+    });
     setShowForm(false);
   }
 
-  const arrow = (key: SortKey) =>
-    sortKey === key ? (sortDir === "asc" ? " ▲" : " ▼") : "";
+  const arrow = (key: SortKey) => sortKey === key ? (sortDir === "asc" ? " \u25B2" : " \u25BC") : "";
 
   const colHeader = (label: string, key: SortKey) => (
     <th
       onClick={() => toggleSort(key)}
       className="p-4 text-left text-xs text-white/30 font-semibold uppercase tracking-wider cursor-pointer hover:text-white/60 transition select-none whitespace-nowrap"
     >
-      {label}
-      <span className="text-amber">{arrow(key)}</span>
+      {label}<span className="text-amber">{arrow(key)}</span>
     </th>
   );
+
+  const statusColor = (step: number) =>
+    step === 8 ? "bg-green-500/20 text-green-400" :
+    step >= 3 ? "bg-amber/20 text-amber" :
+    step >= 1 ? "bg-blue-500/20 text-blue-400" :
+    "bg-white/10 text-white/50";
 
   return (
     <div className="min-h-screen bg-navy text-white">
@@ -192,22 +88,16 @@ export default function FleetOrdersPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1
-              className="text-3xl font-bold"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
+            <h1 className="text-3xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
               Fleet <span className="text-amber">Orders</span>
             </h1>
             <p className="text-sm text-white/40 mt-1">
-              Track and manage all fleet procurement orders.
+              {customers.length} fleet vehicle{customers.length !== 1 ? "s" : ""} in pipeline
             </p>
           </div>
           <button
-            onClick={() => {
-              setShowForm(true);
-              setFormSubmitted(false);
-            }}
-            className="bg-amber text-navy font-bold px-5 py-3 rounded-xl hover:bg-amber-light transition text-sm flex items-center gap-2 self-start"
+            onClick={() => setShowForm(true)}
+            className="bg-amber text-navy font-bold px-5 py-3 rounded-xl hover:brightness-110 transition text-sm flex items-center gap-2 self-start"
           >
             <span className="text-lg leading-none">+</span> New Fleet Order
           </button>
@@ -215,136 +105,134 @@ export default function FleetOrdersPage() {
 
         {/* Table */}
         <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl overflow-x-auto">
-          <table className="w-full text-sm min-w-[800px]">
-            <thead>
-              <tr className="border-b border-white/5">
-                {colHeader("Order #", "id")}
-                {colHeader("Company", "company")}
-                {colHeader("Vehicles", "vehicles")}
-                {colHeader("Type", "type")}
-                {colHeader("Status", "status")}
-                {colHeader("Date", "date")}
-                {colHeader("Savings", "savings")}
-              </tr>
-            </thead>
-            <tbody>
-              {sorted.map((o) => (
-                <tr
-                  key={o.id}
-                  onClick={() => setSelectedOrder(o)}
-                  className="border-b border-white/5 hover:bg-white/[0.03] cursor-pointer transition"
-                >
-                  <td className="p-4 text-amber font-mono font-medium">
-                    {o.id}
-                  </td>
-                  <td className="p-4 text-white">{o.company}</td>
-                  <td className="p-4 text-white">{o.vehicles}</td>
-                  <td className="p-4 text-white/70">{o.type}</td>
-                  <td className="p-4">
-                    <span
-                      className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColor[o.status]}`}
-                    >
-                      {o.status}
-                    </span>
-                  </td>
-                  <td className="p-4 text-white/40">{o.date}</td>
-                  <td className="p-4 text-green-400 font-medium">
-                    ${o.savings.toLocaleString()}
-                  </td>
+          {fleetCustomers.isLoading ? (
+            <div className="text-center py-12 text-white/30 text-sm">Loading fleet orders...</div>
+          ) : customers.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-white/30 mb-4">No fleet orders in the system yet.</p>
+              <button onClick={() => setShowForm(true)} className="bg-amber text-navy font-bold px-6 py-3 rounded-lg hover:brightness-110 transition">
+                Submit First Order
+              </button>
+            </div>
+          ) : (
+            <table className="w-full text-sm min-w-[800px]">
+              <thead>
+                <tr className="border-b border-white/5">
+                  {colHeader("Client", "name")}
+                  {colHeader("Company", "company")}
+                  {colHeader("Vehicle", "vehicle")}
+                  {colHeader("Status", "status")}
+                  {colHeader("Budget", "budget")}
+                  {colHeader("Days", "days")}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {sorted.map((c: any) => (
+                  <tr
+                    key={c.id}
+                    onClick={() => setSelectedCustomer(c)}
+                    className="border-b border-white/5 hover:bg-white/[0.03] cursor-pointer transition"
+                  >
+                    <td className="p-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-navy border border-white/20 flex items-center justify-center text-[10px] font-bold text-white">
+                          {(c.firstName?.[0] || "").toUpperCase()}{(c.lastName?.[0] || "").toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-medium text-white">{c.firstName} {c.lastName}</p>
+                          <p className="text-[10px] text-amber">{c.gofetchClientId || ""}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-4 text-white/60">{c.fleetCompany || "\u2014"}</td>
+                    <td className="p-4 text-white/60">{c.vehicleSpecific || c.vehicleType || "\u2014"}</td>
+                    <td className="p-4">
+                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColor(c.step)}`}>
+                        {STEPS[c.step]}
+                      </span>
+                    </td>
+                    <td className="p-4 text-white/40">{c.budget || "\u2014"}</td>
+                    <td className="p-4 text-white/40">{daysActive(c)}d</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
 
-        {/* Order Detail Modal */}
-        {selectedOrder && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
-            onClick={() => setSelectedOrder(null)}
-          >
-            <div
-              className="w-full max-w-lg bg-navy-light border border-white/10 rounded-2xl p-8 animate-slide-in"
-              onClick={(e) => e.stopPropagation()}
-            >
+        {/* Customer Detail Modal */}
+        {selectedCustomer && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" onClick={() => setSelectedCustomer(null)}>
+            <div className="w-full max-w-lg bg-[#0f1d32] border border-white/10 rounded-2xl p-8 animate-slide-in" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <p className="text-xs text-white/30 uppercase tracking-wider mb-1">
-                    Order Details
-                  </p>
-                  <h2
-                    className="text-2xl font-bold text-amber"
-                    style={{ fontFamily: "var(--font-display)" }}
-                  >
-                    {selectedOrder.id}
+                  <p className="text-xs text-white/30 uppercase tracking-wider mb-1">Fleet Order</p>
+                  <h2 className="text-2xl font-bold text-amber" style={{ fontFamily: "var(--font-display)" }}>
+                    {selectedCustomer.firstName} {selectedCustomer.lastName}
                   </h2>
+                  <p className="text-sm text-white/40">{selectedCustomer.gofetchClientId}</p>
                 </div>
-                <button
-                  onClick={() => setSelectedOrder(null)}
-                  className="text-white/30 hover:text-white text-2xl leading-none transition"
-                >
-                  &times;
-                </button>
+                <button onClick={() => setSelectedCustomer(null)} className="text-white/30 hover:text-white text-2xl leading-none transition">&times;</button>
               </div>
 
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="bg-white/[0.03] rounded-xl p-4">
                   <p className="text-xs text-white/30 uppercase">Company</p>
-                  <p className="text-white font-medium mt-1">
-                    {selectedOrder.company}
-                  </p>
+                  <p className="text-white font-medium mt-1">{selectedCustomer.fleetCompany || "\u2014"}</p>
                 </div>
                 <div className="bg-white/[0.03] rounded-xl p-4">
-                  <p className="text-xs text-white/30 uppercase">Contact</p>
-                  <p className="text-white font-medium mt-1">
-                    {selectedOrder.contact}
-                  </p>
-                </div>
-                <div className="bg-white/[0.03] rounded-xl p-4">
-                  <p className="text-xs text-white/30 uppercase">Vehicles</p>
-                  <p className="text-white font-medium mt-1">
-                    {selectedOrder.vehicles} &mdash; {selectedOrder.type}
-                  </p>
+                  <p className="text-xs text-white/30 uppercase">Vehicle</p>
+                  <p className="text-white font-medium mt-1">{selectedCustomer.vehicleSpecific || selectedCustomer.vehicleType || "\u2014"}</p>
                 </div>
                 <div className="bg-white/[0.03] rounded-xl p-4">
                   <p className="text-xs text-white/30 uppercase">Budget</p>
-                  <p className="text-white font-medium mt-1">
-                    {selectedOrder.budget}
-                  </p>
+                  <p className="text-white font-medium mt-1">{selectedCustomer.budget || "\u2014"}</p>
                 </div>
                 <div className="bg-white/[0.03] rounded-xl p-4">
                   <p className="text-xs text-white/30 uppercase">Status</p>
                   <p className="mt-1">
-                    <span
-                      className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColor[selectedOrder.status]}`}
-                    >
-                      {selectedOrder.status}
+                    <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColor(selectedCustomer.step)}`}>
+                      {STEPS[selectedCustomer.step]}
                     </span>
                   </p>
                 </div>
                 <div className="bg-white/[0.03] rounded-xl p-4">
-                  <p className="text-xs text-white/30 uppercase">Savings</p>
-                  <p className="text-green-400 font-bold mt-1">
-                    ${selectedOrder.savings.toLocaleString()}
-                  </p>
+                  <p className="text-xs text-white/30 uppercase">Timeline</p>
+                  <p className="text-white font-medium mt-1">{selectedCustomer.timeline || "\u2014"}</p>
+                </div>
+                <div className="bg-white/[0.03] rounded-xl p-4">
+                  <p className="text-xs text-white/30 uppercase">Days Active</p>
+                  <p className="text-white font-medium mt-1">{daysActive(selectedCustomer)}d</p>
                 </div>
               </div>
 
-              <div className="bg-white/[0.03] rounded-xl p-4 mb-6">
-                <p className="text-xs text-white/30 uppercase mb-1">Notes</p>
-                <p className="text-white/70 text-sm leading-relaxed">
-                  {selectedOrder.notes}
-                </p>
-              </div>
+              {selectedCustomer.notes && (
+                <div className="bg-white/[0.03] rounded-xl p-4 mb-6">
+                  <p className="text-xs text-white/30 uppercase mb-1">Notes</p>
+                  <p className="text-white/70 text-sm leading-relaxed">{selectedCustomer.notes}</p>
+                </div>
+              )}
+
+              {/* Documents summary */}
+              {selectedCustomer.documents && selectedCustomer.documents.length > 0 && (
+                <div className="bg-white/[0.03] rounded-xl p-4 mb-6">
+                  <p className="text-xs text-white/30 uppercase mb-2">Documents ({selectedCustomer.documents.length})</p>
+                  {selectedCustomer.documents.map((d: any) => (
+                    <div key={d.id} className="flex justify-between text-xs py-1">
+                      <span className="text-white/60">{d.originalName || d.fileName}</span>
+                      <span className={`px-1.5 py-0.5 rounded ${
+                        d.status === "approved" ? "bg-green-500/20 text-green-400" : "bg-white/10 text-white/40"
+                      }`}>{d.status}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <div className="flex gap-3">
                 <p className="text-xs text-white/20 self-center">
-                  {selectedOrder.date} &bull; Timeline: {selectedOrder.timeline}
+                  Created {new Date(selectedCustomer.createdAt).toLocaleDateString()} &bull; {selectedCustomer.email} &bull; {selectedCustomer.phone}
                 </p>
-                <button
-                  onClick={() => setSelectedOrder(null)}
-                  className="ml-auto bg-white/5 border border-white/10 text-white px-5 py-2.5 rounded-lg text-sm hover:bg-white/10 transition"
-                >
+                <button onClick={() => setSelectedCustomer(null)} className="ml-auto bg-white/5 border border-white/10 text-white px-5 py-2.5 rounded-lg text-sm hover:bg-white/10 transition">
                   Close
                 </button>
               </div>
@@ -354,32 +242,18 @@ export default function FleetOrdersPage() {
 
         {/* New Fleet Order Modal */}
         {showForm && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
-            onClick={() => resetForm()}
-          >
-            <div
-              className="w-full max-w-lg bg-navy-light border border-white/10 rounded-2xl p-8 animate-slide-in max-h-[90vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {formSubmitted ? (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" onClick={() => resetForm()}>
+            <div className="w-full max-w-lg bg-[#0f1d32] border border-white/10 rounded-2xl p-8 animate-slide-in max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              {submitOrder.isSuccess ? (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
                     <span className="text-green-400 text-3xl">&#10003;</span>
                   </div>
-                  <h3
-                    className="text-xl font-bold text-white mb-2"
-                    style={{ fontFamily: "var(--font-display)" }}
-                  >
+                  <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "var(--font-display)" }}>
                     Order Submitted!
                   </h3>
-                  <p className="text-white/40 text-sm mb-6">
-                    Our fleet team will reach out within 24 hours.
-                  </p>
-                  <button
-                    onClick={resetForm}
-                    className="bg-amber text-navy font-bold px-6 py-3 rounded-lg hover:bg-amber-light transition"
-                  >
+                  <p className="text-white/40 text-sm mb-6">Our fleet team will reach out within 24 hours.</p>
+                  <button onClick={() => { submitOrder.reset(); resetForm(); }} className="bg-amber text-navy font-bold px-6 py-3 rounded-lg hover:brightness-110 transition">
                     Done
                   </button>
                 </div>
@@ -387,144 +261,85 @@ export default function FleetOrdersPage() {
                 <>
                   <div className="flex items-start justify-between mb-6">
                     <div>
-                      <h2
-                        className="text-xl font-bold text-white"
-                        style={{ fontFamily: "var(--font-display)" }}
-                      >
+                      <h2 className="text-xl font-bold text-white" style={{ fontFamily: "var(--font-display)" }}>
                         New Fleet <span className="text-amber">Order</span>
                       </h2>
-                      <p className="text-sm text-white/30 mt-1">
-                        Fill in the details below to submit a new fleet request.
-                      </p>
+                      <p className="text-sm text-white/30 mt-1">Fill in details to submit a fleet request.</p>
                     </div>
-                    <button
-                      onClick={resetForm}
-                      className="text-white/30 hover:text-white text-2xl leading-none transition"
-                    >
-                      &times;
-                    </button>
+                    <button onClick={resetForm} className="text-white/30 hover:text-white text-2xl leading-none transition">&times;</button>
                   </div>
 
                   <div className="space-y-4">
-                    <div>
-                      <label className="text-xs text-white/40 block mb-1">
-                        Company Name
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Acme Logistics"
-                        value={formCompany}
-                        onChange={(e) => setFormCompany(e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-amber outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs text-white/40 block mb-1">
-                        Contact Name
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. John Smith"
-                        value={formContact}
-                        onChange={(e) => setFormContact(e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-amber outline-none"
-                      />
-                    </div>
-
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-xs text-white/40 block mb-1">
-                          Number of Vehicles
-                        </label>
-                        <select
-                          value={formVehicles}
-                          onChange={(e) =>
-                            setFormVehicles(Number(e.target.value))
-                          }
-                          className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-amber outline-none"
-                        >
-                          {Array.from({ length: 50 }, (_, i) => i + 1).map(
-                            (n) => (
-                              <option key={n} value={n}>
-                                {n} vehicle{n > 1 ? "s" : ""}
-                              </option>
-                            )
-                          )}
-                        </select>
+                        <label className="text-xs text-white/40 block mb-1">Company Name *</label>
+                        <input value={form.companyName} onChange={(e) => setForm((p) => ({ ...p, companyName: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-amber outline-none" />
                       </div>
                       <div>
-                        <label className="text-xs text-white/40 block mb-1">
-                          Vehicle Types
-                        </label>
-                        <select
-                          value={formType}
-                          onChange={(e) => setFormType(e.target.value)}
-                          className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-amber outline-none"
-                        >
-                          <option>Work Trucks</option>
-                          <option>Heavy-Duty Trucks</option>
-                          <option>Cargo Vans</option>
-                          <option>Passenger Vans</option>
-                          <option>Sedans</option>
-                          <option>SUVs</option>
-                          <option>Mixed Fleet</option>
-                        </select>
+                        <label className="text-xs text-white/40 block mb-1">Contact Name *</label>
+                        <input value={form.contactName} onChange={(e) => setForm((p) => ({ ...p, contactName: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-amber outline-none" />
                       </div>
                     </div>
-
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-xs text-white/40 block mb-1">
-                          Budget per Vehicle
-                        </label>
-                        <select
-                          value={formBudget}
-                          onChange={(e) => setFormBudget(e.target.value)}
-                          className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-amber outline-none"
-                        >
-                          <option>Under $35,000</option>
-                          <option>$35,000 - $50,000</option>
-                          <option>$50,000 - $75,000</option>
-                          <option>$75,000 - $100,000</option>
-                          <option>$100,000+</option>
+                        <label className="text-xs text-white/40 block mb-1">Email *</label>
+                        <input value={form.contactEmail} onChange={(e) => setForm((p) => ({ ...p, contactEmail: e.target.value }))} type="email" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-amber outline-none" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-white/40 block mb-1">Phone *</label>
+                        <input value={form.contactPhone} onChange={(e) => setForm((p) => ({ ...p, contactPhone: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-amber outline-none" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs text-white/40 block mb-1">Vehicles</label>
+                        <select value={form.vehicleCount} onChange={(e) => setForm((p) => ({ ...p, vehicleCount: Number(e.target.value) }))} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-amber outline-none">
+                          {[1,2,3,4,5,6,7,8,9,10,15,20,25,30,40,50].map((n) => (
+                            <option key={n} value={n} className="bg-navy text-white">{n} vehicle{n > 1 ? "s" : ""}</option>
+                          ))}
                         </select>
                       </div>
                       <div>
-                        <label className="text-xs text-white/40 block mb-1">
-                          Timeline
-                        </label>
-                        <select
-                          value={formTimeline}
-                          onChange={(e) => setFormTimeline(e.target.value)}
-                          className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-amber outline-none"
-                        >
-                          <option>ASAP</option>
-                          <option>1-2 Weeks</option>
-                          <option>1 Month</option>
-                          <option>This Quarter</option>
+                        <label className="text-xs text-white/40 block mb-1">Vehicle Type</label>
+                        <select value={form.vehicleType} onChange={(e) => setForm((p) => ({ ...p, vehicleType: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-amber outline-none">
+                          {["Work Trucks", "Heavy-Duty Trucks", "Cargo Vans", "Passenger Vans", "Sedans", "SUVs", "Mixed Fleet"].map((t) => (
+                            <option key={t} value={t} className="bg-navy text-white">{t}</option>
+                          ))}
                         </select>
                       </div>
                     </div>
-
-                    <div>
-                      <label className="text-xs text-white/40 block mb-1">
-                        Notes
-                      </label>
-                      <textarea
-                        placeholder="Special requirements, upfitting, branding, specific models..."
-                        rows={3}
-                        value={formNotes}
-                        onChange={(e) => setFormNotes(e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-amber outline-none resize-none"
-                      />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs text-white/40 block mb-1">Budget / Vehicle</label>
+                        <select value={form.budgetPerVehicle} onChange={(e) => setForm((p) => ({ ...p, budgetPerVehicle: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-amber outline-none">
+                          {["Under $35,000", "$35,000 - $50,000", "$50,000 - $75,000", "$75,000 - $100,000", "$100,000+"].map((b) => (
+                            <option key={b} value={b} className="bg-navy text-white">{b}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs text-white/40 block mb-1">Timeline</label>
+                        <select value={form.timeline} onChange={(e) => setForm((p) => ({ ...p, timeline: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-amber outline-none">
+                          {["ASAP", "1-2 Weeks", "1 Month", "This Quarter"].map((t) => (
+                            <option key={t} value={t} className="bg-navy text-white">{t}</option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
-
+                    <div>
+                      <label className="text-xs text-white/40 block mb-1">Notes</label>
+                      <textarea placeholder="Special requirements, upfitting, branding..." rows={3} value={form.notes} onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-amber outline-none resize-none" />
+                    </div>
+                    {submitOrder.isError && <p className="text-red-400 text-sm">{submitOrder.error.message}</p>}
                     <button
-                      onClick={handleSubmit}
-                      className="w-full bg-amber text-navy font-bold py-4 rounded-lg hover:bg-amber-light transition text-base"
+                      onClick={() => {
+                        if (!form.companyName || !form.contactName || !form.contactEmail || !form.contactPhone) return;
+                        submitOrder.mutate(form);
+                      }}
+                      disabled={submitOrder.isPending}
+                      className="w-full bg-amber text-navy font-bold py-4 rounded-lg hover:brightness-110 transition text-base disabled:opacity-50"
                     >
-                      Submit Fleet Order
+                      {submitOrder.isPending ? "Submitting..." : "Submit Fleet Order"}
                     </button>
                   </div>
                 </>

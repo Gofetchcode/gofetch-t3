@@ -4,8 +4,7 @@ import { TRPCProvider } from "@/components/providers";
 import { ToastProvider } from "@/components/toast";
 import { CommandPalette } from "@/components/command-palette";
 import { AICoPilot } from "@/components/ai-copilot";
-import { Nav } from "@/components/layout/nav";
-import { Footer } from "@/components/layout/footer";
+import { LayoutShell } from "@/components/layout/layout-shell";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -58,9 +57,7 @@ export default function RootLayout({
           <ToastProvider>
             <CommandPalette />
             <AICoPilot />
-            <Nav />
-            <main className="flex-1">{children}</main>
-            <Footer />
+            <LayoutShell>{children}</LayoutShell>
           </ToastProvider>
         </TRPCProvider>
       </body>
