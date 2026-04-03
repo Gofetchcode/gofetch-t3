@@ -336,12 +336,47 @@ export default function DealerPage() {
     if (pin.length >= 4) {
       localStorage.setItem("gf-dealer-pin", pin);
       setAuthed(true);
-      // Force tRPC to refetch with new headers
       setTimeout(() => customers.refetch(), 100);
     } else {
       setError("PIN must be at least 4 digits");
     }
   };
+
+  // ALL hooks must be called before any return — move data processing here
+  const rawData: any[] = customers.data ?? [];
+  const dataWithOverrides = rawData.map((c: any) => (stepOverrides[c.id] !== undefined ? { ...c, step: stepOverrides[c.id] } : c));
+
+  const filtered = useMemo(() => {
+    let list = dataWithOverrides;
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase();
+      list = list.filter((c: any) =>
+        c.firstName?.toLowerCase().includes(q) || c.lastName?.toLowerCase().includes(q) ||
+        c.email?.toLowerCase().includes(q) || c.phone?.includes(q) ||
+        (c.vehicleSpecific ?? "").toLowerCase().includes(q)
+      );
+    }
+    if (filterPill === "retail") list = list.filter((c: any) => !c.isFleet);
+    else if (filterPill === "fleet") list = list.filter((c: any) => c.isFleet);
+    else if (filterPill === "paid") list = list.filter((c: any) => c.paid);
+    else if (filterPill !== "all") {
+      const stepMap: Record<string, number[]> = { new: [0, 1], working: [2], negotiating: [3, 4], closing: [5, 6], delivered: [7, 8] };
+      const steps = stepMap[filterPill];
+      if (steps) list = list.filter((c: any) => steps.includes(c.step));
+    }
+    return list;
+  }, [dataWithOverrides, debouncedSearch, filterPill]);
+
+  const sorted = useMemo(() => {
+    return [...filtered].sort((a: any, b: any) => {
+      let cmp = 0;
+      if (sortKey === "name") cmp = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+      else if (sortKey === "step") cmp = a.step - b.step;
+      else if (sortKey === "days") cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      else if (sortKey === "email") cmp = (a.email || "").localeCompare(b.email || "");
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+  }, [filtered, sortKey, sortDir]);
 
   /* ── PIN Login Screen ── */
   if (!authed) {
@@ -373,64 +408,9 @@ export default function DealerPage() {
     );
   }
 
-  /* ── Resolve data with step overrides ── */
-  const rawData: any[] = customers.data ?? [];
-  const data = rawData.map((c: any) => (stepOverrides[c.id] !== undefined ? { ...c, step: stepOverrides[c.id] } : c));
-
-  /* ── Helpers ── */
+  /* ── Use pre-computed data from above (hooks called before login return) ── */
+  const data = dataWithOverrides;
   const daysActive = (c: any) => Math.max(0, Math.floor((Date.now() - new Date(c.createdAt).getTime()) / 86400000));
-
-  /* ── Filtering ── */
-  const filtered = useMemo(() => {
-    let list = data;
-
-    // Search filter
-    if (debouncedSearch) {
-      const q = debouncedSearch.toLowerCase();
-      list = list.filter((c: any) =>
-        c.firstName.toLowerCase().includes(q) ||
-        c.lastName.toLowerCase().includes(q) ||
-        c.email.toLowerCase().includes(q) ||
-        c.phone.includes(q) ||
-        (c.vehicleSpecific ?? "").toLowerCase().includes(q) ||
-        (c.vehicleType ?? "").toLowerCase().includes(q)
-      );
-    }
-
-    // Pill filter
-    switch (filterPill) {
-      case "new": list = list.filter((c: any) => c.step === 0 || c.step === 1); break;
-      case "working": list = list.filter((c: any) => c.step === 2); break;
-      case "negotiating": list = list.filter((c: any) => c.step === 3); break;
-      case "closing": list = list.filter((c: any) => c.step >= 4 && c.step <= 6); break;
-      case "delivered": list = list.filter((c: any) => c.step === 7 || c.step === 8); break;
-      case "paid": list = list.filter((c: any) => c.paid); break;
-      case "retail": list = list.filter((c: any) => !c.isFleet); break;
-      case "fleet": list = list.filter((c: any) => c.isFleet); break;
-    }
-
-    return list;
-  }, [data, debouncedSearch, filterPill]);
-
-  /* ── Sorting (for table) ── */
-  const sorted = useMemo(() => {
-    const arr = [...filtered];
-    const dir = sortDir === "asc" ? 1 : -1;
-    arr.sort((a: any, b: any) => {
-      switch (sortKey) {
-        case "name": return dir * (`${a.firstName} ${a.lastName}`).localeCompare(`${b.firstName} ${b.lastName}`);
-        case "vehicle": return dir * ((a.vehicleSpecific || a.vehicleType || "").localeCompare(b.vehicleSpecific || b.vehicleType || ""));
-        case "step": return dir * (a.step - b.step);
-        case "type": return dir * ((a.isFleet ? 1 : 0) - (b.isFleet ? 1 : 0));
-        case "days": return dir * (daysActive(a) - daysActive(b));
-        case "phone": return dir * (a.phone.localeCompare(b.phone));
-        case "email": return dir * (a.email.localeCompare(b.email));
-        case "payment": return dir * ((a.paid ? 1 : 0) - (b.paid ? 1 : 0));
-        default: return 0;
-      }
-    });
-    return arr;
-  }, [filtered, sortKey, sortDir]);
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir(sortDir === "asc" ? "desc" : "asc");
