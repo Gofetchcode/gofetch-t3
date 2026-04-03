@@ -25,9 +25,7 @@ export default function FleetLayout({ children }: { children: React.ReactNode })
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all ${scrolled ? "bg-navy/98 backdrop-blur-lg shadow-lg" : "bg-navy"} border-b border-white/5`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
           <Link href="/fleet" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-amber flex items-center justify-center">
-              <span className="text-navy font-bold text-lg" style={{ fontFamily: "var(--font-display)" }}>G</span>
-            </div>
+            <img src="/logo-icon.jpeg" alt="GoFetch Auto" className="w-8 h-8 rounded-lg object-cover" />
             <span style={{ fontFamily: "var(--font-display)" }} className="text-xl text-white">
               GoFetch <span className="text-amber">Auto</span>
             </span>

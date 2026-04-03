@@ -7,9 +7,7 @@ export function Footer() {
         {/* Brand */}
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-amber flex items-center justify-center">
-              <span className="text-navy font-bold text-lg" style={{ fontFamily: "var(--font-display)" }}>G</span>
-            </div>
+            <img src="/logo-icon.jpeg" alt="GoFetch Auto" className="w-8 h-8 rounded-lg object-cover" />
             <span style={{ fontFamily: "var(--font-display)" }} className="text-xl">
               GoFetch <span className="text-amber">Auto</span>
             </span>

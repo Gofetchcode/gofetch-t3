@@ -73,9 +73,7 @@ export default function PortalPage() {
             <div key={i} className="particle" style={{left:`${5+Math.random()*90}%`,bottom:`-5%`,animationDuration:`${8+Math.random()*12}s`,animationDelay:`${Math.random()*10}s`,opacity:0.15+Math.random()*0.3,width:`${2+Math.random()*3}px`,height:`${2+Math.random()*3}px`}} />
           ))}
           <div className="relative text-center px-12 z-10">
-            <div className="w-16 h-16 rounded-2xl bg-amber flex items-center justify-center mx-auto mb-8">
-              <span className="text-navy font-bold text-3xl" style={{ fontFamily: "var(--font-display)" }}>G</span>
-            </div>
+            <img src="/logo-icon.jpeg" alt="GoFetch Auto" className="w-16 h-16 rounded-2xl mx-auto mb-8 object-cover" />
             <h2 className="text-4xl font-bold text-white mb-4" style={{ fontFamily: "var(--font-display)" }}>
               Your Deal.<br />Your Dashboard.
             </h2>
@@ -89,9 +87,7 @@ export default function PortalPage() {
         <div className="w-full lg:w-2/5 bg-white flex items-center justify-center px-6">
           <div className="w-full max-w-sm">
             <div className="lg:hidden flex justify-center mb-6">
-              <div className="w-12 h-12 rounded-xl bg-amber flex items-center justify-center">
-                <span className="text-navy font-bold text-2xl" style={{ fontFamily: "var(--font-display)" }}>G</span>
-              </div>
+              <img src="/logo-icon.jpeg" alt="GoFetch Auto" className="w-12 h-12 rounded-xl object-cover" />
             </div>
             <h3 className="text-2xl font-bold text-navy mb-1" style={{ fontFamily: "var(--font-display)" }}>Welcome back</h3>
             <p className="text-sm text-muted mb-8">Sign in to your Client Portal</p>

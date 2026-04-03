@@ -1041,9 +1041,7 @@ export default function DealerPage() {
       <aside className={`${sidebarCollapsed ? "w-[60px]" : "w-[240px]"} min-w-0 bg-[#0f1d32] border-r border-white/5 h-screen flex flex-col transition-all duration-200`}>
         {/* Logo */}
         <div className="p-4 border-b border-white/5 flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-amber flex items-center justify-center flex-shrink-0">
-            <span className="text-navy font-bold text-sm" style={{ fontFamily: "var(--font-display)" }}>G</span>
-          </div>
+          <img src="/logo-icon.jpeg" alt="GoFetch CRM" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
           {!sidebarCollapsed && (
             <span className="text-sm font-bold text-white" style={{ fontFamily: "var(--font-display)" }}>
               GoFetch <span className="text-amber">CRM</span>

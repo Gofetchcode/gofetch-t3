@@ -28,9 +28,7 @@ export default function DealerLayout({ children }: { children: React.ReactNode }
         {/* Logo */}
         <div className="p-4 border-b border-white/5">
           <Link href="/dealer" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-amber flex items-center justify-center">
-              <span className="text-navy font-bold text-sm" style={{ fontFamily: "var(--font-display)" }}>G</span>
-            </div>
+            <img src="/logo-icon.jpeg" alt="GoFetch CRM" className="w-8 h-8 rounded-lg object-cover" />
             <div>
               <span className="text-sm font-bold text-white">GoFetch <span className="text-amber">CRM</span></span>
             </div>
