@@ -31,7 +31,7 @@ export default function CommunicationsPage() {
   const filters = ["all", "texts", "emails", "notes", "ai", "system"];
 
   return (
-    <div className="min-h-screen bg-navy text-white pt-20">
+    <div className="text-white p-6">
       <div className="max-w-7xl mx-auto px-4 py-6">
         <h2 className="text-2xl font-bold mb-4">Communications</h2>
         <div className="flex gap-4 h-[calc(100vh-160px)]">

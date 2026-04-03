@@ -27,7 +27,7 @@ export default function SettingsPage() {
   const [active, setActive] = useState("users");
 
   return (
-    <div className="min-h-screen bg-navy text-white pt-20">
+    <div className="text-white p-6">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <h2 className="text-2xl font-bold mb-6">Settings</h2>
         <div className="flex gap-6">

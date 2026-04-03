@@ -109,7 +109,7 @@ export default function AnalyticsPage() {
   let cumulativeOffset = 0;
 
   return (
-    <div className="min-h-screen bg-navy text-white pt-20">
+    <div className="text-white p-6">
       <div className="max-w-[1600px] mx-auto px-4 py-8">
 
         {/* Header */}

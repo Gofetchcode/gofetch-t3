@@ -33,7 +33,7 @@ export default function TasksPage() {
   const open = mockTasks.filter(t => t.status === "open" || t.status === "in_progress").length;
 
   return (
-    <div className="min-h-screen bg-navy text-white pt-20">
+    <div className="text-white p-6">
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <div>

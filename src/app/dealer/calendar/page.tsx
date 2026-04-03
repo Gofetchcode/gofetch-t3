@@ -30,7 +30,7 @@ export default function CalendarPage() {
   const hours = Array.from({ length: 12 }, (_, i) => i + 8); // 8 AM to 7 PM
 
   return (
-    <div className="min-h-screen bg-navy text-white pt-20">
+    <div className="text-white p-6">
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <div>
