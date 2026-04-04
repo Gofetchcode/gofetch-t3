@@ -18,17 +18,18 @@ export async function sendOutreachEmail(dealer: {
   });
 
   // Use SendGrid if available, otherwise log
-  if (process.env.SENDGRID_API_KEY) {
+  const sgKey = (process.env.SENDGRID_API_KEY || "").replace(/\s+/g, "").replace(/[^\x20-\x7E]/g, "").trim();
+  if (sgKey) {
     const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
+        Authorization: `Bearer ${sgKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         personalizations: [{ to: [{ email: dealer.email }] }],
-        from: { email: `deals+${opts.clientId}@gofetchauto.com`, name: "GoFetch Auto" },
-        reply_to: { email: `deals+${opts.clientId}@gofetchauto.com`, name: "GoFetch Auto" },
+        from: { email: "inquiry@gofetchauto.com", name: "GoFetch Auto" },
+        reply_to: { email: "inquiry@gofetchauto.com", name: "GoFetch Auto" },
         subject,
         content: [{ type: "text/plain", value: body }],
       }),
