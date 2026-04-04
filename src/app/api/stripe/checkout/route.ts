@@ -5,9 +5,9 @@ const stripeKey = process.env.STRIPE_SECRET_KEY;
 const stripe = stripeKey ? new Stripe(stripeKey, { apiVersion: "2025-04-30.basil" as any }) : null;
 
 const TIERS: Record<string, { price: number; name: string }> = {
-  standard: { price: 9900, name: "GoFetch Auto — Standard Car Buying Advocacy" },
-  premium: { price: 19900, name: "GoFetch Auto — Premium Car Buying Advocacy" },
-  exotic: { price: 129900, name: "GoFetch Auto — Exotic Car Buying Advocacy" },
+  standard: { price: 19900, name: "GoFetch Auto — Standard Car Buying Advocacy" },
+  premium: { price: 29900, name: "GoFetch Auto — Premium Car Buying Advocacy" },
+  exotic: { price: 199900, name: "GoFetch Auto — Exotic Car Buying Advocacy" },
 };
 
 export async function POST(req: Request) {

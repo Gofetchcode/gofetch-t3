@@ -5,7 +5,7 @@ import { useRef, useState, useEffect } from "react";
 const CONTRACT_TERMS = [
   "EXCLUSIVE REPRESENTATION: I grant GoFetch Auto LLC the exclusive right to act as my authorized representative for locating, negotiating, and facilitating the purchase of a motor vehicle. This representation is effective for 180 days from signing.",
   "SCOPE OF SERVICES: GoFetch will research vehicles, contact dealerships on my behalf using GoFetch's identity, negotiate pricing and fees, present offers, and coordinate paperwork and delivery upon acceptance and payment.",
-  "SERVICE FEES: Standard $99, Premium $199, Exotic $1,299. Fees are due BEFORE dealer identity is revealed. Fees are NON-REFUNDABLE once paid, as services will have been substantially performed.",
+  "SERVICE FEES: Standard $199, Premium $299, Exotic $1,999. Fees are due BEFORE dealer identity is revealed. Fees are NON-REFUNDABLE once paid, as services will have been substantially performed.",
   "NO CANCELLATION: I acknowledge GoFetch begins services immediately. There is NO cooling-off period, cancellation window, or right of rescission. I expressly waive any right to cancel after signing.",
   "EXCLUSIVITY: During this Agreement, I will NOT contact, negotiate with, or purchase from any dealership GoFetch has contacted. I will not use GoFetch's pricing or deal information to negotiate independently. Violation results in full fee plus 2x penalty as liquidated damages.",
   "NON-CIRCUMVENTION: All pricing and dealer information is proprietary and confidential. I will not contact any dealer identified by GoFetch for 12 months after termination. Circumvention penalty: full fee + $2,500.",

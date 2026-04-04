@@ -527,7 +527,7 @@ export default function PortalPage() {
               </>
             ) : (
               <>
-                <p className="text-5xl font-bold text-amber mb-2" style={{ fontFamily: "var(--font-display)" }}>$99</p>
+                <p className="text-5xl font-bold text-amber mb-2" style={{ fontFamily: "var(--font-display)" }}>$199</p>
                 <p className="text-sm text-muted mb-6">Standard Tier — Car Buying Advocacy</p>
                 <button
                   onClick={async () => {

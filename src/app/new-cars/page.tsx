@@ -27,7 +27,7 @@ export default function NewCarsPage() {
             Popular <span className="text-amber">New Vehicles</span>
           </h1>
           <p className="text-lg text-white/70 max-w-2xl mx-auto">
-            We negotiate below invoice on every one of these. Our $99 flat fee saves you thousands.
+            We negotiate below invoice on every one of these. Our $199 flat fee saves you thousands.
           </p>
         </div>
       </section>

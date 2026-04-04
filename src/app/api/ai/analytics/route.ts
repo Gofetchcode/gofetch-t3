@@ -27,7 +27,7 @@ export async function POST(req: Request) {
 - Last 30 days: ${recentLeads} new leads
 - Avg lead score: ${Math.round(avgScore._avg?.leadScore || 0)}
 - Conversion rate: ${total > 0 ? Math.round((delivered / total) * 100) : 0}%
-- Revenue estimate: $${paid * 99} (at $99/deal avg)`;
+- Revenue estimate: $${paid * 199} (at $199/deal avg)`;
 
     if (anthropic) {
       const response = await anthropic.messages.create({

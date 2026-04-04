@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     const tier = session.metadata?.tier || "standard";
 
     if (customerId) {
-      const amount = session.amount_total ? `$${(session.amount_total / 100).toFixed(0)}` : "$99";
+      const amount = session.amount_total ? `$${(session.amount_total / 100).toFixed(0)}` : "$199";
 
       await db.customer.update({
         where: { id: customerId },

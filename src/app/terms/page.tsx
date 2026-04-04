@@ -44,9 +44,9 @@ export default function TermsPage() {
               <h2 className="text-navy font-bold text-lg mb-3">3. Service Tiers &amp; Fees</h2>
               <p className="mb-3">Our service fees are structured as follows:</p>
               <ul className="list-disc pl-6 space-y-1">
-                <li><strong>Standard Tier:</strong> $99 &mdash; Mainstream brands and models</li>
-                <li><strong>Premium Tier:</strong> $199 &mdash; Premium brands (BMW, Mercedes-Benz, Audi, etc.)</li>
-                <li><strong>Exotic Tier:</strong> $1,299 &mdash; Exotic and luxury vehicles with concierge service</li>
+                <li><strong>Standard Tier:</strong> $199 &mdash; Mainstream brands and models</li>
+                <li><strong>Premium Tier:</strong> $299 &mdash; Premium brands (BMW, Mercedes-Benz, Audi, etc.)</li>
+                <li><strong>Exotic Tier:</strong> $1,999 &mdash; Exotic and luxury vehicles with concierge service</li>
               </ul>
               <p className="mt-3">
                 Fees are due at the &ldquo;Deal Agreed&rdquo; milestone and are non-refundable once

@@ -336,9 +336,9 @@ export default function Home() {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { tier: "Standard", price: "$99", desc: "Honda, Toyota, Hyundai, Kia, Ford, Chevy, and other mainstream brands.", features: ["Full dealer negotiation", "Add-on removal", "Paperwork handling", "Delivery coordination"] },
-              { tier: "Premium", price: "$199", desc: "BMW, Mercedes-Benz, Audi, Lexus, and other premium brands.", features: ["Everything in Standard", "Priority service", "Multi-dealer bidding", "Premium brand expertise"], popular: true },
-              { tier: "Exotic", price: "$1,299", desc: "Porsche, Ferrari, Lamborghini, Rolls-Royce, and exotic vehicles.", features: ["Everything in Premium", "Dedicated concierge", "Nationwide search", "White-glove delivery"] },
+              { tier: "Standard", price: "$199", desc: "Honda, Toyota, Hyundai, Kia, Ford, Chevy, and other mainstream brands.", features: ["Full dealer negotiation", "Add-on removal", "Paperwork handling", "Delivery coordination"] },
+              { tier: "Premium", price: "$299", desc: "BMW, Mercedes-Benz, Audi, Lexus, and other premium brands.", features: ["Everything in Standard", "Priority service", "Multi-dealer bidding", "Premium brand expertise"], popular: true },
+              { tier: "Exotic", price: "$1,999", desc: "Porsche, Ferrari, Lamborghini, Rolls-Royce, and exotic vehicles.", features: ["Everything in Premium", "Dedicated concierge", "Nationwide search", "White-glove delivery"] },
             ].map((p) => (
               <div key={p.tier} className={`rounded-2xl p-8 border ${p.popular ? "bg-navy text-white border-amber shadow-xl shadow-amber/10 relative" : "bg-white border-gray-100 shadow-sm"} hover:shadow-lg transition`}>
                 {p.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber text-navy text-xs font-bold px-4 py-1 rounded-full">Most Popular</span>}

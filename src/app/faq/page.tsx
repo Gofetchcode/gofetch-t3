@@ -10,7 +10,7 @@ const faqs = [
   },
   {
     q: "How much does the service cost?",
-    a: "Standard vehicles: $99. Premium brands (BMW, Mercedes, Audi, etc.): $199. Exotic/supercars (Ferrari, Porsche, Lamborghini, etc.): $1,299. If we can't save you more than our fee, you pay nothing.",
+    a: "Standard vehicles: $199. Premium brands (BMW, Mercedes, Audi, etc.): $299. Exotic/supercars (Ferrari, Porsche, Lamborghini, etc.): $1,999. If we can't save you more than our fee, you pay nothing.",
   },
   {
     q: "How much can I expect to save?",
