@@ -279,6 +279,8 @@ model Dealership {
   partnerSince    DateTime?
   agreedTerms     Boolean  @default(false)
   preferredTier   String?
+  formUrl         String?
+  formPlatform    String?
   createdAt       DateTime @default(now())
 
   deskingOffers     DeskingOffer[]
