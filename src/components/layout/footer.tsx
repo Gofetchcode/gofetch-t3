@@ -22,11 +22,11 @@ export function Footer() {
           <h4 className="font-semibold text-sm mb-4 text-white/80">Pages</h4>
           <div className="flex flex-col gap-2.5 text-sm text-white/40">
             <Link href="/" className="hover:text-white transition">Home</Link>
-            <Link href="/about" className="hover:text-white transition">About</Link>
+            <Link href="/about" className="hover:text-white transition">Our Story</Link>
             <Link href="/how-it-works" className="hover:text-white transition">How It Works</Link>
             <Link href="/new-cars" className="hover:text-white transition">New Cars</Link>
             <Link href="/exotic" className="hover:text-white transition">Exotic & Luxury</Link>
-            <Link href="/car-finder" className="hover:text-white transition">Car Finder</Link>
+            <Link href="/car-finder" className="hover:text-white transition">Free Consultation</Link>
             <Link href="/faq" className="hover:text-white transition">FAQ</Link>
           </div>
         </div>

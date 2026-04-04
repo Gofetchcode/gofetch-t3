@@ -6,12 +6,11 @@ import { DarkModeToggle } from "@/components/dark-mode-toggle";
 
 const links = [
   { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
+  { href: "/about", label: "Our Story" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/new-cars", label: "New Cars" },
   { href: "/exotic", label: "Exotic" },
-  { href: "/car-finder", label: "Car Finder" },
-  { href: "/contact", label: "Contact" },
+  { href: "/car-finder", label: "Free Consultation" },
   { href: "https://fleet.gofetchauto.com", label: "Fleet", external: true },
   { href: "/portal", label: "My Portal", cta: true },
   { href: "/dealer", label: "Dealer", muted: true },

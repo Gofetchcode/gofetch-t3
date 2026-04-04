@@ -112,12 +112,12 @@ export default function Home() {
             </p>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-              What If Buying a Car Actually{" "}
+              Dealerships Train to Take Your Money.{" "}
               <em
                 className="text-amber not-italic"
                 style={{ fontFamily: "var(--font-display)" }}
               >
-                <i>Felt Good?</i>
+                <i>We Train to Stop Them.</i>
               </em>
             </h1>
 
@@ -270,7 +270,98 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── 6. CTA ──────────────────────────────────────────────── */}
+      {/* ─── 6. HOW IT WORKS (3 steps + CTA) ────────────────────── */}
+      <section className="bg-offwhite py-20 lg:py-28 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-amber text-xs font-semibold uppercase tracking-[0.25em] mb-4">How It Works</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-navy">Three Steps. Zero Stress.</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            {[
+              { num: "01", title: "Tell Us What You Want", desc: "Fill out our free consultation form. Tell us your dream car, budget, and timeline. We handle everything from there.", icon: "💬" },
+              { num: "02", title: "We Negotiate For You", desc: "We contact multiple dealerships, negotiate below invoice, strip out hidden fees, and find the best deal in the market.", icon: "🤝" },
+              { num: "03", title: "Get Your Keys", desc: "Review and approve the deal. We handle all paperwork and coordinate delivery. You drive away stress-free.", icon: "🔑" },
+            ].map((s) => (
+              <div key={s.num} className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all">
+                <div className="text-3xl mb-4">{s.icon}</div>
+                <span className="text-amber font-bold text-sm">{s.num}</span>
+                <h3 className="text-xl font-bold text-navy mt-1 mb-3" style={{ fontFamily: "var(--font-display)" }}>{s.title}</h3>
+                <p className="text-warm-600 text-sm leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center">
+            <Link href="/car-finder" className="inline-block bg-amber text-navy px-8 py-4 rounded-lg font-bold text-lg hover:bg-amber-light transition shadow-lg shadow-amber/20">
+              Book Your Free Consultation
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 7. SOCIAL PROOF / WINS ─────────────────────────────── */}
+      <section className="bg-navy py-20 lg:py-28 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-amber text-xs font-semibold uppercase tracking-[0.25em] mb-4">Real Results</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white">Wins From Our Clients</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { vehicle: "2026 Toyota RAV4 XLE", savings: "$4,400", time: "11 days", addons: "$2,800 in add-ons removed" },
+              { vehicle: "2025 BMW X3 xDrive30i", savings: "$6,200", time: "14 days", addons: "$3,500 in add-ons removed" },
+              { vehicle: "2026 Honda CR-V Sport", savings: "$3,100", time: "8 days", addons: "$2,200 in add-ons removed" },
+            ].map((w) => (
+              <div key={w.vehicle} className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-amber/30 transition">
+                <p className="text-white font-bold mb-1" style={{ fontFamily: "var(--font-display)" }}>{w.vehicle}</p>
+                <p className="text-3xl font-bold text-amber mb-3">{w.savings}</p>
+                <div className="space-y-1 text-sm text-white/50">
+                  <p>✓ {w.addons}</p>
+                  <p>✓ Completed in {w.time}</p>
+                  <p>✓ Zero hours at dealership</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 8. PRICING PACKAGES ────────────────────────────────── */}
+      <section className="bg-offwhite py-20 lg:py-28 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-amber text-xs font-semibold uppercase tracking-[0.25em] mb-4">Pricing</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-navy">Simple, Flat-Fee Pricing</h2>
+            <p className="text-warm-600 mt-3 max-w-xl mx-auto">No hidden fees. No percentage cuts. If we can&rsquo;t save you more than our fee, you pay nothing.</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { tier: "Standard", price: "$99", desc: "Honda, Toyota, Hyundai, Kia, Ford, Chevy, and other mainstream brands.", features: ["Full dealer negotiation", "Add-on removal", "Paperwork handling", "Delivery coordination"] },
+              { tier: "Premium", price: "$199", desc: "BMW, Mercedes-Benz, Audi, Lexus, and other premium brands.", features: ["Everything in Standard", "Priority service", "Multi-dealer bidding", "Premium brand expertise"], popular: true },
+              { tier: "Exotic", price: "$1,299", desc: "Porsche, Ferrari, Lamborghini, Rolls-Royce, and exotic vehicles.", features: ["Everything in Premium", "Dedicated concierge", "Nationwide search", "White-glove delivery"] },
+            ].map((p) => (
+              <div key={p.tier} className={`rounded-2xl p-8 border ${p.popular ? "bg-navy text-white border-amber shadow-xl shadow-amber/10 relative" : "bg-white border-gray-100 shadow-sm"} hover:shadow-lg transition`}>
+                {p.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber text-navy text-xs font-bold px-4 py-1 rounded-full">Most Popular</span>}
+                <p className={`text-sm font-semibold uppercase tracking-wider mb-2 ${p.popular ? "text-amber" : "text-amber"}`}>{p.tier}</p>
+                <p className={`text-4xl font-bold mb-2 ${p.popular ? "text-white" : "text-navy"}`} style={{ fontFamily: "var(--font-display)" }}>{p.price}</p>
+                <p className={`text-sm mb-6 ${p.popular ? "text-white/60" : "text-warm-600"}`}>{p.desc}</p>
+                <ul className="space-y-2 mb-8">
+                  {p.features.map((f) => (
+                    <li key={f} className={`flex items-center gap-2 text-sm ${p.popular ? "text-white/70" : "text-warm-600"}`}>
+                      <span className="text-amber">✓</span> {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/car-finder" className={`block text-center font-bold py-3.5 rounded-xl transition ${p.popular ? "bg-amber text-navy hover:bg-amber-light" : "bg-navy text-white hover:bg-navy-light"}`}>
+                  Get Started
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 9. CTA ──────────────────────────────────────────────── */}
       <section className="bg-navy py-20 lg:py-28 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
