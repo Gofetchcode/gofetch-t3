@@ -1,13 +1,11 @@
 import { db } from "@/lib/db";
-import { sendOutreachEmail, sendADFToDealerCRM } from "@/lib/outreach-sender";
+import { sendOutreachEmail } from "@/lib/outreach-sender";
 
-// Execute outreach campaign: send to all matching dealers
 export async function POST(req: Request) {
   try {
-    const { campaignId, customerId, vehicle, brand, radiusMiles, maxPrice, color, features, timeline } = await req.json();
+    const { customerId, vehicle, brand, maxPrice, color, features, timeline } = await req.json();
 
-    // Get customer's anonymous ID
-    const customer = await db.customer.findUnique({ where: { id: customerId }, select: { gofetchClientId: true } });
+    const customer = await db.customer.findUnique({ where: { id: customerId }, select: { gofetchClientId: true, firstName: true, lastName: true } });
     if (!customer?.gofetchClientId) return Response.json({ error: "Customer not found" }, { status: 404 });
 
     // Find matching dealers
@@ -15,39 +13,63 @@ export async function POST(req: Request) {
     if (brand) where.brand = brand;
     const dealers = await db.dealership.findMany({ where, orderBy: { responseRate: "desc" } });
 
+    if (dealers.length === 0) return Response.json({ success: true, sent: 0, failed: 0, totalDealers: 0, message: "No matching dealers found" });
+
+    // Auto-create campaign
+    const campaign = await db.outreachCampaign.create({
+      data: {
+        customerId,
+        vehicleDesc: vehicle || "Vehicle",
+        colorPref: color || null,
+        features: features || null,
+        maxPrice: maxPrice || null,
+        radiusMiles: 100,
+        brandFilter: brand || null,
+        dealersSent: 0,
+        dealersResponded: 0,
+        status: "active",
+      },
+    });
+
     let sent = 0;
     let failed = 0;
+    const results: { dealer: string; success: boolean; method: string }[] = [];
 
     for (const dealer of dealers) {
-      // Try ADF first (higher response rate), fallback to email
       const result = await sendOutreachEmail(dealer, vehicle, {
         color, features, budget: maxPrice, timeline, clientId: customer.gofetchClientId,
       });
 
       if (result.success) {
-        // Create response tracking record
         await db.outreachResponse.create({
           data: {
-            campaignId: campaignId || "manual",
+            campaignId: campaign.id,
             dealershipId: dealer.id,
             status: "pending",
           },
         });
         sent++;
+        results.push({ dealer: dealer.name, success: true, method: result.method });
       } else {
         failed++;
+        results.push({ dealer: dealer.name, success: false, method: result.method });
       }
     }
 
-    // Update campaign stats
-    if (campaignId) {
-      await db.outreachCampaign.update({
-        where: { id: campaignId },
-        data: { dealersSent: sent },
-      });
-    }
+    // Update campaign with send count
+    await db.outreachCampaign.update({
+      where: { id: campaign.id },
+      data: { dealersSent: sent },
+    });
 
-    return Response.json({ success: true, sent, failed, totalDealers: dealers.length });
+    return Response.json({
+      success: true,
+      campaignId: campaign.id,
+      sent,
+      failed,
+      totalDealers: dealers.length,
+      results,
+    });
   } catch (err: any) {
     return Response.json({ error: err.message }, { status: 500 });
   }
