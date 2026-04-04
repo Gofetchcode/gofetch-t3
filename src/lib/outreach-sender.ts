@@ -24,7 +24,7 @@ export async function sendOutreachEmail(dealer: {
   if (resend) {
     try {
       const result = await resend.emails.send({
-        from: "GoFetch Auto <onboarding@resend.dev>",
+        from: "GoFetch Auto <inquiry@gofetchauto.com>",
         to: [dealer.email],
         replyTo: "inquiry@gofetchauto.com",
         subject,
@@ -54,7 +54,7 @@ export async function sendADFToDealerCRM(dealer: {
   if (resend) {
     try {
       const result = await resend.emails.send({
-        from: "GoFetch Auto <onboarding@resend.dev>",
+        from: "GoFetch Auto <inquiry@gofetchauto.com>",
         to: [dealer.email],
         replyTo: "inquiry@gofetchauto.com",
         subject: `ADF Lead — ${opts.year} ${opts.make} ${opts.model} — GoFetch Auto`,
@@ -91,7 +91,7 @@ export async function sendFollowUp(dealer: {
 
   if (resend) {
     await resend.emails.send({
-      from: "GoFetch Auto <onboarding@resend.dev>",
+      from: "GoFetch Auto <inquiry@gofetchauto.com>",
       to: [dealer.email],
       replyTo: "inquiry@gofetchauto.com",
       subject,
