@@ -31,6 +31,8 @@ export default function PortalPage() {
   const [showPw, setShowPw] = useState(false);
   const [payLoading, setPayLoading] = useState(false);
   const [needsPasswordChange, setNeedsPasswordChange] = useState(false);
+  const [showReset, setShowReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
   const [dragOver, setDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadMsg, setUploadMsg] = useState("");
@@ -131,7 +133,16 @@ export default function PortalPage() {
                 ) : "Log In"}
               </button>
             </div>
-            <button onClick={() => { const em = prompt("Enter your email for password reset:"); if (em) fetch("/api/auth/reset", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: em }) }).then(() => alert("If that email exists, a reset has been sent.")); }} className="block text-xs text-muted hover:text-navy text-center mt-4 w-full">Forgot password?</button>
+            <button onClick={() => setShowReset(!showReset)} className="block text-xs text-muted hover:text-navy text-center mt-4 w-full">Forgot password?</button>
+            {showReset && (
+              <div className="mt-3 bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <p className="text-xs text-navy font-medium mb-2">Enter your email for password reset:</p>
+                <div className="flex gap-2">
+                  <input type="email" value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} placeholder="your@email.com" className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-amber outline-none" />
+                  <button onClick={() => { fetch("/api/auth/reset", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: resetEmail }) }).then(() => { setShowReset(false); setResetEmail(""); }); }} className="bg-amber text-navy font-semibold px-4 py-2 rounded-lg text-xs hover:bg-amber-light transition">Send</button>
+                </div>
+              </div>
+            )}
             <p className="text-xs text-muted text-center mt-2">
               New client? <Link href="/car-finder" className="text-amber hover:underline">Start a free consultation →</Link>
             </p>
