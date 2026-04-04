@@ -1,6 +1,10 @@
+import { Resend } from "resend";
 import { generateOutreachEmail, generateADFXML } from "./adf-generator";
 
-// ═══ STRATEGY 1+3: Send outreach email to dealer ═══
+const resendKey = (process.env.RESEND_API_KEY || "").replace(/\s+/g, "").trim();
+const resend = resendKey ? new Resend(resendKey) : null;
+
+// ═══ SEND OUTREACH EMAIL TO DEALER ═══
 export async function sendOutreachEmail(dealer: {
   name: string; email?: string | null;
 }, vehicle: string, opts: {
@@ -17,32 +21,26 @@ export async function sendOutreachEmail(dealer: {
     timeline: opts.timeline,
   });
 
-  // Use SendGrid if available, otherwise log
-  const sgKey = (process.env.SENDGRID_API_KEY || "").replace(/\s+/g, "").replace(/[^\x20-\x7E]/g, "").trim();
-  if (sgKey) {
-    const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${sgKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        personalizations: [{ to: [{ email: dealer.email }] }],
-        from: { email: "inquiry@gofetchauto.com", name: "GoFetch Auto" },
-        reply_to: { email: "inquiry@gofetchauto.com", name: "GoFetch Auto" },
+  if (resend) {
+    try {
+      const result = await resend.emails.send({
+        from: "GoFetch Auto <onboarding@resend.dev>",
+        to: [dealer.email],
+        replyTo: "inquiry@gofetchauto.com",
         subject,
-        content: [{ type: "text/plain", value: body }],
-      }),
-    });
-    return { success: res.ok, method: "sendgrid" };
+        text: body,
+      });
+      return { success: !result.error, method: result.error ? `resend_error: ${result.error.message}` : "resend" };
+    } catch (err: any) {
+      return { success: false, method: `resend_error: ${err.message}` };
+    }
   }
 
-  // Log to console if no SendGrid
   console.log(`[OUTREACH] Would send to ${dealer.email}:\nSubject: ${subject}\n${body.slice(0, 200)}...`);
   return { success: true, method: "logged" };
 }
 
-// ═══ STRATEGY 1: Send ADF/XML to dealer CRM ═══
+// ═══ SEND ADF/XML TO DEALER CRM ═══
 export async function sendADFToDealerCRM(dealer: {
   name: string; email?: string | null;
 }, opts: {
@@ -53,28 +51,25 @@ export async function sendADFToDealerCRM(dealer: {
 
   const adfXml = generateADFXML(opts);
 
-  if (process.env.SENDGRID_API_KEY) {
-    const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        personalizations: [{ to: [{ email: dealer.email }] }],
-        from: { email: `deals+${opts.clientId}@gofetchauto.com`, name: "GoFetch Auto" },
+  if (resend) {
+    try {
+      const result = await resend.emails.send({
+        from: "GoFetch Auto <onboarding@resend.dev>",
+        to: [dealer.email],
+        replyTo: "inquiry@gofetchauto.com",
         subject: `ADF Lead — ${opts.year} ${opts.make} ${opts.model} — GoFetch Auto`,
-        content: [{ type: "text/xml", value: adfXml }],
-      }),
-    });
-    return { success: res.ok, method: "adf_email" };
+        text: adfXml,
+      });
+      return { success: !result.error, method: "adf_resend" };
+    } catch (err: any) {
+      return { success: false, method: `adf_error: ${err.message}` };
+    }
   }
 
-  console.log(`[ADF] Would send ADF/XML to ${dealer.email}`);
   return { success: true, method: "logged" };
 }
 
-// ═══ STRATEGY 5: Follow-up escalation for non-responders ═══
+// ═══ FOLLOW-UP ESCALATION ═══
 export async function sendFollowUp(dealer: {
   name: string; email?: string | null;
 }, vehicle: string, daysSinceSent: number, clientId: string): Promise<{ sent: boolean; message: string }> {
@@ -94,26 +89,23 @@ export async function sendFollowUp(dealer: {
     body = `Hi ${dealer.name},\n\nWe've completed this purchase with another dealer. For future GoFetch Auto inquiries, please respond within 24 hours.\n\nGoFetch Auto delivers 10+ qualified, ready-to-buy clients per month in Tampa Bay. Responsive dealers receive priority lead flow.\n\nRicardo Gamon\nGoFetch Auto`;
   }
 
-  if (process.env.SENDGRID_API_KEY) {
-    await fetch("https://api.sendgrid.com/v3/mail/send", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        personalizations: [{ to: [{ email: dealer.email }] }],
-        from: { email: `deals+${clientId}@gofetchauto.com`, name: "GoFetch Auto" },
-        subject,
-        content: [{ type: "text/plain", value: body }],
-      }),
+  if (resend) {
+    await resend.emails.send({
+      from: "GoFetch Auto <onboarding@resend.dev>",
+      to: [dealer.email],
+      replyTo: "inquiry@gofetchauto.com",
+      subject,
+      text: body,
     });
   }
 
   return { sent: true, message: `Follow-up ${daysSinceSent <= 1 ? "#1" : daysSinceSent <= 2 ? "#2 (final)" : "closing"} sent` };
 }
 
-// ═══ STRATEGY 6: Volume stats for outreach ═══
+// ═══ VOLUME STATS ═══
 export function getVolumeStats(totalDeals: number): string {
-  if (totalDeals > 100) return `GoFetch Auto has completed ${totalDeals} deals in Tampa Bay. We deliver 10+ qualified buyers per month.`;
-  if (totalDeals > 50) return `GoFetch Auto has completed ${totalDeals}+ deals and delivers multiple qualified buyers monthly.`;
+  if (totalDeals > 100) return `GoFetch Auto has completed ${totalDeals} deals in Tampa Bay.`;
+  if (totalDeals > 50) return `GoFetch Auto has completed ${totalDeals}+ deals.`;
   if (totalDeals > 10) return `GoFetch Auto is an active buyer representation service with ${totalDeals}+ completed deals.`;
   return "GoFetch Auto is a professional car buying advocacy service representing qualified buyers.";
 }
