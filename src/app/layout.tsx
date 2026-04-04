@@ -48,6 +48,15 @@ export default function RootLayout({
             __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-F6K8C4RVYZ');`,
           }}
         />
+        {/* Meta Pixel */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','1160767272755408');fbq('track','PageView');`,
+          }}
+        />
+        <noscript>
+          <img height="1" width="1" style={{ display: "none" }} src="https://www.facebook.com/tr?id=1160767272755408&ev=PageView&noscript=1" />
+        </noscript>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0A1628" />
         <style dangerouslySetInnerHTML={{ __html: `:root { --font-display: 'Instrument Serif', serif; }` }} />
