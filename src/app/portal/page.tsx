@@ -33,6 +33,23 @@ export default function PortalPage() {
   const [needsPasswordChange, setNeedsPasswordChange] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
+
+  const sendPortalMessage = async () => {
+    if (!newMessage.trim() || !customer) return;
+    setSendingMessage(true);
+    try {
+      await fetch("/api/trpc/message.sendFromPortal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ json: { customerId: customer.id, content: newMessage.trim() } }),
+      });
+      // Add message locally for instant feedback
+      setCustomer({ ...customer, messages: [...(customer.messages || []), { id: Date.now().toString(), content: newMessage.trim(), sender: "customer", createdAt: new Date().toISOString() }] });
+      setNewMessage("");
+    } catch (err) { console.error("Send failed:", err); }
+    setSendingMessage(false);
+  };
   const [dragOver, setDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadMsg, setUploadMsg] = useState("");
@@ -598,10 +615,15 @@ export default function PortalPage() {
                 placeholder="Type a message..."
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && newMessage.trim()) { sendPortalMessage(); } }}
                 className="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-amber outline-none"
               />
-              <button className="bg-amber text-navy px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-amber-light transition">
-                Send
+              <button
+                onClick={sendPortalMessage}
+                disabled={!newMessage.trim() || sendingMessage}
+                className="bg-amber text-navy px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-amber-light transition disabled:opacity-50"
+              >
+                {sendingMessage ? "..." : "Send"}
               </button>
             </div>
           </div>

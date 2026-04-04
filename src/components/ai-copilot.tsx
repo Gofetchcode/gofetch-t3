@@ -10,8 +10,16 @@ interface Message {
 export function AICoPilot() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
+
+  // Detect if we're on client portal vs dealer CRM
+  const isPortal = typeof window !== "undefined" && window.location.pathname.startsWith("/portal");
+  const apiEndpoint = isPortal ? "/api/ai/client" : "/api/ai/chat";
+  const welcomeMsg = isPortal
+    ? "Hi! I'm your GoFetch assistant. Ask me about your deal progress, documents, payments, or anything about the car buying process."
+    : "Hi! I'm Fetch AI, your CRM co-pilot. Ask me anything — lead scores, deal status, draft messages, analytics, or recommendations.";
+
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Hi! I'm Fetch AI, your CRM co-pilot. Ask me anything — lead scores, deal status, draft messages, analytics, or recommendations." },
+    { role: "assistant", content: welcomeMsg },
   ]);
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -29,7 +37,7 @@ export function AICoPilot() {
 
     // Real AI API call
     try {
-      const res = await fetch("/api/ai/chat", {
+      const res = await fetch(apiEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMsg }),
@@ -61,8 +69,8 @@ export function AICoPilot() {
         <div className="flex items-center gap-2">
           <span className="text-xl">🤖</span>
           <div>
-            <p className="text-navy font-bold text-sm">Fetch AI</p>
-            <p className="text-navy/60 text-[10px]">Your CRM Co-Pilot</p>
+            <p className="text-navy font-bold text-sm">{isPortal ? "GoFetch Assistant" : "Fetch AI"}</p>
+            <p className="text-navy/60 text-[10px]">{isPortal ? "Your Deal Assistant" : "Your CRM Co-Pilot"}</p>
           </div>
         </div>
         <button onClick={() => setOpen(false)} className="text-navy/50 hover:text-navy text-xl leading-none">&times;</button>
@@ -98,7 +106,7 @@ export function AICoPilot() {
 
       {/* Quick prompts */}
       <div className="px-3 py-1.5 flex gap-1.5 overflow-x-auto border-t border-white/5">
-        {["Hottest lead?", "What's next?", "Draft a text", "Stalled deals"].map((q) => (
+        {(isPortal ? ["My deal status?", "What documents do I need?", "When do I pay?", "How long will it take?"] : ["Hottest lead?", "What's next?", "Draft a text", "Stalled deals"]).map((q) => (
           <button key={q} onClick={() => { setInput(q); }} className="text-[10px] text-white/30 bg-white/5 px-2 py-1 rounded-full whitespace-nowrap hover:bg-white/10 hover:text-white/60 transition">
             {q}
           </button>
