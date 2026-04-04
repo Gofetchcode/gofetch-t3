@@ -5,7 +5,7 @@ async function main() {
   // Default dealer
   const dealerCount = await db.dealer.count();
   if (dealerCount === 0) {
-    await db.dealer.create({ data: { pin: "7777", name: "GoFetch Auto" } });
+    await db.dealer.create({ data: { pin: "2598", name: "GoFetch Auto" } });
     console.log("Created default dealer (PIN: 7777)");
   }
 

@@ -133,7 +133,7 @@ export default function Home() {
                 href="/car-finder"
                 className="inline-block bg-amber text-navy px-8 py-4 rounded-lg font-bold text-lg hover:bg-amber-light transition shadow-lg shadow-amber/20"
               >
-                Find Your Perfect Car
+                Submit FREE Consultation
               </Link>
               <a
                 href="#sound-familiar"
@@ -299,34 +299,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── 7. SOCIAL PROOF / WINS ─────────────────────────────── */}
-      <section className="bg-navy py-20 lg:py-28 px-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-amber text-xs font-semibold uppercase tracking-[0.25em] mb-4">Real Results</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white">Wins From Our Clients</h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { vehicle: "2026 Toyota RAV4 XLE", savings: "$4,400", time: "11 days", addons: "$2,800 in add-ons removed" },
-              { vehicle: "2025 BMW X3 xDrive30i", savings: "$6,200", time: "14 days", addons: "$3,500 in add-ons removed" },
-              { vehicle: "2026 Honda CR-V Sport", savings: "$3,100", time: "8 days", addons: "$2,200 in add-ons removed" },
-            ].map((w) => (
-              <div key={w.vehicle} className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-amber/30 transition">
-                <p className="text-white font-bold mb-1" style={{ fontFamily: "var(--font-display)" }}>{w.vehicle}</p>
-                <p className="text-3xl font-bold text-amber mb-3">{w.savings}</p>
-                <div className="space-y-1 text-sm text-white/50">
-                  <p>✓ {w.addons}</p>
-                  <p>✓ Completed in {w.time}</p>
-                  <p>✓ Zero hours at dealership</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── 8. PRICING PACKAGES ────────────────────────────────── */}
+      {/* ─── 7. PRICING PACKAGES ────────────────────────────────── */}
       <section className="bg-offwhite py-20 lg:py-28 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
@@ -338,7 +311,7 @@ export default function Home() {
             {[
               { tier: "Standard", price: "$199", desc: "Honda, Toyota, Hyundai, Kia, Ford, Chevy, and other mainstream brands.", features: ["Full dealer negotiation", "Add-on removal", "Paperwork handling", "Delivery coordination"] },
               { tier: "Premium", price: "$299", desc: "BMW, Mercedes-Benz, Audi, Lexus, and other premium brands.", features: ["Everything in Standard", "Priority service", "Multi-dealer bidding", "Premium brand expertise"], popular: true },
-              { tier: "Exotic", price: "$1,999", desc: "Porsche, Ferrari, Lamborghini, Rolls-Royce, and exotic vehicles.", features: ["Everything in Premium", "Dedicated concierge", "Nationwide search", "White-glove delivery"] },
+              { tier: "Exotic", price: "$1,999", desc: "Porsche, Ferrari, Lamborghini, Rolls-Royce, and exotic vehicles.", features: ["Everything in Premium", "Dedicated concierge", "Statewide search", "White-glove delivery"] },
             ].map((p) => (
               <div key={p.tier} className={`rounded-2xl p-8 border ${p.popular ? "bg-navy text-white border-amber shadow-xl shadow-amber/10 relative" : "bg-white border-gray-100 shadow-sm"} hover:shadow-lg transition`}>
                 {p.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber text-navy text-xs font-bold px-4 py-1 rounded-full">Most Popular</span>}
@@ -376,7 +349,7 @@ export default function Home() {
             href="/car-finder"
             className="inline-block bg-amber text-navy px-10 py-4 rounded-lg font-bold text-lg hover:bg-amber-light transition shadow-lg shadow-amber/20"
           >
-            Find Your Perfect Car
+            Submit FREE Consultation
           </Link>
         </div>
       </section>

@@ -1,12 +1,12 @@
 import Link from "next/link";
 
 const vehicles = [
-  { name: "2026 Porsche Cayenne", msrp: "$76,550" },
-  { name: "2026 BMW X5 M50i", msrp: "$83,900" },
-  { name: "2026 Mercedes-Benz GLE 450", msrp: "$68,400" },
-  { name: "2026 Audi Q7 Premium Plus", msrp: "$64,800" },
-  { name: "2026 Land Rover Defender", msrp: "$72,300" },
-  { name: "2026 Lexus LX 600", msrp: "$98,500" },
+  { name: "2025 Porsche 911 Carrera", msrp: "$115,400", lease: "$1,299/mo", note: "Porsche loyalty incentives available" },
+  { name: "2025 BMW M4 Competition", msrp: "$82,900", lease: "$899/mo", note: "Aggressive conquest lease rates" },
+  { name: "2025 Mercedes-AMG C63 S", msrp: "$87,500", lease: "$979/mo", note: "Hybrid AMG — dealer inventory discounts" },
+  { name: "2025 Audi RS e-tron GT", msrp: "$109,800", lease: "$1,199/mo", note: "Massive EV incentives stacking" },
+  { name: "2025 Maserati Grecale GT", msrp: "$63,500", lease: "$699/mo", note: "Heavy dealer discounts right now" },
+  { name: "2025 Range Rover Sport", msrp: "$86,600", lease: "$949/mo", note: "Year-end clearance pricing" },
 ];
 
 export default function ExoticPage() {
@@ -87,6 +87,8 @@ export default function ExoticPage() {
                 <p className="text-sm text-white/40 mb-1">
                   From <span className="font-bold text-white text-lg">{v.msrp}</span> MSRP
                 </p>
+                {(v as any).lease && <p className="text-xs text-green-400 font-bold mb-1">🔥 {(v as any).lease}</p>}
+                {(v as any).note && <p className="text-[11px] text-white/30 italic mb-1">{(v as any).note}</p>}
                 <p className="text-xs text-amber font-semibold mb-6 flex items-center gap-1.5">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />

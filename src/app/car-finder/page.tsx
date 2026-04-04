@@ -80,19 +80,7 @@ export default function CarFinderPage() {
         </div>
       </section>
 
-      {/* Brand Marquee */}
-      <div className="bg-navy-light py-5 overflow-hidden border-y border-white/5">
-        <div className="animate-marquee whitespace-nowrap flex gap-12">
-          {[...brands, ...brands].map((b, i) => (
-            <span
-              key={i}
-              className="text-white/10 text-sm font-bold uppercase tracking-[0.2em]"
-            >
-              {b}
-            </span>
-          ))}
-        </div>
-      </div>
+      {/* Removed brand marquee */}
 
       {/* Form Section */}
       <section className="py-20 px-6">
@@ -280,7 +268,7 @@ export default function CarFinderPage() {
                     Submitting...
                   </span>
                 ) : (
-                  "Continue to Agreement"
+                  "Submit FREE Consultation Request"
                 )}
               </button>
               <p className="text-xs text-muted text-center mt-4">

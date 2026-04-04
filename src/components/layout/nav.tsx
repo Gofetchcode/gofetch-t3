@@ -13,7 +13,6 @@ const links = [
   { href: "/car-finder", label: "Free Consultation" },
   { href: "https://fleet.gofetchauto.com", label: "Fleet", external: true },
   { href: "/portal", label: "My Portal", cta: true },
-  { href: "/dealer", label: "Dealer", muted: true },
 ];
 
 export function Nav() {

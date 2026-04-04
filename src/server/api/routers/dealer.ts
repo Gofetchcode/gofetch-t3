@@ -12,6 +12,14 @@ export const dealerRouter = router({
       return { success: true, user: crmUser ?? { id: dealer!.id, name: dealer!.name, role: "admin" } };
     }),
 
+  changePin: dealerProcedure
+    .input(z.object({ newPin: z.string().min(4) }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.dealer.updateMany({ data: { pin: input.newPin } });
+      await ctx.db.cRMUser.updateMany({ where: { role: "admin" }, data: { pin: input.newPin } });
+      return { success: true };
+    }),
+
   getCustomers: dealerProcedure
     .input(z.object({
       step: z.number().optional(),
