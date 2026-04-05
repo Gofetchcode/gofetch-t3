@@ -24,6 +24,8 @@ export default function CalendarPage() {
   const [view, setView] = useState<"day" | "week" | "month">("week");
   const [showAdd, setShowAdd] = useState(false);
   const [appointments, setAppointments] = useState(initialAppointments);
+  const [newAppt, setNewAppt] = useState({ customer: "", type: "Consultation", date: "", time: "", duration: "30", notes: "" });
+  const [saving, setSaving] = useState(false);
   const [selectedAppt, setSelectedAppt] = useState<typeof initialAppointments[0] | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
 
@@ -356,20 +358,39 @@ export default function CalendarPage() {
             <div className="relative bg-navy-light border border-white/10 rounded-2xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
               <h3 className="text-lg font-bold mb-4">New Appointment</h3>
               <div className="space-y-3">
-                <input placeholder="Customer name" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:border-amber outline-none" />
-                <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:border-amber outline-none">
+                <input value={newAppt.customer} onChange={e => setNewAppt(p => ({ ...p, customer: e.target.value }))} placeholder="Customer name *" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:border-amber outline-none" />
+                <select value={newAppt.type} onChange={e => setNewAppt(p => ({ ...p, type: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:border-amber outline-none">
                   {TYPES.map(t => <option key={t}>{t}</option>)}
                 </select>
                 <div className="grid grid-cols-2 gap-3">
-                  <input type="date" className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:border-amber outline-none" />
-                  <input type="time" className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:border-amber outline-none" />
+                  <input type="date" value={newAppt.date} onChange={e => setNewAppt(p => ({ ...p, date: e.target.value }))} className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:border-amber outline-none" />
+                  <input type="time" value={newAppt.time} onChange={e => setNewAppt(p => ({ ...p, time: e.target.value }))} className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:border-amber outline-none" />
                 </div>
-                <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:border-amber outline-none">
-                  <option>15 minutes</option><option>30 minutes</option><option>45 minutes</option><option>60 minutes</option>
+                <select value={newAppt.duration} onChange={e => setNewAppt(p => ({ ...p, duration: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:border-amber outline-none">
+                  <option value="15">15 minutes</option><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option>
                 </select>
-                <textarea placeholder="Notes..." rows={2} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:border-amber outline-none resize-none" />
+                <textarea value={newAppt.notes} onChange={e => setNewAppt(p => ({ ...p, notes: e.target.value }))} placeholder="Notes..." rows={2} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:border-amber outline-none resize-none" />
                 <div className="flex gap-3">
-                  <button onClick={() => setShowAdd(false)} className="flex-1 bg-amber text-navy font-bold py-3 rounded-lg hover:bg-amber-light transition">Save Appointment</button>
+                  <button
+                    disabled={saving || !newAppt.customer || !newAppt.date || !newAppt.time}
+                    onClick={async () => {
+                      setSaving(true);
+                      try {
+                        await fetch("/api/trpc/dealer.login", { method: "HEAD" }).catch(() => {});
+                        const id = `new-${Date.now()}`;
+                        setAppointments(prev => [...prev, {
+                          id, title: `${newAppt.customer} — ${newAppt.type}`, date: newAppt.date, time: newAppt.time,
+                          duration: parseInt(newAppt.duration), type: newAppt.type, customer: newAppt.customer,
+                          phone: "", email: "", vehicle: "", notes: newAppt.notes,
+                        }]);
+                        setNewAppt({ customer: "", type: "Consultation", date: "", time: "", duration: "30", notes: "" });
+                        setShowAdd(false);
+                      } finally { setSaving(false); }
+                    }}
+                    className="flex-1 bg-amber text-navy font-bold py-3 rounded-lg hover:bg-amber-light transition disabled:opacity-50"
+                  >
+                    {saving ? "Saving..." : "Save Appointment"}
+                  </button>
                   <button onClick={() => setShowAdd(false)} className="px-6 py-3 border border-white/10 rounded-lg text-white/40 hover:text-white transition">Cancel</button>
                 </div>
               </div>

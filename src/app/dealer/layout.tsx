@@ -13,30 +13,27 @@ const CRM_NAV = [
   { href: "/dealer/reports", label: "Reports", icon: "▤" },
   { href: "/dealer/import", label: "Import", icon: "⬆" },
   { href: "/dealer/settings", label: "Settings", icon: "⚙" },
-  { href: "/dealer-portal", label: "Admin Portal", icon: "🤝" },
 ];
 
 export default function DealerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
 
-  // Don't show sidebar on the main dealer page (it has its own full layout)
+  // Main dealer page has its own full layout with sidebar
   if (pathname === "/dealer") {
     return <>{children}</>;
   }
 
   return (
-    <div className="min-h-screen bg-navy flex pt-16">
+    <div className="min-h-screen bg-navy flex">
       {/* CRM Sidebar */}
-      <aside className={`${collapsed ? "w-[60px]" : "w-56"} flex-shrink-0 bg-navy-light border-r border-white/5 flex flex-col transition-all duration-200`}>
+      <aside className={`${collapsed ? "w-[60px]" : "w-56"} flex-shrink-0 bg-navy-light border-r border-white/5 flex flex-col h-screen sticky top-0 transition-all duration-200`}>
         {/* Logo + Collapse */}
         <div className="p-4 border-b border-white/5 flex items-center gap-2">
           <Link href="/dealer" className="flex items-center gap-2 min-w-0">
             <img src="/logo-icon-dark.png" alt="GoFetch CRM" className="w-10 h-10 rounded-xl object-cover flex-shrink-0" />
             {!collapsed && (
-              <div>
-                <span className="text-sm font-bold text-white"><span className="text-amber">GoFetch</span> CRM</span>
-              </div>
+              <span className="text-sm font-bold text-white"><span className="text-amber">GoFetch</span> CRM</span>
             )}
           </Link>
           <button
@@ -49,7 +46,7 @@ export default function DealerLayout({ children }: { children: React.ReactNode }
         </div>
 
         {/* Nav Links */}
-        <nav className="flex-1 p-3 space-y-1">
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {CRM_NAV.map((item) => {
             const isActive = pathname === item.href || (item.href !== "/dealer" && pathname?.startsWith(item.href));
             return (
@@ -70,9 +67,13 @@ export default function DealerLayout({ children }: { children: React.ReactNode }
           })}
         </nav>
 
-        {/* Back to Site */}
-        <div className="p-3 border-t border-white/5">
-          <Link href="/" className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-white/20 hover:text-white/40 transition">
+        {/* Back to Dashboard + Site */}
+        <div className="p-3 border-t border-white/5 space-y-1">
+          <Link href="/dealer" className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-amber/40 hover:text-amber transition">
+            <span className="flex-shrink-0">◧</span>
+            {!collapsed && "Back to Dashboard"}
+          </Link>
+          <Link href="/" className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-white/15 hover:text-white/30 transition">
             <span className="flex-shrink-0">←</span>
             {!collapsed && "Back to Site"}
           </Link>
@@ -80,7 +81,7 @@ export default function DealerLayout({ children }: { children: React.ReactNode }
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto min-h-screen">
         {children}
       </main>
     </div>

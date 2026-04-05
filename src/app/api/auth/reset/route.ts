@@ -1,5 +1,9 @@
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
+import { Resend } from "resend";
+
+const resendKey = (process.env.RESEND_API_KEY || "").trim();
+const resend = resendKey ? new Resend(resendKey) : null;
 
 export async function POST(req: Request) {
   try {
@@ -15,11 +19,21 @@ export async function POST(req: Request) {
       data: { password: await bcrypt.hash(newTempPw, 10), tempPassword: newTempPw, passwordChanged: false },
     });
 
+    // Send password reset email
+    if (resend) {
+      await resend.emails.send({
+        from: "GoFetch Auto <inquiry@gofetchauto.com>",
+        to: [customer.email],
+        subject: "GoFetch Auto — Password Reset",
+        text: `Hi ${customer.firstName},\n\nYour GoFetch Auto portal password has been reset.\n\nYour new temporary password: ${newTempPw}\n\nLog in at https://gofetchauto.com/portal and you'll be asked to create a new password.\n\nIf you didn't request this reset, please contact us at (352) 410-5889.\n\n— GoFetch Auto Team`,
+      });
+    }
+
+    // Also store as system message for CRM visibility
     await db.message.create({
-      data: { customerId: customer.id, sender: "system", content: `Your password has been reset. New temporary password: ${newTempPw}. You'll be asked to change it on next login.` },
+      data: { customerId: customer.id, sender: "system", content: `Password reset email sent. Temp password: ${newTempPw}` },
     });
 
-    // In production, send this via email instead of storing in message
     return Response.json({ success: true });
   } catch (err: any) {
     return Response.json({ error: err.message }, { status: 500 });
