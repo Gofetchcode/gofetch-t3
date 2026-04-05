@@ -35,7 +35,7 @@ export default function DealerLayout({ children }: { children: React.ReactNode }
             <img src="/logo-icon.jpeg" alt="GoFetch CRM" className="w-10 h-10 rounded-xl object-cover flex-shrink-0" />
             {!collapsed && (
               <div>
-                <span className="text-sm font-bold text-white">GoFetch <span className="text-amber">CRM</span></span>
+                <span className="text-sm font-bold text-white"><span className="text-amber">GoFetch</span> CRM</span>
               </div>
             )}
           </Link>

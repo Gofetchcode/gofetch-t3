@@ -966,7 +966,7 @@ export default function DealerPage() {
             <img src="/logo-icon.jpeg" alt="GoFetch" className="w-20 h-20 rounded-2xl object-cover shadow-lg" />
           </div>
           <h3 className="text-xl font-bold text-white text-center mb-1" style={{ fontFamily: "var(--font-display)" }}>
-            GoFetch <span className="text-amber">CRM</span>
+            <span className="text-amber">GoFetch</span> CRM
           </h3>
           <p className="text-sm text-white/40 text-center mb-8">Enter your PIN to access the dashboard.</p>
           <input
@@ -1092,7 +1092,7 @@ export default function DealerPage() {
           <img src="/logo-icon.jpeg" alt="GoFetch CRM" className="w-10 h-10 rounded-xl object-cover flex-shrink-0" />
           {!sidebarCollapsed && (
             <span className="text-sm font-bold text-white" style={{ fontFamily: "var(--font-display)" }}>
-              GoFetch <span className="text-amber">CRM</span>
+              <span className="text-amber">GoFetch</span> CRM
             </span>
           )}
           <button

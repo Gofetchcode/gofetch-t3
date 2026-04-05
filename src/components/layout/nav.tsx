@@ -35,8 +35,8 @@ export function Nav() {
         {/* Logo — bigger */}
         <Link href="/" className="flex items-center gap-3">
           <img src="/logo-icon.jpeg" alt="GoFetch Auto" className="w-11 h-11 rounded-xl object-cover shadow-md" />
-          <span style={{ fontFamily: "var(--font-display)" }} className="text-2xl text-white tracking-wide">
-            Go<span className="text-amber">Fetch</span> <span className="text-white/80 font-normal">Auto</span>
+          <span style={{ fontFamily: "var(--font-display)" }} className="text-2xl tracking-wide">
+            <span className="text-amber">GoFetch</span> <span className="text-white">Auto</span>
           </span>
         </Link>
 
