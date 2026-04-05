@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { GoogleReviewsStat } from "@/components/google-reviews-stat";
 
 /* ───────────────────────────── helpers ───────────────────────────── */
 
@@ -253,20 +254,7 @@ export default function Home() {
           <CounterStat end={3400} prefix="$" suffix="+" label="Average Savings" />
           <CounterStat end={0} suffix=" Hrs" label="At Dealerships" />
           <CounterStat end={200} suffix="+" label="Happy Buyers" />
-          <a
-            href="https://www.google.com/search?q=GoFetch+Auto+Tampa+Bay+reviews"
-            target="_blank"
-            rel="noopener"
-            className="text-center block hover:scale-105 transition-transform duration-200"
-          >
-            <div className="text-4xl md:text-5xl font-bold text-amber mb-2">
-              4.9&thinsp;&#9733;
-            </div>
-            <div className="text-sm text-gray-400 uppercase tracking-wider">
-              Google Reviews
-            </div>
-            <div className="text-xs text-gray-500 mt-1">See our reviews &rarr;</div>
-          </a>
+          <GoogleReviewsStat />
         </div>
       </section>
 
