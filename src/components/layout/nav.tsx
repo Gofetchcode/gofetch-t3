@@ -4,14 +4,22 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { DarkModeToggle } from "@/components/dark-mode-toggle";
 
-const links = [
+const leftLinks = [
   { href: "/", label: "Home" },
   { href: "/about", label: "Our Story" },
   { href: "/how-it-works", label: "How It Works" },
+];
+
+const rightLinks = [
   { href: "/new-cars", label: "Vehicles" },
-  { href: "/new-cars?tab=exclusive", label: "exclusive", exclusive: true },
   { href: "/car-finder", label: "Free Consultation" },
   { href: "/portal", label: "My Portal", cta: true },
+];
+
+const allLinks = [
+  ...leftLinks,
+  { href: "/new-cars?tab=exclusive", label: "exclusive", exclusive: true },
+  ...rightLinks,
 ];
 
 export function Nav() {
@@ -24,6 +32,8 @@ export function Nav() {
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
+  const linkCls = "px-3 py-2 text-sm text-white/60 hover:text-white transition-all duration-200";
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -31,35 +41,41 @@ export function Nav() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
-        {/* Logo — bigger */}
-        <Link href="/" className="flex items-center gap-3">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-3 flex-shrink-0">
           <img src="/logo-icon-dark.png" alt="GoFetch Auto" className="w-12 h-12 rounded-xl object-cover" />
-          <span className="text-[22px] font-medium tracking-wide" style={{ fontFamily: "'Outfit', sans-serif" }}>
+          <span className="text-[22px] font-medium tracking-wide hidden sm:inline" style={{ fontFamily: "'Outfit', sans-serif" }}>
             <span className="text-amber font-semibold">GoFetch</span>{" "}
             <span className="text-white font-light">Auto</span>
           </span>
         </Link>
 
-        {/* Desktop links */}
-        <div className="hidden lg:flex items-center gap-1">
-          {links.map((l) => {
-            if ((l as any).exclusive) {
-              return (
-                <Link key="exclusive" href={l.href} className="flex items-center gap-0.5 px-3 py-2 text-sm text-white/60 hover:text-white transition-all duration-200">
-                  <img src="/g-icon-transparent.png" alt="G" className="w-5 h-5 object-contain -mr-0.5" />
-                  <span>oFetch Exclusive</span>
-                </Link>
-              );
-            }
-            const cls = (l as any).cta
-              ? "ml-2 bg-amber text-navy px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-light transition-all duration-200"
-              : "px-3 py-2 text-sm text-white/60 hover:text-white transition-all duration-200";
-            return (l as any).external ? (
-              <a key={l.label} href={l.href} className={cls}>{l.label}</a>
+        {/* Desktop nav — split layout with GoFetch Exclusive centered */}
+        <div className="hidden lg:flex items-center gap-0.5 flex-1 justify-center">
+          {/* Left links */}
+          {leftLinks.map((l) => (
+            <Link key={l.label} href={l.href} className={linkCls}>{l.label}</Link>
+          ))}
+
+          {/* CENTER: GoFetch Exclusive — the standout tab */}
+          <Link
+            href="/new-cars?tab=exclusive"
+            className="flex items-center gap-0 mx-4 px-4 py-2 rounded-xl border border-amber/20 hover:border-amber/50 hover:bg-amber/5 transition-all duration-200 group"
+          >
+            <img src="/g-icon-transparent.png" alt="G" className="w-7 h-7 object-contain" />
+            <span className="text-sm font-semibold text-amber/80 group-hover:text-amber transition-all duration-200">oFetch Exclusive</span>
+          </Link>
+
+          {/* Right links */}
+          {rightLinks.map((l) => (
+            (l as any).cta ? (
+              <Link key={l.label} href={l.href} className="ml-1 bg-amber text-navy px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-light transition-all duration-200">
+                {l.label}
+              </Link>
             ) : (
-              <Link key={l.label} href={l.href} className={cls}>{l.label}</Link>
-            );
-          })}
+              <Link key={l.label} href={l.href} className={linkCls}>{l.label}</Link>
+            )
+          ))}
           <DarkModeToggle />
         </div>
 
@@ -78,7 +94,7 @@ export function Nav() {
       {/* Mobile menu */}
       {open && (
         <div className="lg:hidden bg-navy-light border-t border-white/5 px-4 py-4 flex flex-col gap-1 animate-slide-in">
-          {links.map((l) => (
+          {allLinks.map((l) => (
             <Link
               key={l.label}
               href={l.href}
@@ -86,13 +102,15 @@ export function Nav() {
               className={
                 (l as any).cta
                   ? "bg-amber text-navy px-4 py-3 rounded-lg font-semibold text-center mt-2"
+                  : (l as any).exclusive
+                  ? "flex items-center gap-0 py-3 px-2 text-sm border-b border-amber/10"
                   : "text-white/60 hover:text-white py-3 px-2 text-sm border-b border-white/5 transition-all duration-200"
               }
             >
               {(l as any).exclusive ? (
-                <span className="flex items-center gap-0.5">
-                  <img src="/g-icon-transparent.png" alt="G" className="w-5 h-5 object-contain -mr-0.5" />
-                  <span>oFetch Exclusive</span>
+                <span className="flex items-center gap-0">
+                  <img src="/g-icon-transparent.png" alt="G" className="w-6 h-6 object-contain" />
+                  <span className="text-amber font-semibold">oFetch Exclusive</span>
                 </span>
               ) : l.label}
             </Link>
