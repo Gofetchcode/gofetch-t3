@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -30,21 +30,25 @@ const exclusiveDeals = [
 
 type Tab = "new" | "exotic" | "exclusive";
 
-export default function VehiclesPage() {
+function TabReader({ onTab }: { onTab: (t: Tab) => void }) {
   const searchParams = useSearchParams();
-  const [tab, setTab] = useState<Tab>("new");
-
   useEffect(() => {
     const t = searchParams.get("tab");
-    if (t === "exclusive") setTab("exclusive");
-    else if (t === "exotic") setTab("exotic");
-  }, [searchParams]);
+    if (t === "exclusive") onTab("exclusive");
+    else if (t === "exotic") onTab("exotic");
+  }, [searchParams, onTab]);
+  return null;
+}
+
+export default function VehiclesPage() {
+  const [tab, setTab] = useState<Tab>("new");
 
   const vehicles = tab === "new" ? newCars : tab === "exotic" ? exoticCars : exclusiveDeals;
   const isDark = tab === "exotic";
 
   return (
     <div className={isDark ? "bg-navy min-h-screen" : "bg-offwhite min-h-screen"}>
+      <Suspense fallback={null}><TabReader onTab={setTab} /></Suspense>
       {/* Hero */}
       <section className="relative bg-navy text-white py-24 md:py-28 px-4 md:px-6 overflow-hidden">
         <div className="absolute inset-0 opacity-5">
