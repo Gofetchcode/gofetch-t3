@@ -1,12 +1,12 @@
 import Link from "next/link";
 
 const vehicles = [
-  { name: "2025 Hyundai Ioniq 5", msrp: "$33,500", tag: "Hot Deal", note: "EV incentives + dealer discounts making this one of the best values in Florida", img: "https://images.unsplash.com/photo-1677761342067-ccbe23a2ddfe?w=600&h=400&fit=crop&q=80" },
-  { name: "2025 Chevrolet Equinox EV", msrp: "$33,900", tag: "High Demand", note: "GM's most affordable EV — strong dealer incentives available", img: "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=600&h=400&fit=crop&q=80" },
-  { name: "2026 Toyota RAV4 XLE Hybrid", msrp: "$34,295", tag: "Best Seller", note: "#1 selling SUV — we consistently negotiate below invoice", img: "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=600&h=400&fit=crop&q=80" },
-  { name: "2025 Kia EV6 Light", msrp: "$35,900", tag: "EV Special", note: "Federal tax credits + dealer markdowns on EV inventory", img: "https://images.unsplash.com/photo-1706906644527-1f4e2e6b03a5?w=600&h=400&fit=crop&q=80" },
-  { name: "2026 Honda CR-V Sport Hybrid", msrp: "$33,150", tag: "Popular", note: "Honda's best-selling SUV with excellent fuel economy", img: "https://images.unsplash.com/photo-1606611013016-969c19ba27bb?w=600&h=400&fit=crop&q=80" },
-  { name: "2025 Nissan Ariya Engage", msrp: "$36,830", tag: "Clearance", note: "Dealers moving EV inventory — big savings available", img: "https://images.unsplash.com/photo-1549317661-bd32c8ce0afa?w=600&h=400&fit=crop&q=80" },
+  { name: "2025 Hyundai Ioniq 5", msrp: "$33,500", tag: "Hot Deal", note: "EV incentives + dealer discounts making this one of the best values in Florida", brand: "Hyundai", gradient: "from-blue-900 to-blue-700" },
+  { name: "2025 Chevrolet Equinox EV", msrp: "$33,900", tag: "High Demand", note: "GM's most affordable EV — strong dealer incentives available", brand: "Chevrolet", gradient: "from-red-900 to-red-700" },
+  { name: "2026 Toyota RAV4 XLE Hybrid", msrp: "$34,295", tag: "Best Seller", note: "#1 selling SUV — we consistently negotiate below invoice", brand: "Toyota", gradient: "from-gray-900 to-gray-700" },
+  { name: "2025 Kia EV6 Light", msrp: "$35,900", tag: "EV Special", note: "Federal tax credits + dealer markdowns on EV inventory", brand: "Kia", gradient: "from-emerald-900 to-emerald-700" },
+  { name: "2026 Honda CR-V Sport Hybrid", msrp: "$33,150", tag: "Popular", note: "Honda's best-selling SUV with excellent fuel economy", brand: "Honda", gradient: "from-slate-900 to-slate-700" },
+  { name: "2025 Nissan Ariya Engage", msrp: "$36,830", tag: "Clearance", note: "Dealers moving EV inventory — big savings available", brand: "Nissan", gradient: "from-indigo-900 to-indigo-700" },
 ];
 
 export default function NewCarsPage() {
@@ -37,16 +37,18 @@ export default function NewCarsPage() {
               key={v.name}
               className="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
             >
-              {/* Vehicle Image */}
-              <div className="relative h-44 md:h-52 overflow-hidden">
-                <img
-                  src={v.img}
-                  alt={v.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+              {/* Vehicle Card Header */}
+              <div className={`relative h-40 md:h-48 bg-gradient-to-br ${v.gradient} overflow-hidden flex items-end p-5 md:p-6`}>
+                <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4" />
+                <div className="relative">
+                  <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-1">{v.brand}</p>
+                  <p className="text-white text-xl md:text-2xl font-bold leading-tight" style={{ fontFamily: "var(--font-display)" }}>
+                    {v.name.replace(/^\d{4}\s/, "").replace(v.brand + " ", "")}
+                  </p>
+                </div>
                 {v.tag && (
-                  <span className="absolute top-3 left-3 bg-green-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+                  <span className="absolute top-3 right-3 bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
                     {v.tag}
                   </span>
                 )}

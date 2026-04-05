@@ -1,12 +1,12 @@
 import Link from "next/link";
 
 const vehicles = [
-  { name: "2025 Porsche 911 Carrera", msrp: "$115,400", note: "Porsche loyalty incentives and allocation advantages available", img: "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=600&h=400&fit=crop&q=80" },
-  { name: "2025 BMW M4 Competition", msrp: "$82,900", note: "BMW currently offering competitive conquest rates", img: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=600&h=400&fit=crop&q=80" },
-  { name: "2025 Mercedes-AMG C63 S", msrp: "$87,500", note: "Hybrid AMG powertrain — dealer inventory available", img: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&h=400&fit=crop&q=80" },
-  { name: "2025 Audi RS e-tron GT", msrp: "$109,800", note: "EV incentives creating significant savings opportunities", img: "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=600&h=400&fit=crop&q=80" },
-  { name: "2025 Maserati Grecale GT", msrp: "$63,500", note: "Strong dealer incentives on current inventory", img: "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=600&h=400&fit=crop&q=80" },
-  { name: "2025 Range Rover Sport", msrp: "$86,600", note: "Current model year clearance pricing available", img: "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=600&h=400&fit=crop&q=80" },
+  { name: "2025 Porsche 911 Carrera", msrp: "$115,400", note: "Porsche loyalty incentives and allocation advantages available", brand: "Porsche", model: "911 Carrera", gradient: "from-[#2D2926] to-[#4A443E]" },
+  { name: "2025 BMW M4 Competition", msrp: "$82,900", note: "BMW currently offering competitive conquest rates", brand: "BMW", model: "M4 Competition", gradient: "from-[#1C2541] to-[#3A506B]" },
+  { name: "2025 Mercedes-AMG C63 S", msrp: "$87,500", note: "Hybrid AMG powertrain — dealer inventory available", brand: "Mercedes-AMG", model: "C63 S", gradient: "from-[#1A1A2E] to-[#16213E]" },
+  { name: "2025 Audi RS e-tron GT", msrp: "$109,800", note: "EV incentives creating significant savings opportunities", brand: "Audi", model: "RS e-tron GT", gradient: "from-[#2B2D42] to-[#5C5D72]" },
+  { name: "2025 Maserati Grecale GT", msrp: "$63,500", note: "Strong dealer incentives on current inventory", brand: "Maserati", model: "Grecale GT", gradient: "from-[#0B132B] to-[#1C2541]" },
+  { name: "2025 Range Rover Sport", msrp: "$86,600", note: "Current model year clearance pricing available", brand: "Range Rover", model: "Sport", gradient: "from-[#2D3436] to-[#636E72]" },
 ];
 
 export default function ExoticPage() {
@@ -39,14 +39,16 @@ export default function ExoticPage() {
               key={v.name}
               className="group bg-navy-light border border-white/8 rounded-2xl overflow-hidden hover:border-amber/40 hover:-translate-y-1 transition-all duration-300"
             >
-              {/* Vehicle Image */}
-              <div className="relative h-44 md:h-56 overflow-hidden">
-                <img
-                  src={v.img}
-                  alt={v.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-navy-light/80 to-transparent" />
+              {/* Vehicle Card Header */}
+              <div className={`relative h-40 md:h-48 bg-gradient-to-br ${v.gradient} overflow-hidden flex items-end p-5 md:p-6`}>
+                <div className="absolute top-0 right-0 w-48 h-48 bg-white/[0.03] rounded-full -translate-y-1/2 translate-x-1/4" />
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/[0.03] rounded-full translate-y-1/2 -translate-x-1/4" />
+                <div className="relative">
+                  <p className="text-amber/60 text-xs font-bold uppercase tracking-widest mb-1">{v.brand}</p>
+                  <p className="text-white text-xl md:text-2xl font-bold leading-tight" style={{ fontFamily: "var(--font-display)" }}>
+                    {v.model}
+                  </p>
+                </div>
                 <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber/40 to-transparent" />
               </div>
 

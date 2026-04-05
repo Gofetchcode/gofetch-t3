@@ -108,7 +108,7 @@ export default function Home() {
 
         <div className="relative max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
           <div>
-            <p className="text-amber text-xs font-semibold uppercase tracking-[0.25em] mb-6">
+            <p className="text-amber text-sm md:text-base lg:text-lg font-semibold uppercase tracking-[0.2em] mb-6">
               Your Personal Car Buying Advocate
             </p>
 
