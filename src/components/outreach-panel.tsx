@@ -70,7 +70,7 @@ export function OutreachPanel({ customerId, customerName, vehicleDesc, onClose }
                   <option value="50">50 miles</option>
                   <option value="100">100 miles</option>
                   <option value="200">200 miles</option>
-                  <option value="500">500+ miles (nationwide)</option>
+                  <option value="500">500+ miles (statewide)</option>
                 </select>
               </div>
               <div>
