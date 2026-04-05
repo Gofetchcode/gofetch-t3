@@ -34,15 +34,31 @@ body { font-family: var(--font-body), system-ui, sans-serif; font-size: 16px; -w
   input, select, textarea { font-size: 16px !important; } /* Prevent iOS zoom */
 }
 
-/* Dark mode — scoped to avoid breaking already-dark sections */
+/* Dark mode — comprehensive text readability */
 .dark body { background: #0A1628; color: #FAF6EF; }
+
+/* Light background sections flip to dark in dark mode */
 .dark .bg-offwhite { background: #121E33; }
-.dark section.bg-offwhite .text-navy { color: #FAF6EF; }
-.dark section.bg-offwhite .text-warm-600 { color: rgba(250,246,239,0.7); }
-.dark section.bg-offwhite .text-muted { color: rgba(250,246,239,0.4); }
-.dark section.bg-offwhite .bg-white { background: rgba(255,255,255,0.05); }
-.dark section.bg-offwhite .border-gray-100 { border-color: rgba(255,255,255,0.08); }
-.dark section.bg-offwhite .border-amber\/20 { border-color: rgba(212,162,58,0.3); }
+.dark .bg-white { background: #0f1d32; }
+
+/* All text must be readable on dark backgrounds */
+.dark .text-navy { color: #FAF6EF !important; }
+.dark .text-warm-600 { color: rgba(250,246,239,0.7) !important; }
+.dark .text-muted { color: rgba(250,246,239,0.5) !important; }
+.dark .text-gray-400 { color: rgba(250,246,239,0.5) !important; }
+.dark .text-gray-300 { color: rgba(250,246,239,0.6) !important; }
+
+/* Borders */
+.dark .border-gray-100 { border-color: rgba(255,255,255,0.08) !important; }
+.dark .border-gray-200 { border-color: rgba(255,255,255,0.1) !important; }
+
+/* Cards and inputs */
+.dark .shadow-sm { box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important; }
+.dark input, .dark select, .dark textarea { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: #FAF6EF !important; }
+
+/* Don't override already-dark sections (navy bg already has white text) */
+.dark .bg-navy .text-navy { color: #FAF6EF !important; }
+.dark .bg-navy-light .text-navy { color: #FAF6EF !important; }
 
 /* Animated counters */
 @keyframes countUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

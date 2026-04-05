@@ -1,12 +1,12 @@
 import Link from "next/link";
 
 const vehicles = [
-  { name: "2025 Hyundai Ioniq 5", msrp: "$33,500", lease: "$219/mo for 36 months", note: "One of the most aggressive EV leases in Florida right now" },
-  { name: "2025 Chevrolet Equinox EV", msrp: "$33,900", lease: "$249/mo for 36 months", note: "GM's most affordable EV with massive dealer incentives" },
-  { name: "2026 Toyota RAV4 XLE Hybrid", msrp: "$34,295", lease: "$289/mo for 36 months", note: "#1 selling SUV — we negotiate below invoice every time" },
-  { name: "2025 Kia EV6 Light", msrp: "$35,900", lease: "$229/mo for 36 months", note: "Aggressive lease with $7,500 federal tax credit applied" },
-  { name: "2026 Honda CR-V Sport Hybrid", msrp: "$33,150", lease: "$279/mo for 36 months", note: "Honda's best-selling SUV with hybrid efficiency" },
-  { name: "2025 Nissan Ariya Engage", msrp: "$36,830", lease: "$239/mo for 36 months", note: "Deep dealer discounts — EV inventory sitting on lots" },
+  { name: "2025 Hyundai Ioniq 5", msrp: "$33,500", tag: "Hot Deal", note: "EV incentives + dealer discounts making this one of the best values in Florida" },
+  { name: "2025 Chevrolet Equinox EV", msrp: "$33,900", tag: "High Demand", note: "GM's most affordable EV — strong dealer incentives available" },
+  { name: "2026 Toyota RAV4 XLE Hybrid", msrp: "$34,295", tag: "Best Seller", note: "#1 selling SUV — we consistently negotiate below invoice" },
+  { name: "2025 Kia EV6 Light", msrp: "$35,900", tag: "EV Special", note: "Federal tax credits + dealer markdowns on EV inventory" },
+  { name: "2026 Honda CR-V Sport Hybrid", msrp: "$33,150", tag: "Popular", note: "Honda's best-selling SUV with excellent fuel economy" },
+  { name: "2025 Nissan Ariya Engage", msrp: "$36,830", tag: "Clearance", note: "Dealers moving EV inventory — big savings available" },
 ];
 
 export default function NewCarsPage() {
@@ -74,8 +74,8 @@ export default function NewCarsPage() {
                 <p className="text-sm text-muted mb-1">
                   From <span className="font-bold text-navy text-lg">{v.msrp}</span> MSRP
                 </p>
-                {(v as any).lease && <p className="text-xs text-green-600 font-bold mb-1">🔥 {(v as any).lease}</p>}
-                {(v as any).note && <p className="text-[11px] text-muted italic mb-1">{(v as any).note}</p>}
+                {(v as any).tag && <span className="inline-block bg-green-50 text-green-700 text-[11px] font-bold px-2 py-0.5 rounded-full mb-2">{(v as any).tag}</span>}
+                {(v as any).note && <p className="text-[11px] text-muted leading-relaxed mb-1">{(v as any).note}</p>}
                 <p className="text-xs text-amber font-semibold mb-6 flex items-center gap-1.5">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />

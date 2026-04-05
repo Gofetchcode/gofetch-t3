@@ -1,12 +1,12 @@
 import Link from "next/link";
 
 const vehicles = [
-  { name: "2025 Porsche 911 Carrera", msrp: "$115,400", lease: "$1,299/mo", note: "Porsche loyalty incentives available" },
-  { name: "2025 BMW M4 Competition", msrp: "$82,900", lease: "$899/mo", note: "Aggressive conquest lease rates" },
-  { name: "2025 Mercedes-AMG C63 S", msrp: "$87,500", lease: "$979/mo", note: "Hybrid AMG — dealer inventory discounts" },
-  { name: "2025 Audi RS e-tron GT", msrp: "$109,800", lease: "$1,199/mo", note: "Massive EV incentives stacking" },
-  { name: "2025 Maserati Grecale GT", msrp: "$63,500", lease: "$699/mo", note: "Heavy dealer discounts right now" },
-  { name: "2025 Range Rover Sport", msrp: "$86,600", lease: "$949/mo", note: "Year-end clearance pricing" },
+  { name: "2025 Porsche 911 Carrera", msrp: "$115,400", note: "Porsche loyalty incentives and allocation advantages available" },
+  { name: "2025 BMW M4 Competition", msrp: "$82,900", note: "BMW currently offering competitive conquest rates" },
+  { name: "2025 Mercedes-AMG C63 S", msrp: "$87,500", note: "Hybrid AMG powertrain — dealer inventory available" },
+  { name: "2025 Audi RS e-tron GT", msrp: "$109,800", note: "EV incentives creating significant savings opportunities" },
+  { name: "2025 Maserati Grecale GT", msrp: "$63,500", note: "Strong dealer incentives on current inventory" },
+  { name: "2025 Range Rover Sport", msrp: "$86,600", note: "Current model year clearance pricing available" },
 ];
 
 export default function ExoticPage() {
@@ -87,8 +87,7 @@ export default function ExoticPage() {
                 <p className="text-sm text-white/40 mb-1">
                   From <span className="font-bold text-white text-lg">{v.msrp}</span> MSRP
                 </p>
-                {(v as any).lease && <p className="text-xs text-green-400 font-bold mb-1">🔥 {(v as any).lease}</p>}
-                {(v as any).note && <p className="text-[11px] text-white/30 italic mb-1">{(v as any).note}</p>}
+                {(v as any).note && <p className="text-[11px] text-white/40 leading-relaxed mb-1">{(v as any).note}</p>}
                 <p className="text-xs text-amber font-semibold mb-6 flex items-center gap-1.5">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
