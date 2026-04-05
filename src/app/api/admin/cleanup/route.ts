@@ -29,7 +29,20 @@ export async function POST(req: Request) {
 
     const ids = testClients.map(c => c.id);
 
-    // Delete related records first (cascade may handle this, but be explicit)
+    // Delete related records in correct order (respect foreign keys)
+    // First: get campaign IDs for these customers
+    const campaigns = await db.outreachCampaign.findMany({
+      where: { customerId: { in: ids } },
+      select: { id: true },
+    });
+    const campaignIds = campaigns.map(c => c.id);
+
+    // Delete outreach responses (child of campaigns)
+    if (campaignIds.length > 0) {
+      await db.outreachResponse.deleteMany({ where: { campaignId: { in: campaignIds } } });
+    }
+
+    // Now delete the rest
     await db.message.deleteMany({ where: { customerId: { in: ids } } });
     await db.note.deleteMany({ where: { customerId: { in: ids } } });
     await db.document.deleteMany({ where: { customerId: { in: ids } } });
