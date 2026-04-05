@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 const newCars = [
   { name: "2025 Hyundai Ioniq 5", msrp: "$33,500", tag: "Hot Deal", note: "EV incentives + dealer discounts making this one of the best values in Florida", img: "https://images.unsplash.com/photo-1712193424561-d1e2c09f524e?w=800&h=500&fit=crop&crop=center&q=80", category: "new" },
@@ -30,7 +31,14 @@ const exclusiveDeals = [
 type Tab = "new" | "exotic" | "exclusive";
 
 export default function VehiclesPage() {
+  const searchParams = useSearchParams();
   const [tab, setTab] = useState<Tab>("new");
+
+  useEffect(() => {
+    const t = searchParams.get("tab");
+    if (t === "exclusive") setTab("exclusive");
+    else if (t === "exotic") setTab("exotic");
+  }, [searchParams]);
 
   const vehicles = tab === "new" ? newCars : tab === "exotic" ? exoticCars : exclusiveDeals;
   const isDark = tab === "exotic";
@@ -76,17 +84,6 @@ export default function VehiclesPage() {
             }`}
           >
             Exotic &amp; Luxury
-          </button>
-          <button
-            onClick={() => setTab("exclusive")}
-            className={`px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 flex items-center gap-2 ${
-              tab === "exclusive"
-                ? "bg-amber text-navy shadow-md"
-                : isDark ? "text-white/50 hover:text-white hover:bg-white/5" : "text-navy/50 hover:text-navy hover:bg-gray-100"
-            }`}
-          >
-            <img src="/logo-icon-dark.png" alt="G" className="w-7 h-7 rounded-md object-cover" />
-            <span className="text-xs md:text-sm">oFetch Exclusive Deals</span>
           </button>
         </div>
       </div>

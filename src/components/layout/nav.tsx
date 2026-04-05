@@ -9,6 +9,7 @@ const links = [
   { href: "/about", label: "Our Story" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/new-cars", label: "Vehicles" },
+  { href: "/new-cars?tab=exclusive", label: "exclusive", exclusive: true },
   { href: "/car-finder", label: "Free Consultation" },
   { href: "/portal", label: "My Portal", cta: true },
 ];
@@ -42,6 +43,14 @@ export function Nav() {
         {/* Desktop links */}
         <div className="hidden lg:flex items-center gap-1">
           {links.map((l) => {
+            if ((l as any).exclusive) {
+              return (
+                <Link key="exclusive" href={l.href} className="flex items-center gap-0.5 px-3 py-2 text-sm text-white/60 hover:text-white transition-all duration-200">
+                  <img src="/g-icon-transparent.png" alt="G" className="w-5 h-5 object-contain -mr-0.5" />
+                  <span>oFetch Exclusive</span>
+                </Link>
+              );
+            }
             const cls = (l as any).cta
               ? "ml-2 bg-amber text-navy px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-light transition-all duration-200"
               : "px-3 py-2 text-sm text-white/60 hover:text-white transition-all duration-200";
@@ -80,7 +89,12 @@ export function Nav() {
                   : "text-white/60 hover:text-white py-3 px-2 text-sm border-b border-white/5 transition-all duration-200"
               }
             >
-              {l.label}
+              {(l as any).exclusive ? (
+                <span className="flex items-center gap-0.5">
+                  <img src="/g-icon-transparent.png" alt="G" className="w-5 h-5 object-contain -mr-0.5" />
+                  <span>oFetch Exclusive</span>
+                </span>
+              ) : l.label}
             </Link>
           ))}
           <div className="flex justify-center pt-2">
