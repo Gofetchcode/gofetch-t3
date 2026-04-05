@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /dealer
+Disallow: /dealer-portal
+Disallow: /api/
+Disallow: /portal
+
+Sitemap: https://gofetchauto.com/sitemap.xml

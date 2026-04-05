@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://gofetchauto.com</loc><priority>1.0</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://gofetchauto.com/about</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://gofetchauto.com/how-it-works</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://gofetchauto.com/new-cars</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://gofetchauto.com/exotic</loc><priority>0.7</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://gofetchauto.com/car-finder</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://gofetchauto.com/faq</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://gofetchauto.com/terms</loc><priority>0.3</priority><changefreq>yearly</changefreq></url>
+  <url><loc>https://gofetchauto.com/privacy</loc><priority>0.3</priority><changefreq>yearly</changefreq></url>
+</urlset>
