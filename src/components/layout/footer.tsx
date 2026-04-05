@@ -6,11 +6,8 @@ export function Footer() {
       <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-10">
         {/* Brand — bigger logo */}
         <div>
-          <div className="flex items-center gap-3 mb-4">
-            <img src="/logo-icon-dark.png" alt="GoFetch Auto" className="w-12 h-12 rounded-xl object-cover" />
-            <span style={{ fontFamily: "var(--font-display)" }} className="text-2xl tracking-wide">
-              <span className="text-amber">GoFetch</span> <span className="text-white">Auto</span>
-            </span>
+          <div className="mb-4">
+            <img src="/logo-full-dark.png" alt="GoFetch Auto" className="h-10 object-contain" />
           </div>
           <p className="text-sm text-white/40 leading-relaxed">
             Your personal car buying advocate. Professional representation for the second-biggest purchase of your life.

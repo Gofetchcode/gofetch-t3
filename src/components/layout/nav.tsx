@@ -32,11 +32,8 @@ export function Nav() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
         {/* Logo — bigger */}
-        <Link href="/" className="flex items-center gap-3">
-          <img src="/logo-icon-dark.png" alt="GoFetch Auto" className="w-11 h-11 rounded-xl object-cover shadow-md" />
-          <span style={{ fontFamily: "var(--font-display)" }} className="text-2xl tracking-wide">
-            <span className="text-amber">GoFetch</span> <span className="text-white">Auto</span>
-          </span>
+        <Link href="/" className="flex items-center">
+          <img src="/logo-full-dark.png" alt="GoFetch Auto" className="h-10 object-contain" />
         </Link>
 
         {/* Desktop links */}
