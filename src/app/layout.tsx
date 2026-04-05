@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   title: "GoFetch Auto | Your Personal Car Buying Advocate",
   description:
     "GoFetch Auto is the professional representation that's been missing from the second-biggest purchase of your life. We find your car, negotiate the deal, and handle the dealership — so you get the keys without the dread.",
+  icons: {
+    icon: "/icon.png",
+    apple: "/apple-icon.png",
+  },
   openGraph: {
     title: "GoFetch Auto | What If Buying a Car Actually Felt Good?",
     description: "Professional car buying advocacy. We negotiate, you save. $3,400 average savings.",
