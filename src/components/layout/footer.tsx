@@ -25,8 +25,7 @@ export function Footer() {
             <Link href="/" className="hover:text-white transition-all duration-200">Home</Link>
             <Link href="/about" className="hover:text-white transition-all duration-200">Our Story</Link>
             <Link href="/how-it-works" className="hover:text-white transition-all duration-200">How It Works</Link>
-            <Link href="/new-cars" className="hover:text-white transition-all duration-200">New Cars</Link>
-            <Link href="/exotic" className="hover:text-white transition-all duration-200">Exotic & Luxury</Link>
+            <Link href="/new-cars" className="hover:text-white transition-all duration-200">Vehicles</Link>
             <Link href="/car-finder" className="hover:text-white transition-all duration-200">Free Consultation</Link>
             <Link href="/faq" className="hover:text-white transition-all duration-200">FAQ</Link>
           </div>

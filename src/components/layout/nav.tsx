@@ -8,8 +8,7 @@ const links = [
   { href: "/", label: "Home" },
   { href: "/about", label: "Our Story" },
   { href: "/how-it-works", label: "How It Works" },
-  { href: "/new-cars", label: "New Cars" },
-  { href: "/exotic", label: "Exotic" },
+  { href: "/new-cars", label: "Vehicles" },
   { href: "/car-finder", label: "Free Consultation" },
   { href: "/portal", label: "My Portal", cta: true },
 ];
