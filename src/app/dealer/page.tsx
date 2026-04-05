@@ -334,6 +334,32 @@ function DetailPanel({
                 <span>|</span>
                 <span>Paid: {customer.paid ? "Yes" : "No"}</span>
               </div>
+
+              {/* Contract Section */}
+              <div className="bg-white/[0.03] rounded-lg p-3 border border-white/5">
+                <p className="text-[10px] text-white/30 uppercase tracking-wider mb-2">Contract</p>
+                {customer.contractSigned ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-400 text-sm">✓</span>
+                      <span className="text-sm text-white">Signed {customer.contractDate ? new Date(customer.contractDate).toLocaleDateString() : ""}</span>
+                    </div>
+                    {customer.contractData && (
+                      <div className="bg-white/[0.02] rounded-lg p-3 border border-white/5">
+                        <p className="text-[10px] text-white/20 mb-1">Signed by: {(customer.contractData as any)?.signatureName || "Client"}</p>
+                        <p className="text-[10px] text-white/20">Signed at: {(customer.contractData as any)?.signedAt || "N/A"}</p>
+                        {(customer.contractData as any)?.signatureData && (
+                          <div className="mt-2 bg-white rounded p-2">
+                            <img src={(customer.contractData as any).signatureData} alt="Signature" className="h-12 mx-auto" />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-white/30 italic">Not signed yet</p>
+                )}
+              </div>
             </div>
           )}
 

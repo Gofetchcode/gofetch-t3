@@ -215,6 +215,38 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ─── THE REAL COST ─────────────────────────────────────── */}
+      <section className="bg-offwhite py-20 lg:py-28 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-amber text-xs font-semibold uppercase tracking-[0.25em] mb-4">The Real Cost</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-navy">What Dealerships Don&rsquo;t Want You to Know</h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+              <h3 className="text-xl font-bold text-navy mb-4" style={{ fontFamily: "var(--font-display)" }}>Hidden Markup</h3>
+              <p className="text-warm-600 text-sm leading-relaxed mb-4">The average car buyer overpays by <span className="text-navy font-bold">$3,000–$5,000</span> because they don&rsquo;t know invoice pricing, holdback amounts, or manufacturer incentives. Dealerships count on this.</p>
+              <p className="text-warm-600 text-sm leading-relaxed">We know every number they&rsquo;re hiding — because we used to be the ones hiding them.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+              <h3 className="text-xl font-bold text-navy mb-4" style={{ fontFamily: "var(--font-display)" }}>Forced Add-Ons</h3>
+              <p className="text-warm-600 text-sm leading-relaxed mb-4">Nitrogen tire fills ($299), paint protection ($899), fabric coating ($499), VIN etching ($399) — dealerships slip <span className="text-navy font-bold">$2,000–$4,000 in junk fees</span> into every deal.</p>
+              <p className="text-warm-600 text-sm leading-relaxed">We identify and remove every single one. If it&rsquo;s not bolted to the car, it&rsquo;s coming off the contract.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+              <h3 className="text-xl font-bold text-navy mb-4" style={{ fontFamily: "var(--font-display)" }}>The Finance Office</h3>
+              <p className="text-warm-600 text-sm leading-relaxed mb-4">After you agree on a price, the F&amp;I manager tries to add extended warranties, GAP insurance, and protection packages — often at <span className="text-navy font-bold">3–4x their actual cost</span>.</p>
+              <p className="text-warm-600 text-sm leading-relaxed">We review every line item before you sign. Nothing gets past us.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+              <h3 className="text-xl font-bold text-navy mb-4" style={{ fontFamily: "var(--font-display)" }}>Your Time</h3>
+              <p className="text-warm-600 text-sm leading-relaxed mb-4">The average car purchase takes <span className="text-navy font-bold">4+ hours at the dealership</span> — designed to wear you down so you&rsquo;ll agree to anything just to leave.</p>
+              <p className="text-warm-600 text-sm leading-relaxed">Our clients spend zero hours at dealerships. We handle everything remotely.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ─── 4. STATS ────────────────────────────────────────────── */}
       <section className="bg-navy-light py-20 lg:py-28 px-4">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10">
@@ -270,36 +302,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── 6. HOW IT WORKS (3 steps + CTA) ────────────────────── */}
-      <section className="bg-offwhite py-20 lg:py-28 px-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-amber text-xs font-semibold uppercase tracking-[0.25em] mb-4">How It Works</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-navy">Three Steps. Zero Stress.</h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
-            {[
-              { num: "01", title: "Tell Us What You Want", desc: "Fill out our free consultation form. Tell us your dream car, budget, and timeline. We handle everything from there.", icon: "💬" },
-              { num: "02", title: "We Negotiate For You", desc: "We contact multiple dealerships, negotiate below invoice, strip out hidden fees, and find the best deal in the market.", icon: "🤝" },
-              { num: "03", title: "Get Your Keys", desc: "Review and approve the deal. We handle all paperwork and coordinate delivery. You drive away stress-free.", icon: "🔑" },
-            ].map((s) => (
-              <div key={s.num} className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all">
-                <div className="text-3xl mb-4">{s.icon}</div>
-                <span className="text-amber font-bold text-sm">{s.num}</span>
-                <h3 className="text-xl font-bold text-navy mt-1 mb-3" style={{ fontFamily: "var(--font-display)" }}>{s.title}</h3>
-                <p className="text-warm-600 text-sm leading-relaxed">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-          <div className="text-center">
-            <Link href="/car-finder" className="inline-block bg-amber text-navy px-8 py-4 rounded-lg font-bold text-lg hover:bg-amber-light transition shadow-lg shadow-amber/20">
-              Book Your Free Consultation
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── 7. PRICING PACKAGES ────────────────────────────────── */}
+      {/* ─── 6. PRICING PACKAGES ────────────────────────────────── */}
       <section className="bg-offwhite py-20 lg:py-28 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
@@ -334,23 +337,27 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── 9. CTA ──────────────────────────────────────────────── */}
-      <section className="bg-navy py-20 lg:py-28 px-4">
-        <div className="max-w-3xl mx-auto text-center">
+      {/* ─── FINAL CTA ──────────────────────────────────────────── */}
+      <section className="relative bg-navy py-24 lg:py-32 px-4 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(212,162,58,0.08),transparent)]" />
+        <div className="relative max-w-3xl mx-auto text-center">
+          <img src="/logo-icon.jpeg" alt="GoFetch Auto" className="w-16 h-16 rounded-2xl mx-auto mb-8 object-cover" />
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
             Ready to Buy a Car{" "}
             <span className="text-amber">Without the Games?</span>
           </h2>
-          <p className="text-gray-400 text-lg mb-10 max-w-xl mx-auto">
+          <p className="text-gray-400 text-lg mb-4 max-w-xl mx-auto">
             Let us handle the negotiation, the paperwork, and the dealership.
             You just pick the car you love.
           </p>
+          <p className="text-amber font-semibold text-sm mb-10">It&rsquo;s completely FREE to get started. No obligation.</p>
           <Link
             href="/car-finder"
-            className="inline-block bg-amber text-navy px-10 py-4 rounded-lg font-bold text-lg hover:bg-amber-light transition shadow-lg shadow-amber/20"
+            className="inline-block bg-amber text-navy px-12 py-5 rounded-xl font-bold text-xl hover:bg-amber-light transition shadow-xl shadow-amber/30 hover:scale-105"
           >
             Submit FREE Consultation
           </Link>
+          <p className="text-gray-500 text-xs mt-6">(352) 410-5889 &bull; inquiry@gofetchauto.com &bull; Statewide Florida Service</p>
         </div>
       </section>
     </>

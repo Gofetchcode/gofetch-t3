@@ -17,8 +17,22 @@
 }
 
 html { scroll-behavior: smooth; }
-body { font-family: var(--font-body), system-ui, sans-serif; }
+body { font-family: var(--font-body), system-ui, sans-serif; font-size: 16px; -webkit-font-smoothing: antialiased; }
 ::selection { background: var(--color-amber); color: var(--color-navy); }
+
+/* Mobile readability — larger base fonts for older audiences */
+@media (max-width: 768px) {
+  body { font-size: 17px; }
+  p, li, span { line-height: 1.7; }
+  h1 { font-size: 2rem !important; }
+  h2 { font-size: 1.6rem !important; }
+  h3 { font-size: 1.3rem !important; }
+  .text-sm { font-size: 0.938rem !important; }
+  .text-xs { font-size: 0.813rem !important; }
+  .text-muted, .text-warm-600 { font-size: 0.938rem !important; line-height: 1.7 !important; }
+  button, a { min-height: 44px; } /* Touch target size */
+  input, select, textarea { font-size: 16px !important; } /* Prevent iOS zoom */
+}
 
 /* Dark mode — scoped to avoid breaking already-dark sections */
 .dark body { background: #0A1628; color: #FAF6EF; }
