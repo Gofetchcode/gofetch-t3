@@ -104,7 +104,7 @@ export default function DealerPortalPage() {
             <img src="/logo-icon.jpeg" alt="GoFetch" className="w-10 h-10 rounded-xl object-cover" />
             <div>
               <h1 className="text-xl font-bold">
-                GoFetch <span className="text-amber">Dealer Portal</span>
+                GoFetch <span className="text-amber">Admin Portal</span>
               </h1>
               <p className="text-xs text-white/30">Submit competitive offers to qualified, ready-to-buy clients</p>
             </div>
