@@ -132,16 +132,103 @@ export async function GET(req: Request) {
       }
     }
 
+    // ═══ #4 — AUTO FOLLOW-UPS FOR OUTREACH CAMPAIGNS ═══
+    const followUpResults = { followUpsSent: 0, campaignsChecked: 0 };
+
+    try {
+      const { sendFollowUp } = await import("@/lib/outreach-sender");
+      const { buildTimingProfile } = await import("@/lib/dealer-timing");
+
+      // Find active campaigns with pending responses
+      const activeCampaigns = await db.outreachCampaign.findMany({
+        where: { status: "active" },
+        include: {
+          responses: {
+            where: { status: "pending" },
+            include: { dealership: true },
+          },
+        },
+      });
+
+      for (const campaign of activeCampaigns) {
+        followUpResults.campaignsChecked++;
+        const daysSinceSent = Math.floor(
+          (Date.now() - new Date(campaign.sentAt).getTime()) / 86400000
+        );
+
+        // Follow-up schedule: Day 1, Day 2, Day 3+
+        if (daysSinceSent >= 1 && daysSinceSent <= 3) {
+          for (const resp of campaign.responses) {
+            if (!resp.dealership?.email) continue;
+
+            // Don't send if we already followed up today
+            const lastNote = resp.notes || "";
+            const todayStr = new Date().toISOString().split("T")[0];
+            if (lastNote.includes(todayStr)) continue;
+
+            // Build timing profile from dealer's past responses
+            const dealerResponses = await db.outreachResponse.findMany({
+              where: { dealershipId: resp.dealershipId, respondedAt: { not: null } },
+              select: { respondedAt: true, createdAt: true, responseTime: true },
+              take: 50,
+              orderBy: { createdAt: "desc" },
+            });
+            const timingProfile = buildTimingProfile(resp.dealershipId, dealerResponses);
+
+            const result = await sendFollowUp(
+              resp.dealership,
+              campaign.vehicleDesc || "Vehicle",
+              daysSinceSent,
+              campaign.customerId,
+              {
+                totalDealersContacted: campaign.dealersSent,
+                responsesReceived: campaign.dealersResponded,
+                timingProfile,
+              }
+            );
+
+            if (result.sent) {
+              await db.outreachResponse.update({
+                where: { id: resp.id },
+                data: {
+                  notes: `${lastNote}\nAuto follow-up #${daysSinceSent} sent ${todayStr}`.trim(),
+                },
+              });
+              followUpResults.followUpsSent++;
+            }
+          }
+        }
+
+        // Close campaign if 3+ days old and no more pending
+        if (daysSinceSent > 3) {
+          const stillPending = campaign.responses.filter(r => r.status === "pending").length;
+          if (stillPending > 0) {
+            // Mark remaining as no_response
+            await db.outreachResponse.updateMany({
+              where: { campaignId: campaign.id, status: "pending" },
+              data: { status: "no_response" },
+            });
+          }
+          await db.outreachCampaign.update({
+            where: { id: campaign.id },
+            data: { status: "completed" },
+          });
+        }
+      }
+    } catch (followUpErr: any) {
+      console.error("[Cron] Follow-up error:", followUpErr.message);
+    }
+
     // Log to AILearning
     await db.aILearning.create({
       data: {
         category: "cron_run",
         dataPoint: JSON.stringify({ timestamp: new Date().toISOString(), activeLeads: activeLeads.length }),
-        outcome: JSON.stringify(results),
+        outcome: JSON.stringify({ ...results, ...followUpResults }),
       },
     });
 
-    return Response.json({ success: true, ...results, checked: activeLeads.length });
+    return Response.json({ success: true, ...results, ...followUpResults, checked: activeLeads.length });
   } catch (err: any) {
     console.error("Cron error:", err);
     return Response.json({ error: err.message }, { status: 500 });

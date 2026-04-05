@@ -69,34 +69,86 @@ export async function sendADFToDealerCRM(dealer: {
   return { success: true, method: "logged" };
 }
 
-// ═══ FOLLOW-UP ESCALATION ═══
+import { type DealerTimingProfile, isGoodTimeToSend, buildTimingProfile } from "./dealer-timing";
+
+// ═══ FOLLOW-UP ESCALATION (Smart timing — learns dealer patterns) ═══
 export async function sendFollowUp(dealer: {
   name: string; email?: string | null;
-}, vehicle: string, daysSinceSent: number, clientId: string): Promise<{ sent: boolean; message: string }> {
+}, vehicle: string, daysSinceSent: number, clientId: string, context?: {
+  totalDealersContacted?: number;
+  responsesReceived?: number;
+  timingProfile?: DealerTimingProfile;
+}): Promise<{ sent: boolean; message: string }> {
   if (!dealer.email) return { sent: false, message: "No email" };
+
+  // Never send between midnight and 7am
+  const hour = new Date().getHours();
+  if (hour < 7) return { sent: false, message: "Skipped — too early (before 7am)" };
+
+  // Smart timing: check dealer's response patterns if available
+  if (context?.timingProfile && !isGoodTimeToSend(context.timingProfile)) {
+    return { sent: false, message: `Skipped — not optimal time for this dealer (best: ${context.timingProfile.bestHour}:00)` };
+  }
+
+  const dealerCount = context?.totalDealersContacted || 0;
+  const responseCount = context?.responsesReceived || 0;
 
   let subject = "";
   let body = "";
 
+  // 4A: Specific, data-driven follow-up messages
   if (daysSinceSent <= 1) {
     subject = `Following up — ${vehicle} — GoFetch Auto`;
-    body = `Hi ${dealer.name} Internet Sales Team,\n\nFollowing up on our inquiry for a ${vehicle}. Our client is actively looking to purchase within 7 days. Do you have this vehicle in stock?\n\nPlease reply with your best OTD price, stock #, and VIN.\n\nThank you,\nRicardo Gamon\nGoFetch Auto | (352) 410-5889`;
+    body = `Hi ${dealer.name} Internet Sales Team,
+
+Following up on our inquiry for a ${vehicle} for our ready-to-purchase client.${dealerCount > 0 ? ` We're evaluating responses from ${dealerCount} dealers in your area.` : ""}
+
+Our client is pre-qualified, funded, and looking to complete this purchase within 7 days. Do you have this vehicle in stock?
+
+Please reply with your best OTD price, stock #, and VIN.
+
+Thank you,
+Ricardo Gamon
+GoFetch Auto | (352) 410-5889
+inquiry@gofetchauto.com`;
   } else if (daysSinceSent <= 2) {
-    subject = `Final follow-up — ${vehicle} — GoFetch Auto`;
-    body = `Hi ${dealer.name},\n\nWe're making a decision on the ${vehicle} within 48 hours. If you have this vehicle available, please respond with your best price today.\n\nWe are working with multiple dealers and will proceed with the most competitive offer.\n\nRicardo Gamon\nGoFetch Auto`;
+    subject = `Last chance to bid — ${vehicle} — GoFetch Auto`;
+    body = `Hi ${dealer.name},
+
+${responseCount > 0
+  ? `We've received ${responseCount} competitive offer${responseCount > 1 ? "s" : ""} for this ${vehicle}. We'd love to include ${dealer.name} in the final comparison.`
+  : `We're making a decision on the ${vehicle} within 48 hours.`}
+
+Last chance to submit your best OTD price. Our client is ready to move forward with the most competitive offer today.
+
+GoFetch Auto represents 5-15 qualified buyers per month in Tampa Bay. Responsive dealers receive priority lead flow.
+
+Ricardo Gamon
+GoFetch Auto | (352) 410-5889`;
   } else {
-    subject = `Closing inquiry — ${vehicle} — GoFetch Auto`;
-    body = `Hi ${dealer.name},\n\nWe've completed this purchase with another dealer. For future GoFetch Auto inquiries, please respond within 24 hours.\n\nGoFetch Auto delivers 10+ qualified, ready-to-buy clients per month in Tampa Bay. Responsive dealers receive priority lead flow.\n\nRicardo Gamon\nGoFetch Auto`;
+    subject = `Inquiry closed — ${vehicle} — GoFetch Auto`;
+    body = `Hi ${dealer.name},
+
+We've selected a dealer for this ${vehicle} purchase.
+
+For future GoFetch Auto inquiries — we send 5-15 qualified, ready-to-buy clients per month in Tampa Bay — please respond within 24 hours. Responsive dealers receive priority access to new leads before they're sent to the broader network.
+
+Ricardo Gamon
+GoFetch Auto | (352) 410-5889`;
   }
 
   if (resend) {
-    await resend.emails.send({
-      from: "GoFetch Auto <inquiry@gofetchauto.com>",
-      to: [dealer.email],
-      replyTo: "inquiry@gofetchauto.com",
-      subject,
-      text: body,
-    });
+    try {
+      await resend.emails.send({
+        from: "GoFetch Auto <inquiry@gofetchauto.com>",
+        to: [dealer.email],
+        replyTo: "inquiry@gofetchauto.com",
+        subject,
+        text: body,
+      });
+    } catch (err: any) {
+      return { sent: false, message: `Error: ${err.message}` };
+    }
   }
 
   return { sent: true, message: `Follow-up ${daysSinceSent <= 1 ? "#1" : daysSinceSent <= 2 ? "#2 (final)" : "closing"} sent` };

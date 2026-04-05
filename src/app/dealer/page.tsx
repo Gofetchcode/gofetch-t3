@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useRef, type DragEvent } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect, type DragEvent } from "react";
 import Link from "next/link";
 import { trpc } from "@/lib/trpc";
 
@@ -29,10 +29,13 @@ const STEP_COLORS = [
 const CRM_NAV = [
   { id: "dashboard", label: "Dashboard", icon: "\u25A6" },
   { id: "pipeline", label: "Pipeline", icon: "\u2630" },
+  { id: "desking", label: "Desking", icon: "\uD83D\uDCB0" },
   { id: "tasks", href: "/dealer/tasks", label: "Tasks", icon: "\u2611" },
   { id: "calendar", href: "/dealer/calendar", label: "Calendar", icon: "\u25CB" },
   { id: "comms", href: "/dealer/communications", label: "Messages", icon: "\u2709" },
+  { id: "outreach", label: "Outreach", icon: "\uD83D\uDD0D" },
   { id: "analytics", href: "/dealer/analytics", label: "Analytics", icon: "\u25C8" },
+  { id: "reports", href: "/dealer/reports", label: "Reports", icon: "\u25A4" },
   { id: "settings", href: "/dealer/settings", label: "Settings", icon: "\u2699" },
 ];
 
@@ -862,6 +865,8 @@ export default function DealerPage() {
   const loginMutation = trpc.dealer.login.useMutation({
     onSuccess: () => {
       localStorage.setItem("gf-dealer-pin", pin);
+      // Store session with 24-hour timestamp
+      localStorage.setItem("gf-dealer-session", JSON.stringify({ ts: Date.now(), ttl: 86400000 }));
       setAuthed(true);
       setLoginError("");
     },
@@ -869,6 +874,29 @@ export default function DealerPage() {
       setLoginError(err.message || "Invalid PIN");
     },
   });
+
+  /* ── Auto-login from stored session (24hr persistence) ── */
+  const [autoLoginAttempted, setAutoLoginAttempted] = useState(false);
+  useEffect(() => {
+    if (authed || autoLoginAttempted) return;
+    setAutoLoginAttempted(true);
+    const storedPin = localStorage.getItem("gf-dealer-pin");
+    const session = localStorage.getItem("gf-dealer-session");
+    if (storedPin && session) {
+      try {
+        const { ts, ttl } = JSON.parse(session);
+        if (Date.now() - ts < ttl) {
+          setPin(storedPin);
+          loginMutation.mutate({ pin: storedPin });
+          return;
+        }
+      } catch {}
+    }
+    // Clear expired session
+    if (storedPin && !session) {
+      localStorage.removeItem("gf-dealer-pin");
+    }
+  }, [authed, autoLoginAttempted]);
 
   /* ── Data ── */
   const customers = trpc.customer.getAll.useQuery(undefined, {
@@ -888,13 +916,6 @@ export default function DealerPage() {
     }
     loginMutation.mutate({ pin });
   };
-
-  // Check for existing session
-  const existingPin = typeof window !== "undefined" ? localStorage.getItem("gf-dealer-pin") : null;
-  if (existingPin && !authed && !loginMutation.isPending) {
-    // Auto-login with stored PIN — set state synchronously on first render won't work,
-    // so we handle it via useEffect-like pattern below
-  }
 
   /* ── Process data ── */
   const rawData: any[] = customers.data ?? [];
@@ -1060,6 +1081,9 @@ export default function DealerPage() {
     .sort((a: any, b: any) => new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime())
     .slice(0, 5);
 
+  /* ── Loading state (show skeleton while auto-login or data loading) ── */
+  const isLoading = customers.isLoading || (autoLoginAttempted && loginMutation.isPending);
+
   /* ═══════════════════ RENDER ═══════════════════ */
   return (
     <div className="h-screen bg-navy text-white flex overflow-hidden">
@@ -1162,7 +1186,7 @@ export default function DealerPage() {
         {/* Sign out */}
         <div className="p-4 border-t border-white/5 mt-auto">
           <button
-            onClick={() => { setAuthed(false); setPin(""); localStorage.removeItem("gf-dealer-pin"); }}
+            onClick={() => { setAuthed(false); setPin(""); localStorage.removeItem("gf-dealer-pin"); localStorage.removeItem("gf-dealer-session"); }}
             className="w-full text-white/30 text-xs hover:text-white transition py-1 flex items-center justify-center gap-1"
           >
             {!sidebarCollapsed && "Sign Out"}
@@ -1174,6 +1198,36 @@ export default function DealerPage() {
       <main className="flex-1 h-screen overflow-y-auto overflow-x-hidden">
         {/* ── Command Bar ── */}
         <div className="sticky top-0 z-30 bg-navy/95 backdrop-blur-sm border-b border-white/5 p-4 space-y-3">
+          {/* Breadcrumb + Notifications */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs text-white/30">
+              <span>CRM</span>
+              <span className="text-white/10">/</span>
+              <span className={activeNav === "dashboard" ? "text-amber" : "text-white/50"}>
+                {activeNav === "dashboard" ? "Dashboard" : activeNav === "pipeline" ? "Pipeline" : activeNav === "outreach" ? "Outreach" : activeNav === "desking" ? "Desking" : "Dashboard"}
+              </span>
+              {selectedCustomer && (
+                <>
+                  <span className="text-white/10">/</span>
+                  <span className="text-white/50">{selectedCustomer.firstName} {selectedCustomer.lastName}</span>
+                </>
+              )}
+            </div>
+            <div className="flex items-center gap-3">
+              {/* Notification bell */}
+              <button className="relative text-white/30 hover:text-white transition p-1" title="Notifications">
+                <span className="text-base">&#128276;</span>
+                {data.filter((c: any) => c.step < 8 && daysActive(c) >= 3).length > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center">
+                    {Math.min(9, data.filter((c: any) => c.step < 8 && daysActive(c) >= 3).length)}
+                  </span>
+                )}
+              </button>
+              {/* Keyboard shortcut hint */}
+              <span className="text-[10px] text-white/15 bg-white/5 px-1.5 py-0.5 rounded border border-white/5">&#8984;K</span>
+            </div>
+          </div>
+
           {/* KPI Cards */}
           <div className="grid grid-cols-5 gap-3">
             {[
@@ -1181,7 +1235,7 @@ export default function DealerPage() {
               { label: "Negotiating", value: negotiating, accent: "border-l-amber" },
               { label: "Pending Close", value: pendingClose, accent: "border-l-orange-400" },
               { label: "Delivered", value: deliveredThisMonth, accent: "border-l-green-400" },
-              { label: "Revenue", value: `$${revenue.toLocaleString()}`, accent: "border-l-amber" },
+              { label: "Revenue", value: revenue > 0 ? `$${revenue.toLocaleString()}` : "\u2014", accent: "border-l-amber" },
             ].map((kpi) => (
               <div key={kpi.label} className={`bg-white/[0.03] border border-white/5 ${kpi.accent} border-l-[3px] rounded-xl p-3`}>
                 <div className="text-xl font-bold text-white">{kpi.value}</div>
@@ -1236,8 +1290,38 @@ export default function DealerPage() {
         {/* ── Content Area ── */}
         <div className="p-4">
 
+          {/* ════════ LOADING SKELETON ════════ */}
+          {isLoading && (
+            <div className="space-y-4 animate-pulse">
+              <div className="grid grid-cols-6 gap-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="bg-white/[0.03] border border-white/5 rounded-xl p-4 space-y-3">
+                    <div className="h-4 bg-white/5 rounded w-20" />
+                    <div className="h-20 bg-white/5 rounded-lg" />
+                    <div className="h-20 bg-white/5 rounded-lg" />
+                    <div className="h-20 bg-white/5 rounded-lg" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ════════ EMPTY STATE ════════ */}
+          {!isLoading && data.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="w-20 h-20 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center mb-6">
+                <span className="text-3xl text-white/10">&#9776;</span>
+              </div>
+              <h3 className="text-lg font-bold text-white/40 mb-2">Your pipeline is empty</h3>
+              <p className="text-sm text-white/20 mb-6 text-center max-w-md">Add your first client to get started. Clients flow through the pipeline as you work their deal.</p>
+              <button onClick={() => setAddCustomerDrawer(true)} className="bg-amber text-navy font-semibold px-6 py-3 rounded-lg hover:bg-amber-light transition">
+                + Add Your First Client
+              </button>
+            </div>
+          )}
+
           {/* ════════ PIPELINE VIEW (6-COLUMN KANBAN) ════════ */}
-          {view === "pipeline" && (
+          {!isLoading && data.length > 0 && view === "pipeline" && (
             <div className="grid grid-cols-6 gap-3 min-h-[calc(100vh-200px)]">
               {pipelineCols.map((col, colIdx) => (
                 <div
@@ -1276,7 +1360,7 @@ export default function DealerPage() {
                         draggable
                         onDragStart={(e) => handleDragStart(e, c.id)}
                         onClick={() => setSelectedCustomer(c)}
-                        className={`rounded-lg p-2.5 cursor-grab active:cursor-grabbing hover:bg-white/[0.08] transition border bg-white/[0.04] ${
+                        className={`rounded-lg p-2.5 cursor-grab active:cursor-grabbing hover:bg-white/[0.08] transition border bg-white/[0.04] group ${
                           c.isFleet
                             ? "border-l-[3px] border-l-navy-800 border-t-white/5 border-r-white/5 border-b-white/5"
                             : "border-l-[3px] border-l-amber border-t-white/5 border-r-white/5 border-b-white/5"
@@ -1320,10 +1404,19 @@ export default function DealerPage() {
                             <span>&#9888;</span> {daysActive(c)} days
                           </div>
                         )}
+                        {/* Quick actions on hover */}
+                        <div className="hidden group-hover:flex items-center gap-1 mt-2 border-t border-white/5 pt-2">
+                          <button onClick={(e) => { e.stopPropagation(); if (c.phone) window.open(`tel:${c.phone}`); }} className="flex-1 text-[9px] text-white/30 hover:text-amber bg-white/5 hover:bg-amber/10 rounded py-1 transition" title="Call">&#128222; Call</button>
+                          <button onClick={(e) => { e.stopPropagation(); if (c.phone) window.open(`sms:${c.phone}`); }} className="flex-1 text-[9px] text-white/30 hover:text-amber bg-white/5 hover:bg-amber/10 rounded py-1 transition" title="Text">&#128172; Text</button>
+                          <button onClick={(e) => { e.stopPropagation(); setSelectedCustomer(c); }} className="flex-1 text-[9px] text-white/30 hover:text-amber bg-white/5 hover:bg-amber/10 rounded py-1 transition" title="View">&#128203; View</button>
+                        </div>
                       </div>
                     ))}
                     {col.customers.length === 0 && (
-                      <div className="text-center py-8 text-white/10 text-xs">No clients</div>
+                      <div className="text-center py-8">
+                        <span className="text-white/5 text-2xl block mb-2">&#9673;</span>
+                        <span className="text-white/10 text-xs">No leads at this stage</span>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -1332,7 +1425,7 @@ export default function DealerPage() {
           )}
 
           {/* ════════ TABLE VIEW ════════ */}
-          {view === "table" && (
+          {!isLoading && data.length > 0 && view === "table" && (
             <div className="bg-white/[0.02] rounded-xl border border-white/5 overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
@@ -1424,7 +1517,7 @@ export default function DealerPage() {
           )}
 
           {/* ════════ ANALYTICS VIEW ════════ */}
-          {view === "analytics" && (
+          {!isLoading && view === "analytics" && (
             <div className="space-y-6">
               {/* Funnel + Metrics */}
               <div className="grid md:grid-cols-2 gap-6">
@@ -1467,8 +1560,8 @@ export default function DealerPage() {
                 <h4 className="text-sm font-semibold text-white/60 mb-4">Revenue Summary</h4>
                 <div className="grid grid-cols-3 gap-6">
                   <div>
-                    <p className="text-3xl font-bold text-amber">${revenue.toLocaleString()}</p>
-                    <p className="text-xs text-white/30 mt-1">Total Revenue (Paid)</p>
+                    <p className="text-3xl font-bold text-amber">{revenue > 0 ? `$${revenue.toLocaleString()}` : "\u2014"}</p>
+                    <p className="text-xs text-white/30 mt-1">{revenue > 0 ? "Total Revenue (Paid)" : "No revenue yet"}</p>
                   </div>
                   <div>
                     <p className="text-3xl font-bold text-white">{negotiating}</p>
@@ -1516,6 +1609,41 @@ export default function DealerPage() {
           )}
         </div>
       </main>
+
+      {/* ═══ Mobile Bottom Nav ═══ */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0f1d32] border-t border-white/5 z-40 flex items-center justify-around py-2 px-1">
+        {[
+          { id: "dashboard", icon: "\u25A6", label: "Home" },
+          { id: "pipeline", icon: "\u2630", label: "Pipeline" },
+          { id: "add", icon: "+", label: "Add" },
+          { id: "comms", icon: "\u2709", label: "Messages", href: "/dealer/communications" },
+          { id: "more", icon: "\u2699", label: "More", href: "/dealer/settings" },
+        ].map((item) => (
+          item.href ? (
+            <Link key={item.id} href={item.href} className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg text-white/30 hover:text-amber transition">
+              <span className="text-lg">{item.icon}</span>
+              <span className="text-[9px]">{item.label}</span>
+            </Link>
+          ) : (
+            <button
+              key={item.id}
+              onClick={() => {
+                if (item.id === "add") setAddCustomerDrawer(true);
+                else if (item.id === "pipeline") { setView("pipeline"); setActiveNav("pipeline"); }
+                else if (item.id === "dashboard") { setView("analytics"); setActiveNav("dashboard"); }
+              }}
+              className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition ${
+                item.id === "add"
+                  ? "bg-amber text-navy -mt-4 w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
+                  : activeNav === item.id ? "text-amber" : "text-white/30"
+              }`}
+            >
+              <span className={item.id === "add" ? "text-2xl font-bold" : "text-lg"}>{item.icon}</span>
+              {item.id !== "add" && <span className="text-[9px]">{item.label}</span>}
+            </button>
+          )
+        ))}
+      </nav>
 
       {/* ═══ Detail Panel ═══ */}
       {selectedCustomer && (

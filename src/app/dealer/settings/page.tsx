@@ -3,8 +3,12 @@
 import { useState } from "react";
 import { TemplateEditor } from "@/components/template-editor";
 import { AttributionDashboard } from "@/components/attribution-dashboard";
+import { DarkModeToggle } from "@/components/dark-mode-toggle";
+import { PreferredNetworkManager } from "@/components/preferred-network";
 
 const sections = [
+  { id: "appearance", label: "Appearance", icon: "🎨" },
+  { id: "network", label: "Dealer Network", icon: "🤝" },
   { id: "users", label: "Users & Roles", icon: "👥" },
   { id: "leads", label: "Lead Settings", icon: "📋" },
   { id: "sources", label: "Lead Sources", icon: "🔗" },
@@ -24,7 +28,7 @@ const sections = [
 ];
 
 export default function SettingsPage() {
-  const [active, setActive] = useState("users");
+  const [active, setActive] = useState("appearance");
 
   return (
     <div className="text-white p-6">
@@ -44,6 +48,71 @@ export default function SettingsPage() {
 
           {/* Content */}
           <div className="flex-1 bg-white/[0.03] border border-white/5 rounded-xl p-6">
+            {active === "appearance" && (
+              <div>
+                <h3 className="text-lg font-bold mb-4">Appearance</h3>
+                <p className="text-white/40 text-sm mb-6">Customize the look and feel of your CRM.</p>
+
+                <div className="space-y-6">
+                  {/* Dark/Light Mode Toggle */}
+                  <div className="bg-white/[0.03] rounded-lg p-4 border border-white/5">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-white">Theme Mode</p>
+                        <p className="text-xs text-white/30 mt-1">Switch between dark and light mode for the CRM interface.</p>
+                      </div>
+                      <DarkModeToggle />
+                    </div>
+                  </div>
+
+                  {/* Accent Color (visual only for now) */}
+                  <div className="bg-white/[0.03] rounded-lg p-4 border border-white/5">
+                    <div>
+                      <p className="font-medium text-white mb-1">Accent Color</p>
+                      <p className="text-xs text-white/30 mb-3">Choose the primary accent color for buttons and highlights.</p>
+                      <div className="flex gap-2">
+                        {[
+                          { name: "Amber", class: "bg-amber" },
+                          { name: "Blue", class: "bg-blue-500" },
+                          { name: "Green", class: "bg-green-500" },
+                          { name: "Purple", class: "bg-purple-500" },
+                          { name: "Red", class: "bg-red-500" },
+                        ].map((c) => (
+                          <button
+                            key={c.name}
+                            title={c.name}
+                            className={`w-8 h-8 rounded-full ${c.class} ${c.name === "Amber" ? "ring-2 ring-white/30 ring-offset-2 ring-offset-navy" : ""} hover:scale-110 transition`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sidebar density */}
+                  <div className="bg-white/[0.03] rounded-lg p-4 border border-white/5">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-white">Compact Sidebar</p>
+                        <p className="text-xs text-white/30 mt-1">Use a narrower sidebar with icon-only navigation.</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" className="sr-only peer" />
+                        <div className="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber"></div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {active === "network" && (
+              <div>
+                <h3 className="text-lg font-bold mb-4">Preferred Dealer Network</h3>
+                <p className="text-white/40 text-sm mb-6">Manage your dealer network. Preferred partners get priority lead flow and faster response times.</p>
+                <PreferredNetworkManager />
+              </div>
+            )}
+
             {active === "users" && (
               <div>
                 <h3 className="text-lg font-bold mb-4">Users & Roles</h3>
