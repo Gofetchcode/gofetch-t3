@@ -11,7 +11,6 @@ const links = [
   { href: "/new-cars", label: "New Cars" },
   { href: "/exotic", label: "Exotic" },
   { href: "/car-finder", label: "Free Consultation" },
-  { href: "https://fleet.gofetchauto.com", label: "Fleet", external: true },
   { href: "/portal", label: "My Portal", cta: true },
 ];
 

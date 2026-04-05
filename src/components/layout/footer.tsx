@@ -47,7 +47,6 @@ export function Footer() {
           <h4 className="font-semibold text-sm mb-4 text-white/80">Portals</h4>
           <div className="flex flex-col gap-2.5 text-sm text-white/40">
             <Link href="/portal" className="hover:text-white transition-all duration-200">Client Portal</Link>
-            <a href="https://fleet.gofetchauto.com" className="hover:text-white transition-all duration-200">Fleet Portal</a>
             <Link href="/dealer" className="hover:text-white transition-all duration-200">Admin Portal</Link>
           </div>
           <div className="flex gap-3 mt-6">
