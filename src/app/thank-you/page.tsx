@@ -1,6 +1,14 @@
-import Link from "next/link";
+"use client";
 
-export default function ThankYouPage() {
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+
+function ThankYouContent() {
+  const params = useSearchParams();
+  const tempPw = params.get("pw");
+  const clientId = params.get("id");
+
   return (
     <div className="min-h-screen bg-navy flex items-center justify-center px-4">
       <div className="max-w-lg text-center">
@@ -15,6 +23,27 @@ export default function ThankYouPage() {
         <p className="text-white/60 text-lg mb-6 leading-relaxed">
           Your free consultation request has been received. A GoFetch advocate will reach out within 24 hours to discuss your vehicle search.
         </p>
+
+        {/* Portal Credentials */}
+        {tempPw && (
+          <div className="bg-amber/10 border border-amber/30 rounded-xl p-6 mb-8 text-left">
+            <h3 className="text-sm font-bold text-amber uppercase tracking-wider mb-3">Your Client Portal Login</h3>
+            <p className="text-white/60 text-sm mb-4">Use these credentials to track your deal progress, upload documents, and communicate with your advocate.</p>
+            <div className="space-y-2">
+              {clientId && (
+                <div className="flex justify-between items-center bg-white/5 rounded-lg px-4 py-3">
+                  <span className="text-white/40 text-sm">Client ID</span>
+                  <span className="text-white font-mono font-bold text-sm">{clientId}</span>
+                </div>
+              )}
+              <div className="flex justify-between items-center bg-white/5 rounded-lg px-4 py-3">
+                <span className="text-white/40 text-sm">Temporary Password</span>
+                <span className="text-amber font-mono font-bold text-sm">{tempPw}</span>
+              </div>
+            </div>
+            <p className="text-white/30 text-xs mt-3">Save this password. You&rsquo;ll be asked to change it on first login.</p>
+          </div>
+        )}
 
         <div className="bg-white/[0.03] border border-white/5 rounded-xl p-6 mb-8 text-left">
           <h3 className="text-sm font-bold text-white/40 uppercase tracking-wider mb-4">What Happens Next</h3>
@@ -36,9 +65,11 @@ export default function ThankYouPage() {
           <Link href="/" className="bg-amber text-navy font-bold px-8 py-3 rounded-xl hover:bg-amber-light transition">
             Back to Home
           </Link>
-          <Link href="/portal" className="border border-white/10 text-white/50 font-semibold px-8 py-3 rounded-xl hover:text-white hover:border-white/20 transition">
-            Client Portal
-          </Link>
+          {tempPw && (
+            <Link href="/portal" className="border border-amber/30 text-amber font-semibold px-8 py-3 rounded-xl hover:bg-amber/10 transition">
+              Go to Client Portal
+            </Link>
+          )}
         </div>
 
         <p className="text-white/20 text-xs mt-8">
@@ -46,15 +77,20 @@ export default function ThankYouPage() {
         </p>
       </div>
 
-      {/* Conversion tracking pixel */}
+      {/* Conversion tracking */}
       <script
         dangerouslySetInnerHTML={{
-          __html: `
-            if(typeof fbq!=='undefined'){fbq('track','Lead');}
-            if(typeof gtag!=='undefined'){gtag('event','conversion',{send_to:'AW-CONVERSION_ID/LABEL'});}
-          `,
+          __html: `if(typeof fbq!=='undefined'){fbq('track','Lead');}`,
         }}
       />
     </div>
+  );
+}
+
+export default function ThankYouPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-navy flex items-center justify-center"><p className="text-white/30">Loading...</p></div>}>
+      <ThankYouContent />
+    </Suspense>
   );
 }

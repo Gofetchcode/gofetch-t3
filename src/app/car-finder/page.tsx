@@ -31,8 +31,11 @@ export default function CarFinderPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, _subject: `New Lead: ${form.firstName} ${form.lastName}` }),
       }).catch(() => {});
-      // Redirect to thank-you page for conversion tracking
-      setTimeout(() => { window.location.href = "/thank-you"; }, 2000);
+      // Redirect to thank-you page with credentials for conversion tracking
+      setTimeout(() => {
+        const params = new URLSearchParams({ pw: data.tempPassword, id: data.clientId || "" });
+        window.location.href = `/thank-you?${params.toString()}`;
+      }, 2000);
     },
     onError: (err) => setError(err.message),
   });
