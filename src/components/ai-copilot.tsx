@@ -11,8 +11,12 @@ export function AICoPilot() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
 
-  // Detect if we're on client portal vs dealer CRM
-  const isPortal = typeof window !== "undefined" && window.location.pathname.startsWith("/portal");
+  // Only show on CRM (/dealer) and client portal (/portal) — not public pages
+  const pathname = typeof window !== "undefined" ? window.location.pathname : "";
+  const isDealer = pathname.startsWith("/dealer");
+  const isPortal = pathname.startsWith("/portal");
+  const shouldShow = isDealer || isPortal;
+
   const apiEndpoint = isPortal ? "/api/ai/client" : "/api/ai/chat";
   const welcomeMsg = isPortal
     ? "Hi! I'm your GoFetch assistant. Ask me about your deal progress, documents, payments, or anything about the car buying process."
@@ -50,12 +54,15 @@ export function AICoPilot() {
     setLoading(false);
   };
 
+  // Don't render on public pages
+  if (!shouldShow) return null;
+
   if (!open) {
     return (
       <button
         onClick={() => setOpen(true)}
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-amber to-amber-light text-navy shadow-xl shadow-amber/30 flex items-center justify-center hover:scale-110 transition-transform"
-        title="Fetch AI Co-Pilot"
+        title={isPortal ? "GoFetch Assistant" : "Fetch AI"}
       >
         <span className="text-2xl">🤖</span>
       </button>
@@ -70,7 +77,7 @@ export function AICoPilot() {
           <span className="text-xl">🤖</span>
           <div>
             <p className="text-navy font-bold text-sm">{isPortal ? "GoFetch Assistant" : "Fetch AI"}</p>
-            <p className="text-navy/60 text-[10px]">{isPortal ? "Your Deal Assistant" : "Your CRM Co-Pilot"}</p>
+            <p className="text-navy/60 text-[10px]">{isPortal ? "Your Deal Assistant" : "CRM Assistant"}</p>
           </div>
         </div>
         <button onClick={() => setOpen(false)} className="text-navy/50 hover:text-navy text-xl leading-none">&times;</button>
