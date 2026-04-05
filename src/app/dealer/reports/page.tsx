@@ -8,7 +8,6 @@ const REPORT_TYPES = [
   { id: "response", label: "Response Times", icon: "⏱", desc: "Average response times by advocate and channel." },
   { id: "pipeline", label: "Pipeline Health", icon: "🏗", desc: "Stage duration, bottlenecks, and stale lead analysis." },
   { id: "advocate", label: "Advocate Performance", icon: "👤", desc: "Individual advocate metrics, scores, and activity." },
-  { id: "fleet", label: "Fleet vs Retail", icon: "🚛", desc: "Compare fleet and retail segments across all metrics." },
 ];
 
 const PERIOD_OPTIONS = ["This Week", "This Month", "Last 30 Days", "Last Quarter", "Year to Date", "Custom"];
@@ -136,12 +135,6 @@ export default function ReportsPage() {
               </div>
             )}
 
-            {/* Fleet vs Retail */}
-            {selectedReport === "fleet" && (
-              <div className="text-sm text-white/20 text-center py-12">
-                Fleet vs retail comparison will populate from pipeline and revenue data.
-              </div>
-            )}
           </div>
         )}
       </div>

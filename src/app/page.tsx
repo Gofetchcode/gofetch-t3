@@ -267,6 +267,40 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ─── SOCIAL PROOF / RECENT CLIENT WINS ────────────────── */}
+      <section className="bg-offwhite py-20 lg:py-28 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="text-amber text-xs font-semibold uppercase tracking-[0.25em] mb-4">Recent Client Wins</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-navy">Real Savings. Real Clients.</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { name: "Marcus R.", vehicle: "2025 Toyota RAV4 XLE", saved: "$3,200", quote: "GoFetch saved me $3,200 and I never stepped foot in a dealership. I got a text that my car was ready for pickup. That was it.", location: "Tampa, FL" },
+              { name: "Jennifer & David L.", vehicle: "2025 BMW X3 M40i", saved: "$5,800", quote: "We were about to pay sticker price. GoFetch found the same car at a dealer 60 miles away for almost $6K less and had it delivered to us.", location: "St. Petersburg, FL" },
+              { name: "Carlos M.", vehicle: "2026 Honda Accord Sport", saved: "$2,400", quote: "I have anxiety about negotiating. Ricardo handled everything. I just signed the paperwork at my kitchen table.", location: "Lakeland, FL" },
+            ].map((t, i) => (
+              <div key={i} className="bg-white rounded-2xl p-8 shadow-md border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div className="flex items-center gap-1 mb-4">
+                  {[1,2,3,4,5].map(s => <span key={s} className="text-amber text-lg">&#9733;</span>)}
+                </div>
+                <p className="text-navy/70 text-sm leading-relaxed mb-6" style={{ fontFamily: "var(--font-display)", fontStyle: "italic" }}>
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <div className="border-t border-gray-100 pt-4">
+                  <p className="font-semibold text-navy text-sm">{t.name}</p>
+                  <p className="text-xs text-warm-600">{t.vehicle}</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-xs text-warm-600">{t.location}</span>
+                    <span className="text-sm font-bold text-emerald-500">Saved {t.saved}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ─── 5. THE DIFFERENCE ───────────────────────────────────── */}
       <section className="bg-navy py-20 lg:py-28 px-4">
         <div className="max-w-5xl mx-auto">
