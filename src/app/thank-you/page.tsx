@@ -1,13 +1,17 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 
-function ThankYouContent() {
-  const params = useSearchParams();
-  const tempPw = params.get("pw");
-  const clientId = params.get("id");
+export default function ThankYouPage() {
+  const [tempPw, setTempPw] = useState<string | null>(null);
+  const [clientId, setClientId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setTempPw(params.get("pw"));
+    setClientId(params.get("id"));
+  }, []);
 
   return (
     <div className="min-h-screen bg-navy flex items-center justify-center px-4">
@@ -77,20 +81,8 @@ function ThankYouContent() {
         </p>
       </div>
 
-      {/* Conversion tracking */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `if(typeof fbq!=='undefined'){fbq('track','Lead');}`,
-        }}
-      />
+      {/* Meta Pixel Lead conversion */}
+      <script dangerouslySetInnerHTML={{ __html: `if(typeof fbq!=='undefined'){fbq('track','Lead');}` }} />
     </div>
-  );
-}
-
-export default function ThankYouPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-navy flex items-center justify-center"><p className="text-white/30">Loading...</p></div>}>
-      <ThankYouContent />
-    </Suspense>
   );
 }
