@@ -268,12 +268,12 @@ export default function Home() {
       </section>
 
       {/* ─── 5. THE DIFFERENCE ───────────────────────────────────── */}
-      <section className="bg-offwhite py-20 lg:py-28 px-4">
+      <section className="bg-navy py-20 lg:py-28 px-4">
         <div className="max-w-5xl mx-auto">
           <p className="text-amber text-xs font-semibold uppercase tracking-[0.25em] mb-4">
             The Difference
           </p>
-          <h2 className="text-3xl md:text-4xl font-bold text-navy mb-12 max-w-2xl">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-12 max-w-2xl">
             What makes GoFetch different from doing it yourself?
           </h2>
 
@@ -281,20 +281,20 @@ export default function Home() {
             {differences.map((d, i) => (
               <div
                 key={i}
-                className="bg-white rounded-xl p-8 shadow-sm border border-gray-100"
+                className="bg-white/[0.05] backdrop-blur-sm rounded-xl p-8 border border-white/10 hover:border-amber/30 hover:bg-white/[0.08] transition-all duration-300"
               >
                 <div className="text-3xl mb-4">{d.icon}</div>
                 <div className="mb-4">
                   <p className="text-sm font-semibold text-red-400 uppercase tracking-wider mb-1">
                     Traditional
                   </p>
-                  <p className="text-navy/70">{d.traditional}</p>
+                  <p className="text-white/50">{d.traditional}</p>
                 </div>
-                <div className="border-t border-gray-100 pt-4">
-                  <p className="text-sm font-semibold text-emerald-500 uppercase tracking-wider mb-1">
+                <div className="border-t border-white/10 pt-4">
+                  <p className="text-sm font-semibold text-emerald-400 uppercase tracking-wider mb-1">
                     GoFetch
                   </p>
-                  <p className="text-navy font-semibold">{d.goFetch}</p>
+                  <p className="text-white font-semibold">{d.goFetch}</p>
                 </div>
               </div>
             ))}
@@ -303,7 +303,7 @@ export default function Home() {
       </section>
 
       {/* ─── 6. PRICING PACKAGES ────────────────────────────────── */}
-      <section className="bg-offwhite py-20 lg:py-28 px-4">
+      <section className="bg-cream py-20 lg:py-28 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-amber text-xs font-semibold uppercase tracking-[0.25em] mb-4">Pricing</p>
@@ -316,19 +316,19 @@ export default function Home() {
               { tier: "Premium", price: "$299", desc: "BMW, Mercedes-Benz, Audi, Lexus, and other premium brands.", features: ["Everything in Standard", "Priority service", "Multi-dealer bidding", "Premium brand expertise"], popular: true },
               { tier: "Exotic", price: "$1,999", desc: "Porsche, Ferrari, Lamborghini, Rolls-Royce, and exotic vehicles.", features: ["Everything in Premium", "Dedicated concierge", "Statewide search", "White-glove delivery"] },
             ].map((p) => (
-              <div key={p.tier} className={`rounded-2xl p-8 border ${p.popular ? "bg-navy text-white border-amber shadow-xl shadow-amber/10 relative" : "bg-white border-gray-100 shadow-sm"} hover:shadow-lg transition`}>
-                {p.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber text-navy text-xs font-bold px-4 py-1 rounded-full">Most Popular</span>}
-                <p className={`text-sm font-semibold uppercase tracking-wider mb-2 ${p.popular ? "text-amber" : "text-amber"}`}>{p.tier}</p>
-                <p className={`text-4xl font-bold mb-2 ${p.popular ? "text-white" : "text-navy"}`} style={{ fontFamily: "var(--font-display)" }}>{p.price}</p>
-                <p className={`text-sm mb-6 ${p.popular ? "text-white/60" : "text-warm-600"}`}>{p.desc}</p>
-                <ul className="space-y-2 mb-8">
+              <div key={p.tier} className={`rounded-2xl p-8 border ${p.popular ? "bg-navy text-white border-amber/40 shadow-2xl shadow-amber/15 relative scale-105" : "bg-white border-gray-200 shadow-md"} hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ease-out`}>
+                {p.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber text-navy text-xs font-bold px-4 py-1 rounded-full shadow-lg">Most Popular</span>}
+                <p className={`text-sm font-semibold uppercase tracking-wider mb-2 text-amber`}>{p.tier}</p>
+                <p className={`text-5xl font-bold mb-3 ${p.popular ? "text-white" : "text-navy"}`} style={{ fontFamily: "var(--font-display)" }}>{p.price}</p>
+                <p className={`text-sm mb-6 leading-relaxed ${p.popular ? "text-white/60" : "text-warm-600"}`}>{p.desc}</p>
+                <ul className="space-y-3 mb-8">
                   {p.features.map((f) => (
-                    <li key={f} className={`flex items-center gap-2 text-sm ${p.popular ? "text-white/70" : "text-warm-600"}`}>
-                      <span className="text-amber">✓</span> {f}
+                    <li key={f} className={`flex items-center gap-2.5 text-sm ${p.popular ? "text-white/70" : "text-warm-600"}`}>
+                      <span className="text-amber text-base">&#10003;</span> {f}
                     </li>
                   ))}
                 </ul>
-                <Link href="/car-finder" className={`block text-center font-bold py-3.5 rounded-xl transition ${p.popular ? "bg-amber text-navy hover:bg-amber-light" : "bg-navy text-white hover:bg-navy-light"}`}>
+                <Link href="/car-finder" className={`block text-center font-bold py-4 rounded-xl transition-all duration-200 ${p.popular ? "bg-amber text-navy hover:bg-amber-light hover:shadow-lg" : "bg-navy text-white hover:bg-navy-light hover:shadow-lg"}`}>
                   Get Started
                 </Link>
               </div>
@@ -339,21 +339,21 @@ export default function Home() {
 
       {/* ─── FINAL CTA ──────────────────────────────────────────── */}
       <section className="relative bg-navy py-24 lg:py-32 px-4 overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(212,162,58,0.08),transparent)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(212,162,58,0.10),transparent)]" />
         <div className="relative max-w-3xl mx-auto text-center">
-          <img src="/logo-icon.jpeg" alt="GoFetch Auto" className="w-16 h-16 rounded-2xl mx-auto mb-8 object-cover" />
+          <img src="/logo-icon.jpeg" alt="GoFetch Auto" className="w-20 h-20 rounded-2xl mx-auto mb-8 object-cover shadow-xl shadow-black/30" />
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
             Ready to Buy a Car{" "}
-            <span className="text-amber">Without the Games?</span>
+            <span className="text-amber" style={{ fontFamily: "var(--font-display)", fontStyle: "italic" }}>Without the Games?</span>
           </h2>
-          <p className="text-gray-400 text-lg mb-4 max-w-xl mx-auto">
+          <p className="text-gray-400 text-lg mb-4 max-w-xl mx-auto leading-relaxed">
             Let us handle the negotiation, the paperwork, and the dealership.
             You just pick the car you love.
           </p>
           <p className="text-amber font-semibold text-sm mb-10">It&rsquo;s completely FREE to get started. No obligation.</p>
           <Link
             href="/car-finder"
-            className="inline-block bg-amber text-navy px-12 py-5 rounded-xl font-bold text-xl hover:bg-amber-light transition shadow-xl shadow-amber/30 hover:scale-105"
+            className="inline-block bg-amber text-navy px-12 py-5 rounded-xl font-bold text-xl hover:bg-amber-light transition-all duration-300 shadow-xl shadow-amber/30 hover:scale-105 hover:shadow-2xl hover:shadow-amber/40"
           >
             Submit FREE Consultation
           </Link>
