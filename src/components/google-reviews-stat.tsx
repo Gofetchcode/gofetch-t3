@@ -2,25 +2,30 @@
 
 import { useState, useEffect } from "react";
 
+// GoFetch Auto CID for direct Google Maps link
+const GOOGLE_MAPS_URL = "https://www.google.com/maps?cid=10131694458127019437";
+
 export function GoogleReviewsStat() {
-  const [rating, setRating] = useState(4.9);
-  const [count, setCount] = useState<number | null>(null);
+  const [rating, setRating] = useState(5.0);
+  const [count, setCount] = useState<number | null>(2);
   const [live, setLive] = useState(false);
 
   useEffect(() => {
     fetch("/api/google-reviews")
       .then((r) => r.json())
       .then((d) => {
-        if (d.rating) setRating(d.rating);
-        if (d.reviewCount && d.reviewCount > 0) setCount(d.reviewCount);
-        if (d.live) setLive(true);
+        if (d.live && d.rating) {
+          setRating(d.rating);
+          if (d.reviewCount && d.reviewCount > 0) setCount(d.reviewCount);
+          setLive(true);
+        }
       })
       .catch(() => {});
   }, []);
 
   return (
     <a
-      href="https://www.google.com/search?q=GoFetch+Auto+reviews"
+      href={GOOGLE_MAPS_URL}
       target="_blank"
       rel="noopener"
       className="text-center block hover:scale-105 transition-transform duration-200"
