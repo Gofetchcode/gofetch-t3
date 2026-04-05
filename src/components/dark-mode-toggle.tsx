@@ -23,10 +23,11 @@ export function DarkModeToggle() {
   return (
     <button
       onClick={toggle}
-      className="p-2 rounded-lg text-sm hover:bg-white/10 transition"
-      title={dark ? "Light mode" : "Dark mode"}
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-white/10 hover:bg-white/20 text-white transition-all duration-200"
+      title={dark ? "Switch to light mode" : "Switch to dark mode"}
     >
-      {dark ? "☀️" : "🌙"}
+      <span className="text-base">{dark ? "\u2600\uFE0F" : "\uD83C\uDF19"}</span>
+      <span className="text-xs text-white/70">{dark ? "Light" : "Dark"}</span>
     </button>
   );
 }

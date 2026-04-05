@@ -56,6 +56,17 @@ body { font-family: var(--font-body), system-ui, sans-serif; font-size: 16px; -w
 .dark .shadow-sm { box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important; }
 .dark input, .dark select, .dark textarea { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: #FAF6EF !important; }
 
+/* Dark mode — ensure all text on light bg sections is readable */
+.dark .text-navy\\/80 { color: rgba(250,246,239,0.8) !important; }
+.dark .text-navy\\/70 { color: rgba(250,246,239,0.7) !important; }
+.dark .text-red-400 { color: #f87171 !important; }
+.dark .text-emerald-500 { color: #34d399 !important; }
+.dark .bg-white.rounded-xl, .dark .bg-white.rounded-2xl { background: #132038 !important; border-color: rgba(255,255,255,0.06) !important; }
+.dark .bg-white.rounded-r-lg { background: #132038 !important; }
+
+/* Section transitions for smooth page feel */
+section { transition: background-color 0.3s ease; }
+
 /* Don't override already-dark sections (navy bg already has white text) */
 .dark .bg-navy .text-navy { color: #FAF6EF !important; }
 .dark .bg-navy-light .text-navy { color: #FAF6EF !important; }

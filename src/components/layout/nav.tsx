@@ -27,15 +27,15 @@ export function Nav() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled ? "bg-navy/98 backdrop-blur-lg shadow-lg" : "bg-navy"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5">
-          <img src="/logo-icon.jpeg" alt="GoFetch Auto" className="w-8 h-8 rounded-lg object-cover" />
-          <span style={{ fontFamily: "var(--font-display)" }} className="text-xl text-white">
+        {/* Logo — bigger */}
+        <Link href="/" className="flex items-center gap-3">
+          <img src="/logo-icon.jpeg" alt="GoFetch Auto" className="w-10 h-10 rounded-xl object-cover" />
+          <span style={{ fontFamily: "var(--font-display)" }} className="text-2xl text-white">
             GoFetch <span className="text-amber">Auto</span>
           </span>
         </Link>
@@ -44,10 +44,8 @@ export function Nav() {
         <div className="hidden lg:flex items-center gap-1">
           {links.map((l) => {
             const cls = (l as any).cta
-              ? "ml-2 bg-amber text-navy px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-light transition"
-              : (l as any).muted
-              ? "ml-1 px-3 py-2 text-sm text-white/30 hover:text-white/60 transition"
-              : "px-3 py-2 text-sm text-white/60 hover:text-white transition";
+              ? "ml-2 bg-amber text-navy px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-light transition-all duration-200"
+              : "px-3 py-2 text-sm text-white/60 hover:text-white transition-all duration-200";
             return (l as any).external ? (
               <a key={l.label} href={l.href} className={cls}>{l.label}</a>
             ) : (
@@ -63,9 +61,9 @@ export function Nav() {
           onClick={() => setOpen(!open)}
           aria-label="Menu"
         >
-          <span className={`w-5 h-0.5 bg-white transition-all ${open ? "rotate-45 translate-y-2" : ""}`} />
-          <span className={`w-5 h-0.5 bg-white transition-all ${open ? "opacity-0" : ""}`} />
-          <span className={`w-5 h-0.5 bg-white transition-all ${open ? "-rotate-45 -translate-y-2" : ""}`} />
+          <span className={`w-5 h-0.5 bg-white transition-all duration-200 ${open ? "rotate-45 translate-y-2" : ""}`} />
+          <span className={`w-5 h-0.5 bg-white transition-all duration-200 ${open ? "opacity-0" : ""}`} />
+          <span className={`w-5 h-0.5 bg-white transition-all duration-200 ${open ? "-rotate-45 -translate-y-2" : ""}`} />
         </button>
       </div>
 
@@ -80,14 +78,15 @@ export function Nav() {
               className={
                 (l as any).cta
                   ? "bg-amber text-navy px-4 py-3 rounded-lg font-semibold text-center mt-2"
-                  : (l as any).muted
-                  ? "text-white/30 py-3 px-2 text-sm text-center"
-                  : "text-white/60 hover:text-white py-3 px-2 text-sm border-b border-white/5"
+                  : "text-white/60 hover:text-white py-3 px-2 text-sm border-b border-white/5 transition-all duration-200"
               }
             >
               {l.label}
             </Link>
           ))}
+          <div className="flex justify-center pt-2">
+            <DarkModeToggle />
+          </div>
         </div>
       )}
     </nav>
