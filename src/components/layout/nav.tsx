@@ -57,13 +57,13 @@ export function Nav() {
             <Link key={l.label} href={l.href} className={linkCls}>{l.label}</Link>
           ))}
 
-          {/* CENTER: GoFetch Exclusive — the standout tab */}
+          {/* CENTER: GoFetch Exclusive */}
           <Link
             href="/new-cars?tab=exclusive"
-            className="flex items-center gap-0 mx-4 px-4 py-2 rounded-xl border border-amber/20 hover:border-amber/50 hover:bg-amber/5 transition-all duration-200 group"
+            className="flex items-center mx-4 py-2 hover:opacity-100 opacity-80 transition-all duration-200 group"
           >
-            <img src="/g-icon-transparent.png" alt="G" className="w-7 h-7 object-contain" />
-            <span className="text-sm font-semibold text-amber/80 group-hover:text-amber transition-all duration-200">oFetch Exclusive</span>
+            <img src="/g-icon-transparent.png" alt="G" className="w-9 h-9 object-contain -mr-0.5" />
+            <span className="text-base font-semibold text-amber group-hover:text-amber-light transition-all duration-200">oFetch Exclusive</span>
           </Link>
 
           {/* Right links */}
