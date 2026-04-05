@@ -51,8 +51,18 @@ export default function ContactPage() {
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [sending, setSending] = useState(false);
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSending(true);
+    try {
+      await fetch("https://formspree.io/f/xjgaqeyy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, _subject: `Contact: ${form.name}` }),
+      });
+    } catch {}
+    setSending(false);
     setSent(true);
   };
 
@@ -146,9 +156,10 @@ export default function ContactPage() {
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-amber text-navy font-bold py-4 rounded-xl text-base hover:bg-amber-light transition-colors duration-200 shadow-md shadow-amber/15"
+                  disabled={sending}
+                  className="w-full bg-amber text-navy font-bold py-4 rounded-xl text-base hover:bg-amber-light transition-colors duration-200 shadow-md shadow-amber/15 disabled:opacity-50"
                 >
-                  Send Message
+                  {sending ? "Sending..." : "Send Message"}
                 </button>
               </form>
             )}

@@ -375,8 +375,27 @@ export default function PortalPage() {
                       {offer.notes && <p className="text-sm text-muted italic mb-4">&ldquo;{offer.notes}&rdquo; — GoFetch Auto</p>}
                       {offer.status === "sent_to_client" && (
                         <div className="flex gap-3">
-                          <button className="flex-1 bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition">✅ Accept This Offer</button>
-                          <button className="flex-1 border border-gray-200 text-muted font-medium py-3 rounded-lg hover:bg-gray-50 transition">↩ Request Changes</button>
+                          <button
+                            onClick={async () => {
+                              await fetch("/api/trpc/desking.updateStatus", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ json: { id: offer.id, status: "accepted" } }) }).catch(() => {});
+                              await fetch("/api/trpc/communications.sendFromPortal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ json: { customerId: customer.id, content: `Client accepted offer: ${offer.vehicleDesc} at ${offer.otdPrice}` } }) }).catch(() => {});
+                              window.location.reload();
+                            }}
+                            className="flex-1 bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition"
+                          >
+                            Accept This Offer
+                          </button>
+                          <button
+                            onClick={async () => {
+                              const msg = prompt("What changes would you like?");
+                              if (!msg) return;
+                              await fetch("/api/trpc/communications.sendFromPortal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ json: { customerId: customer.id, content: `Change request for offer ${offer.vehicleDesc}: ${msg}` } }) }).catch(() => {});
+                              alert("Your request has been sent to your advocate.");
+                            }}
+                            className="flex-1 border border-gray-200 text-muted font-medium py-3 rounded-lg hover:bg-gray-50 transition"
+                          >
+                            Request Changes
+                          </button>
                         </div>
                       )}
                     </div>
@@ -490,13 +509,18 @@ export default function PortalPage() {
                         <p className="text-xs text-muted">{d.docType}</p>
                       </div>
                     </div>
-                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                      d.status === "approved" ? "bg-green-100 text-green-700" :
-                      d.status === "under_review" ? "bg-amber/10 text-amber-dark" :
-                      "bg-gray-100 text-muted"
-                    }`}>
-                      {d.status}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                        d.status === "approved" ? "bg-green-100 text-green-700" :
+                        d.status === "under_review" ? "bg-amber/10 text-amber-dark" :
+                        "bg-gray-100 text-muted"
+                      }`}>
+                        {d.status === "approved" ? "Approved" : d.status === "under_review" ? "Under Review" : "Received"}
+                      </span>
+                      {d.storagePath && (
+                        <a href={d.storagePath} target="_blank" rel="noopener" className="text-xs text-amber hover:text-amber-dark font-medium">View</a>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

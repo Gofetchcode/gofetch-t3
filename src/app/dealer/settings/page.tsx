@@ -27,6 +27,18 @@ const sections = [
   { id: "audit", label: "Audit Logs", icon: "📜" },
 ];
 
+function SaveButton({ label = "Save" }: { label?: string }) {
+  const [saved, setSaved] = useState(false);
+  return (
+    <button
+      onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 2000); }}
+      className={`${saved ? "bg-green-500" : "bg-amber hover:bg-amber-light"} text-navy font-semibold px-6 py-2 rounded-lg text-sm transition`}
+    >
+      {saved ? "Saved!" : label}
+    </button>
+  );
+}
+
 export default function SettingsPage() {
   const [active, setActive] = useState("appearance");
 
@@ -229,7 +241,7 @@ export default function SettingsPage() {
                   <label className="flex items-center gap-3"><input type="checkbox" defaultChecked className="accent-amber" /><span className="text-sm text-white/60">5-second undo window on all AI actions</span></label>
                 </div>
 
-                <button className="mt-6 bg-amber text-navy font-semibold px-6 py-2 rounded-lg text-sm hover:bg-amber-light transition">Save AI Settings</button>
+                <div className="mt-6"><SaveButton label="Save AI Settings" /></div>
               </div>
             )}
 
@@ -269,7 +281,7 @@ export default function SettingsPage() {
                   <div><label className="text-sm text-white/50 block mb-1">Company Name</label><input defaultValue="GoFetch Auto LLC" className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full" /></div>
                   <div><label className="text-sm text-white/50 block mb-1">Phone</label><input defaultValue="(352) 410-5889" className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full" /></div>
                   <div><label className="text-sm text-white/50 block mb-1">Email</label><input defaultValue="inquiry@gofetchauto.com" className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full" /></div>
-                  <button className="bg-amber text-navy font-semibold px-6 py-2 rounded-lg text-sm hover:bg-amber-light transition">Save</button>
+                  <SaveButton />
                 </div>
               </div>
             )}
@@ -290,7 +302,7 @@ export default function SettingsPage() {
                     </div>
                   ))}
                 </div>
-                <button className="mt-4 bg-amber text-navy font-semibold px-4 py-2 rounded-lg text-sm">Save Goals</button>
+                <div className="mt-4"><SaveButton label="Save Goals" /></div>
               </div>
             )}
 
@@ -304,7 +316,7 @@ export default function SettingsPage() {
                   <div><label className="text-sm text-white/50 block mb-1">Default Finance Rate (%)</label><input type="number" defaultValue={5.9} step={0.1} className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full" /></div>
                   <div><label className="text-sm text-white/50 block mb-1">Default Term (months)</label><input type="number" defaultValue={60} className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full" /></div>
                 </div>
-                <button className="mt-4 bg-amber text-navy font-semibold px-4 py-2 rounded-lg text-sm">Save Defaults</button>
+                <div className="mt-4"><SaveButton label="Save Defaults" /></div>
               </div>
             )}
 
@@ -322,7 +334,7 @@ export default function SettingsPage() {
                     </div>
                   ))}
                 </div>
-                <button className="mt-4 bg-amber text-navy font-semibold px-4 py-2 rounded-lg text-sm">Save Templates</button>
+                <div className="mt-4"><SaveButton label="Save Templates" /></div>
               </div>
             )}
 
@@ -339,7 +351,7 @@ export default function SettingsPage() {
                     </div>
                   ))}
                 </div>
-                <button className="mt-4 bg-amber text-navy font-semibold px-4 py-2 rounded-lg text-sm">Save Hours</button>
+                <div className="mt-4"><SaveButton label="Save Hours" /></div>
               </div>
             )}
 
@@ -365,7 +377,7 @@ export default function SettingsPage() {
                     ))}
                   </tbody>
                 </table>
-                <button className="mt-4 bg-amber text-navy font-semibold px-4 py-2 rounded-lg text-sm">Save Preferences</button>
+                <div className="mt-4"><SaveButton label="Save Preferences" /></div>
               </div>
             )}
 

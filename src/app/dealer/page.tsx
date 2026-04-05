@@ -29,11 +29,9 @@ const STEP_COLORS = [
 const CRM_NAV = [
   { id: "dashboard", label: "Dashboard", icon: "\u25A6" },
   { id: "pipeline", label: "Pipeline", icon: "\u2630" },
-  { id: "desking", label: "Desking", icon: "\uD83D\uDCB0" },
   { id: "tasks", href: "/dealer/tasks", label: "Tasks", icon: "\u2611" },
   { id: "calendar", href: "/dealer/calendar", label: "Calendar", icon: "\u25CB" },
   { id: "comms", href: "/dealer/communications", label: "Messages", icon: "\u2709" },
-  { id: "outreach", label: "Outreach", icon: "\uD83D\uDD0D" },
   { id: "analytics", href: "/dealer/analytics", label: "Analytics", icon: "\u25C8" },
   { id: "reports", href: "/dealer/reports", label: "Reports", icon: "\u25A4" },
   { id: "settings", href: "/dealer/settings", label: "Settings", icon: "\u2699" },
@@ -547,7 +545,26 @@ function OutreachTab({ customer }: { customer: any }) {
               <option key={r} value={r} className="bg-navy text-white">{r} mile radius</option>
             ))}
           </select>
-          <button className="w-full bg-amber text-navy font-bold py-2.5 rounded-lg text-sm hover:brightness-110 transition">
+          <button
+            onClick={async () => {
+              try {
+                const res = await fetch("/api/outreach/blast", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    customerId: customer.id,
+                    vehicle: searchForm.vehicle,
+                    color: searchForm.color,
+                    maxPrice: searchForm.maxPrice,
+                    radiusMiles: parseInt(searchForm.radius),
+                  }),
+                });
+                const data = await res.json();
+                alert(data.message || `Sent to ${data.sent} dealers`);
+              } catch (err) { alert("Error sending inquiries"); }
+            }}
+            className="w-full bg-amber text-navy font-bold py-2.5 rounded-lg text-sm hover:brightness-110 transition"
+          >
             Send Dealer Inquiries
           </button>
         </div>
