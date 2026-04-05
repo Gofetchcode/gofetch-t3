@@ -963,7 +963,7 @@ export default function DealerPage() {
       <div className="min-h-screen bg-navy flex items-center justify-center px-4">
         <div className="w-full max-w-sm bg-[#0f1d32] border border-white/10 rounded-2xl p-8">
           <div className="flex justify-center mb-6">
-            <img src="/logo-icon.jpeg" alt="GoFetch" className="w-20 h-20 rounded-2xl object-cover shadow-lg" />
+            <img src="/logo-icon-dark.png" alt="GoFetch" className="w-20 h-20 rounded-2xl object-cover shadow-lg" />
           </div>
           <h3 className="text-xl font-bold text-white text-center mb-1" style={{ fontFamily: "var(--font-display)" }}>
             <span className="text-amber">GoFetch</span> CRM
@@ -1089,7 +1089,7 @@ export default function DealerPage() {
       <aside className={`${sidebarCollapsed ? "w-[60px]" : "w-[240px]"} min-w-0 bg-[#0f1d32] border-r border-white/5 h-screen flex flex-col transition-all duration-200`}>
         {/* Logo */}
         <div className="p-4 border-b border-white/5 flex items-center gap-2">
-          <img src="/logo-icon.jpeg" alt="GoFetch CRM" className="w-10 h-10 rounded-xl object-cover flex-shrink-0" />
+          <img src="/logo-icon-dark.png" alt="GoFetch CRM" className="w-10 h-10 rounded-xl object-cover flex-shrink-0" />
           {!sidebarCollapsed && (
             <span className="text-sm font-bold text-white" style={{ fontFamily: "var(--font-display)" }}>
               <span className="text-amber">GoFetch</span> CRM

@@ -101,7 +101,7 @@ export default function DealerPortalPage() {
       <div className="border-b border-white/5 bg-[#0f1d32]">
         <div className="max-w-5xl mx-auto px-6 py-6">
           <div className="flex items-center gap-3 mb-2">
-            <img src="/logo-icon.jpeg" alt="GoFetch" className="w-10 h-10 rounded-xl object-cover" />
+            <img src="/logo-icon-dark.png" alt="GoFetch" className="w-10 h-10 rounded-xl object-cover" />
             <div>
               <h1 className="text-xl font-bold">
                 GoFetch <span className="text-amber">Admin Portal</span>

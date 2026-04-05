@@ -341,7 +341,7 @@ export default function Home() {
       <section className="relative bg-navy py-24 lg:py-32 px-4 overflow-hidden">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(212,162,58,0.10),transparent)]" />
         <div className="relative max-w-3xl mx-auto text-center">
-          <img src="/logo-icon.jpeg" alt="GoFetch Auto" className="w-20 h-20 rounded-2xl mx-auto mb-8 object-cover shadow-xl shadow-black/30" />
+          <img src="/logo-icon-dark.png" alt="GoFetch Auto" className="w-20 h-20 rounded-2xl mx-auto mb-8 object-cover shadow-xl shadow-black/30" />
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
             Ready to Buy a Car{" "}
             <span className="text-amber" style={{ fontFamily: "var(--font-display)", fontStyle: "italic" }}>Without the Games?</span>

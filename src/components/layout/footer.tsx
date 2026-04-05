@@ -7,7 +7,7 @@ export function Footer() {
         {/* Brand — bigger logo */}
         <div>
           <div className="flex items-center gap-3 mb-4">
-            <img src="/logo-icon.jpeg" alt="GoFetch Auto" className="w-12 h-12 rounded-xl object-cover" />
+            <img src="/logo-icon-dark.png" alt="GoFetch Auto" className="w-12 h-12 rounded-xl object-cover" />
             <span style={{ fontFamily: "var(--font-display)" }} className="text-2xl tracking-wide">
               <span className="text-amber">GoFetch</span> <span className="text-white">Auto</span>
             </span>
