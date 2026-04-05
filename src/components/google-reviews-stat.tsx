@@ -4,23 +4,23 @@ import { useState, useEffect } from "react";
 
 export function GoogleReviewsStat() {
   const [rating, setRating] = useState(4.9);
-  const [count, setCount] = useState(0);
-  const [loaded, setLoaded] = useState(false);
+  const [count, setCount] = useState<number | null>(null);
+  const [live, setLive] = useState(false);
 
   useEffect(() => {
     fetch("/api/google-reviews")
       .then((r) => r.json())
       .then((d) => {
         if (d.rating) setRating(d.rating);
-        if (d.reviewCount) setCount(d.reviewCount);
-        setLoaded(true);
+        if (d.reviewCount && d.reviewCount > 0) setCount(d.reviewCount);
+        if (d.live) setLive(true);
       })
-      .catch(() => setLoaded(true));
+      .catch(() => {});
   }, []);
 
   return (
     <a
-      href="https://www.google.com/search?q=GoFetch+Auto+Tampa+Bay+reviews"
+      href="https://www.google.com/search?q=GoFetch+Auto+reviews"
       target="_blank"
       rel="noopener"
       className="text-center block hover:scale-105 transition-transform duration-200"
@@ -31,10 +31,10 @@ export function GoogleReviewsStat() {
       <div className="text-sm text-gray-400 uppercase tracking-wider">
         Google Reviews
       </div>
-      {count > 0 && (
+      {count && count > 0 && (
         <div className="text-xs text-gray-500 mt-1">{count} reviews</div>
       )}
-      <div className="text-[10px] text-gray-500 mt-0.5">See our reviews &rarr;</div>
+      <div className="text-[10px] text-gray-500 mt-0.5 underline decoration-gray-600">See reviews &rarr;</div>
     </a>
   );
 }

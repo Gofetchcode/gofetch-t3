@@ -16,55 +16,93 @@
   --font-body: var(--font-body);
 }
 
+/* ═══ BASE ═══ */
 html { scroll-behavior: smooth; }
-body { font-family: var(--font-body), system-ui, sans-serif; font-size: 16px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
 ::selection { background: var(--color-amber); color: var(--color-navy); }
 
-/* Smooth section transitions */
-section { transition: background-color 0.3s ease; }
+/* Smooth transitions everywhere */
+*, *::before, *::after {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+/* Opt out for layout-shifting properties */
+img, video, svg { transition: transform 500ms ease-out, opacity 300ms ease; }
 
-/* ═══ MOBILE READABILITY ═══ */
+/* ═══ MOBILE ═══ */
 @media (max-width: 768px) {
-  body { font-size: 17px; }
-  p, li, span { line-height: 1.7; }
-  h1 { font-size: 2rem !important; }
-  h2 { font-size: 1.6rem !important; }
-  h3 { font-size: 1.3rem !important; }
-  .text-sm { font-size: 0.938rem !important; }
-  .text-xs { font-size: 0.813rem !important; }
-  .text-muted, .text-warm-600 { font-size: 0.938rem !important; line-height: 1.7 !important; }
+  body { font-size: 16px; }
+
+  /* Typography scale */
+  h1 { font-size: 1.875rem !important; line-height: 1.2 !important; }
+  h2 { font-size: 1.5rem !important; line-height: 1.25 !important; }
+  h3 { font-size: 1.25rem !important; }
+  p, li { line-height: 1.65; }
+
+  /* Tighter spacing */
+  section {
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Tighter gaps */
+  .gap-8 { gap: 1rem !important; }
+  .gap-10 { gap: 1.25rem !important; }
+  .gap-12 { gap: 1.5rem !important; }
+  .mb-12, .mb-14, .mb-16 { margin-bottom: 1.5rem !important; }
+  .mb-6 { margin-bottom: 1rem !important; }
+
+  /* Touch targets */
   button, a { min-height: 44px; }
   input, select, textarea { font-size: 16px !important; }
 
-  /* Mobile spacing tighter */
-  section { padding-top: 3rem !important; padding-bottom: 3rem !important; }
-  .py-20 { padding-top: 3rem !important; padding-bottom: 3rem !important; }
-  .py-24 { padding-top: 3.5rem !important; padding-bottom: 3.5rem !important; }
-  .py-28 { padding-top: 4rem !important; padding-bottom: 4rem !important; }
-  .mb-12 { margin-bottom: 2rem !important; }
-  .mb-14 { margin-bottom: 2.5rem !important; }
-  .mb-16 { margin-bottom: 2.5rem !important; }
-  .gap-8 { gap: 1.25rem !important; }
-  .gap-10 { gap: 1.5rem !important; }
-
-  /* Pricing cards — no scale on mobile */
+  /* No transforms on mobile (prevents jank) */
   .scale-105 { transform: none !important; }
+  .hover\:-translate-y-1:hover { transform: none !important; }
+  .hover\:-translate-y-2:hover { transform: none !important; }
+  .hover\:scale-105:hover { transform: none !important; }
+
+  /* Cards full width */
+  .grid { gap: 1rem !important; }
+
+  /* Hero image hidden */
+  .lg\:block { display: none !important; }
+
+  /* Smaller hero padding */
+  .pt-28 { padding-top: 5rem !important; }
+  .lg\:pt-40 { padding-top: 5rem !important; }
+  .pb-20 { padding-bottom: 2.5rem !important; }
+
+  /* Nav tighter */
+  .h-16 { height: 3.5rem !important; }
+
+  /* Floating CTA smaller on mobile */
+  .fixed.bottom-6.right-6 {
+    bottom: 1rem !important;
+    right: 1rem !important;
+    font-size: 0.8rem !important;
+    padding: 0.625rem 1rem !important;
+  }
 }
 
-/* ═══ DARK MODE — COMPLETE ═══ */
-
-/* Base */
+/* ═══ DARK MODE ═══ */
 .dark body { background: #0A1628; color: #FAF6EF; }
 
-/* All light backgrounds → dark navy */
+/* Light backgrounds → dark */
 .dark .bg-offwhite { background: #0f1d32 !important; }
 .dark .bg-cream { background: #121E33 !important; }
 .dark .bg-white { background: #132038 !important; }
 
-/* ALL navy text → cream (covers text-navy, text-navy/80, text-navy/70 etc) */
+/* Text colors */
 .dark [class*="text-navy"] { color: #FAF6EF !important; }
-
-/* Gray text → brighter for contrast */
 .dark .text-warm-600 { color: rgba(250,246,239,0.75) !important; }
 .dark .text-muted { color: rgba(250,246,239,0.55) !important; }
 .dark .text-gray-300 { color: rgba(250,246,239,0.7) !important; }
@@ -72,11 +110,10 @@ section { transition: background-color 0.3s ease; }
 .dark .text-gray-500 { color: rgba(250,246,239,0.45) !important; }
 .dark .text-gray-700 { color: rgba(250,246,239,0.55) !important; }
 
-/* Borders → subtle glow */
+/* Borders */
 .dark [class*="border-gray"] { border-color: rgba(255,255,255,0.1) !important; }
-.dark .border-amber { border-color: rgba(212,162,58,0.4) !important; }
 
-/* Cards and surfaces */
+/* Cards */
 .dark .shadow-sm { box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important; }
 .dark .shadow-md { box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important; }
 .dark [class*="bg-white"][class*="rounded"] {
@@ -91,21 +128,18 @@ section { transition: background-color 0.3s ease; }
   color: #FAF6EF !important;
 }
 
-/* Keep accent colors vivid */
+/* Accents stay vivid */
 .dark .text-red-400 { color: #f87171 !important; }
 .dark .text-emerald-500, .dark .text-emerald-400 { color: #34d399 !important; }
 .dark .text-amber { color: #D4A23A !important; }
-
-/* Amber accents stay amber */
 .dark .bg-amber { background: #D4A23A !important; }
 .dark .bg-amber .text-navy { color: #0A1628 !important; }
 
-/* Don't override text that's already white on dark sections */
+/* Don't flip already-dark sections */
 .dark .bg-navy .text-white,
 .dark .bg-navy-light .text-white { color: white !important; }
 
 /* ═══ ANIMATIONS ═══ */
-
 @keyframes countUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .animate-count { animation: countUp 0.6s ease-out forwards; }
 
