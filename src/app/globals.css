@@ -20,7 +20,10 @@ html { scroll-behavior: smooth; }
 body { font-family: var(--font-body), system-ui, sans-serif; font-size: 16px; -webkit-font-smoothing: antialiased; }
 ::selection { background: var(--color-amber); color: var(--color-navy); }
 
-/* Mobile readability — larger base fonts for older audiences */
+/* Smooth section transitions */
+section { transition: background-color 0.3s ease; }
+
+/* ═══ MOBILE READABILITY ═══ */
 @media (max-width: 768px) {
   body { font-size: 17px; }
   p, li, span { line-height: 1.7; }
@@ -30,76 +33,102 @@ body { font-family: var(--font-body), system-ui, sans-serif; font-size: 16px; -w
   .text-sm { font-size: 0.938rem !important; }
   .text-xs { font-size: 0.813rem !important; }
   .text-muted, .text-warm-600 { font-size: 0.938rem !important; line-height: 1.7 !important; }
-  button, a { min-height: 44px; } /* Touch target size */
-  input, select, textarea { font-size: 16px !important; } /* Prevent iOS zoom */
+  button, a { min-height: 44px; }
+  input, select, textarea { font-size: 16px !important; }
+
+  /* Mobile layout fixes */
+  .grid.md\:grid-cols-2,
+  .grid.md\:grid-cols-3,
+  .grid.md\:grid-cols-4 {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  .lg\:grid-cols-2 { grid-template-columns: 1fr !important; }
+  .hidden.lg\:block { display: none !important; }
+
+  /* Mobile nav padding */
+  .max-w-7xl { padding-left: 1rem; padding-right: 1rem; }
+
+  /* Pricing cards — no scale on mobile */
+  .scale-105 { transform: none !important; }
 }
 
-/* Dark mode — comprehensive text readability */
+/* ═══ DARK MODE — COMPLETE ═══ */
+
+/* Base */
 .dark body { background: #0A1628; color: #FAF6EF; }
 
-/* Light background sections flip to dark in dark mode */
-.dark .bg-offwhite { background: #121E33; }
-.dark .bg-white { background: #0f1d32; }
+/* All light backgrounds → dark navy */
+.dark .bg-offwhite { background: #0f1d32 !important; }
+.dark .bg-cream { background: #121E33 !important; }
+.dark .bg-white { background: #132038 !important; }
 
-/* All text must be readable on dark backgrounds */
-.dark .text-navy { color: #FAF6EF !important; }
-.dark .text-warm-600 { color: rgba(250,246,239,0.7) !important; }
-.dark .text-muted { color: rgba(250,246,239,0.5) !important; }
-.dark .text-gray-400 { color: rgba(250,246,239,0.5) !important; }
-.dark .text-gray-300 { color: rgba(250,246,239,0.6) !important; }
+/* ALL navy text → cream (covers text-navy, text-navy/80, text-navy/70 etc) */
+.dark [class*="text-navy"] { color: #FAF6EF !important; }
 
-/* Borders */
-.dark .border-gray-100 { border-color: rgba(255,255,255,0.08) !important; }
-.dark .border-gray-200 { border-color: rgba(255,255,255,0.1) !important; }
+/* Gray text → brighter for contrast */
+.dark .text-warm-600 { color: rgba(250,246,239,0.75) !important; }
+.dark .text-muted { color: rgba(250,246,239,0.55) !important; }
+.dark .text-gray-300 { color: rgba(250,246,239,0.7) !important; }
+.dark .text-gray-400 { color: rgba(250,246,239,0.6) !important; }
+.dark .text-gray-500 { color: rgba(250,246,239,0.45) !important; }
+.dark .text-gray-700 { color: rgba(250,246,239,0.55) !important; }
 
-/* Cards and inputs */
-.dark .shadow-sm { box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important; }
-.dark input, .dark select, .dark textarea { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: #FAF6EF !important; }
+/* Borders → subtle glow */
+.dark [class*="border-gray"] { border-color: rgba(255,255,255,0.1) !important; }
+.dark .border-amber { border-color: rgba(212,162,58,0.4) !important; }
 
-/* Dark mode — ensure all text on light bg sections is readable */
-.dark .text-navy\\/80 { color: rgba(250,246,239,0.8) !important; }
-.dark .text-navy\\/70 { color: rgba(250,246,239,0.7) !important; }
+/* Cards and surfaces */
+.dark .shadow-sm { box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important; }
+.dark .shadow-md { box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important; }
+.dark [class*="bg-white"][class*="rounded"] {
+  background: #132038 !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* Inputs */
+.dark input, .dark select, .dark textarea {
+  background: rgba(255,255,255,0.06) !important;
+  border-color: rgba(255,255,255,0.12) !important;
+  color: #FAF6EF !important;
+}
+
+/* Keep accent colors vivid */
 .dark .text-red-400 { color: #f87171 !important; }
-.dark .text-emerald-500 { color: #34d399 !important; }
-.dark .bg-white.rounded-xl, .dark .bg-white.rounded-2xl { background: #132038 !important; border-color: rgba(255,255,255,0.06) !important; }
-.dark .bg-white.rounded-r-lg { background: #132038 !important; }
+.dark .text-emerald-500, .dark .text-emerald-400 { color: #34d399 !important; }
+.dark .text-amber { color: #D4A23A !important; }
 
-/* Section transitions for smooth page feel */
-section { transition: background-color 0.3s ease; }
+/* Amber accents stay amber */
+.dark .bg-amber { background: #D4A23A !important; }
+.dark .bg-amber .text-navy { color: #0A1628 !important; }
 
-/* Don't override already-dark sections (navy bg already has white text) */
-.dark .bg-navy .text-navy { color: #FAF6EF !important; }
-.dark .bg-navy-light .text-navy { color: #FAF6EF !important; }
+/* Don't override text that's already white on dark sections */
+.dark .bg-navy .text-white,
+.dark .bg-navy-light .text-white { color: white !important; }
 
-/* Animated counters */
+/* ═══ ANIMATIONS ═══ */
+
 @keyframes countUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .animate-count { animation: countUp 0.6s ease-out forwards; }
 
-/* Slide in */
 @keyframes slideIn { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
 .animate-slide-in { animation: slideIn 0.3s ease-out; }
 
-/* Pulse glow */
 @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(212,162,58,0.4); } 50% { box-shadow: 0 0 0 8px rgba(212,162,58,0); } }
 .animate-pulse-glow { animation: pulseGlow 2s infinite; }
 
-/* Brand marquee */
 @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 .animate-marquee { animation: marquee 30s linear infinite; }
 
-/* Shake for errors */
 @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-4px)} 40%,80%{transform:translateX(4px)} }
 .animate-shake { animation: shake 0.4s ease-in-out; }
 
-/* Spinner */
 @keyframes spin { to { transform: rotate(360deg); } }
 .animate-spin { animation: spin 0.6s linear infinite; }
 
-/* Journey path fill */
 @keyframes pathFill { from { width: 0; } to { width: 100%; } }
 .animate-path-fill { animation: pathFill 1.5s ease-out forwards; }
 
-/* Stagger fade in */
 @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .animate-fade-up { animation: fadeUp 0.5s ease-out forwards; opacity: 0; }
 .stagger-in > * { opacity: 0; animation: fadeUp 0.4s ease-out forwards; }
